@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LocationService.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
@@ -14,36 +15,32 @@ import 'package:qrbats_sp/models/QRCodeDetails.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class QRCodeScan extends StatefulWidget {
   final String token;
-  const QRCodeScan({Key? key, this.token=""}) : super(key: key);
+
+  const QRCodeScan({Key? key, this.token = ""}) : super(key: key);
 
   @override
   State<QRCodeScan> createState() => _QRCodeScanState();
 }
 
 class _QRCodeScanState extends State<QRCodeScan> {
-
   late int studentId;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Map<String,dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
+    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
     studentId = jwtDecodedToken["studentId"];
   }
 
-
   String? result;
-  QRCodeDetails? qrCodeDetails;
+  LectureQRCodeDetails? qrCodeDetails;
   bool showQRCodeDetails = false;
   double latitude = 0.0;
   double longitude = 0.0;
   double distance = 99999;
-
-
-
 
   Future<void> getLocation() async {
     Position position = await Geolocator.getCurrentPosition(
@@ -75,8 +72,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
     getLocation(); // Permission granted, get the location
   }
 
-
- /* // Replace this key with your decryption key (32 bytes for AES-256)
+  /* // Replace this key with your decryption key (32 bytes for AES-256)
 
   QRCodeDetails? decryptQRCodeData(String encryptedData)  {
     final key = encrypt.Key.fromUtf8('uDhHvDXPKJUJSMVdx8JSYamDTu18iLTVTzg/Ohy05no=');
@@ -85,10 +81,10 @@ class _QRCodeScanState extends State<QRCodeScan> {
     final decrypted = encrypter.decrypt64(encryptedData, iv: iv);
     qrCodeDetails = QRCodeDetails.fromJson(jsonDecode(decrypted));
     return qrCodeDetails;
-    *//*setState(() {
+    */ /*setState(() {
       qrCodeDetails = QRCodeDetails.fromJson(jsonDecode(decrypted));
       showQRCodeDetails = true;
-    });*//*
+    });*/ /*
   }*/
 
   Future<void> scanQRCode() async {
@@ -104,10 +100,11 @@ class _QRCodeScanState extends State<QRCodeScan> {
         setState(() {
           try {
             setState(() {
-              qrCodeDetails = QRCodeDetails.fromJson(jsonDecode(result!));
+              qrCodeDetails =
+                  LectureQRCodeDetails.fromJson(jsonDecode(result!));
               showQRCodeDetails = true;
             });
-            getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
+            //getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
           } catch (e) {
             debugPrint("Error parsing QR code data: $e");
           }
@@ -120,8 +117,8 @@ class _QRCodeScanState extends State<QRCodeScan> {
     print("THE RESULT IS $result");
   }
 
-  Future<void> markAttendance(
-      int eventID, int attendeeID,double latitude, double longitude, BuildContext context) async {
+  Future<void> markAttendance(int eventID, int attendeeID, double latitude,
+      double longitude, BuildContext context) async {
     bool isCloseDetails = await MarkAttendanceService.markAttendance(
         eventID, attendeeID, latitude, longitude, context);
     if (isCloseDetails) {
@@ -131,14 +128,26 @@ class _QRCodeScanState extends State<QRCodeScan> {
     }
   }
 
-  Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {
+  Future<void> markLectureAttendance(int studentId, String moduleCode,
+      double latitude, double longitude, BuildContext context) async {
+    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
+        studentId, moduleCode, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+        showQRCodeDetails = false;
+      });
+    }
+  }
+
+  /*Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {
     await checkLocationPermission();
     double calcdistance = await LocationService.findLocationDistance(locationName, latitude, longitude);
     print("distance"+ calcdistance.toString());
     setState(() {
+      print(calcdistance);
       distance = calcdistance;
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +167,8 @@ class _QRCodeScanState extends State<QRCodeScan> {
               ),
               SizedBox(height: 40),
               Container(
-                margin: EdgeInsets.only(left: screenWidth*0.07,right: screenWidth*0.07),
+                margin: EdgeInsets.only(
+                    left: screenWidth * 0.07, right: screenWidth * 0.07),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
                   border: Border(
@@ -199,129 +209,86 @@ class _QRCodeScanState extends State<QRCodeScan> {
                         scanQRCode();
                       },
                       text: "Scan QR Code",
-                      width: screenWidth*0.35,
-                      fontSize: screenWidth*0.035,
+                      width: screenWidth * 0.35,
+                      fontSize: screenWidth * 0.035,
                     ),
                     Spacer(),
                   ],
                 ),
               ),
-
               SizedBox(height: 10),
-
               if (showQRCodeDetails && qrCodeDetails != null)
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("QRCode Details"),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Event Name : "),
-                      Text(qrCodeDetails!.eventName),
-                    ],
-                  ),
-                  if(qrCodeDetails!.moduleName != null)
+                Column(
+                  children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Module : "),
-                        Text(qrCodeDetails!.moduleName ?? ''),
+                        Text("QRCode Details"),
                       ],
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Date : "),
-                      Text(qrCodeDetails!.eventDate),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Time : "),
-                      Text(qrCodeDetails!.eventTime),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Venue : "),
-                      Text(qrCodeDetails!.eventVenue),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Spacer(),
+                    SizedBox(height: 10),
+                    if (qrCodeDetails!.moduleCode != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Module : "),
+                          Text(qrCodeDetails!.moduleCode ?? ''),
+                        ],
+                      ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Spacer(),
+                        MyButtonDS(
+                          onTap: () {
+                            getLocation();
+                            //getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
+                          },
+                          text: "Refresh Location",
+                          width: screenWidth * 0.4,
+                          fontSize: screenWidth * 0.035,
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Distance : "),
+                        Text("${distance.toStringAsFixed(3)} m"),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        if (distance <= 30.0)
+                          const Icon(
+                            CupertinoIcons.checkmark_alt,
+                            color: Colors.green,
+                          ),
+                        if (distance > 30.0)
+                          const Icon(
+                            CupertinoIcons.multiply,
+                            color: Colors.red,
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    //if (distance <= 30.0)
                       MyButtonDS(
                         onTap: () {
-                          getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
+                          markLectureAttendance(
+                            studentId,
+                            qrCodeDetails!.moduleCode,
+                            latitude,
+                            longitude,
+                            context,
+                          );
                         },
-                        text: "Refresh Location",
-                        width: screenWidth*0.4,
-                        fontSize: screenWidth*0.035,
+                        text: "Mark Attendance",
+                        width: 200,
                       ),
-                      Spacer(),
-                    ],
-                  ),
-
-                  SizedBox(height: 10),
-                  /*Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("latitude : "),
-                      Text(latitude.toString()),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("longitude : "),
-                      Text(longitude.toString()),
-                    ],
-                  ),*/
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Distance : "),
-                      Text("${distance.toStringAsFixed(3)} m"),
-                      SizedBox(width: 10,),
-                      if(distance<=30.0)
-                        Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: Colors.green,
-                        ),
-                      if(distance>30.0)
-                        Icon(
-                          CupertinoIcons.multiply,
-                          color: Colors.red,
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  if(distance<=30.0)
-                  MyButtonDS(
-                    onTap: () {
-                      markAttendance(
-                        qrCodeDetails!.eventId,
-                        studentId,
-                        latitude,
-                        longitude,
-                        context,
-                      );
-                    },
-                    text: "Mark Attendance",
-                    width: 200,
-                  ),
-
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -329,4 +296,3 @@ class _QRCodeScanState extends State<QRCodeScan> {
     );
   }
 }
-

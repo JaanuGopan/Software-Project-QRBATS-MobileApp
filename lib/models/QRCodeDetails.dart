@@ -35,3 +35,19 @@ class QRCodeDetails {
     );
   }
 }
+
+
+class LectureQRCodeDetails {
+  String moduleCode;
+
+  LectureQRCodeDetails({
+    required this.moduleCode
+  });
+
+  factory LectureQRCodeDetails.fromJson(Map<String, dynamic> json) {
+    return LectureQRCodeDetails(
+      moduleCode: json['moduleCode'],
+    );
+  }
+}
+

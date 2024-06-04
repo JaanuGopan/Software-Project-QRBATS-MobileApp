@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String ipAddress = '10.50.227.12';
+  static const String ipAddress = '192.168.43.136';
   static const String baseUrl = 'http://$ipAddress:8080';
   static const String mobileBaseUrl = 'http://$ipAddress:8080';
   static const String baseUrlEmulater = 'http://10.0.2.2:8080';
@@ -13,4 +13,5 @@ class ApiConstants {
   static const String markAttendanceEndpoint = '/api/v1/attendance/markattendance';
   static const String getallattendancebystudentidEndpoint = '/api/v1/attendance/getallattendancebystudentid';
   static const String getAttendanceDistance = '/api/v1/location/getdistance';
+  static const String lectureAttendanceMarking = '/api/v1/lectureattendance/markattendance';
 }
