@@ -14,4 +14,5 @@ class ApiConstants {
   static const String getallattendancebystudentidEndpoint = '/api/v1/attendance/getallattendancebystudentid';
   static const String getAttendanceDistance = '/api/v1/location/getdistance';
   static const String lectureAttendanceMarking = '/api/v1/lectureattendance/markattendance';
+  static const String getEnrolledModuleUrl = '/api/v1/module/getenrolledmodulesbystudentid';
 }
