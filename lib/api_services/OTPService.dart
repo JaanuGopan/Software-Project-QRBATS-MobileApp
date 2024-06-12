@@ -25,7 +25,7 @@ class OTPServoces{
       );
       if (response.statusCode == 200) {
 
-        CustomSnackBar.showSnackBar(context, 'Please check your email.'); // Use CustomSnackBar
+        CustomSnackBar.showSnackBar(context, 'Please check your email.');
       } else {
         CustomSnackBar.showSnackBar(context, 'Invalid Request.'); // Use CustomSnackBar
       }

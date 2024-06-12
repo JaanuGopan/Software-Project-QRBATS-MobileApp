@@ -50,7 +50,7 @@ class _MainPageState extends State<MainPage> {
 
     // Add your other pages to this list
     List<Widget> pages = [
-      Home(),
+      Home(token: widget.token,),
       QRCodeScan(token: widget.token,),
       HistoryPage(token: widget.token,),
       SettingPage()

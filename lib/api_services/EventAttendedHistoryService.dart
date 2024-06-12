@@ -7,7 +7,7 @@ import '../models/AttendanceHistoryData.dart';
 
 class EventAttendedHistoryService{
   static Future<List<AttendanceData>> fetchAttendanceList(int studentId) async {
-    final apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getallattendancebystudentidEndpoint}';
+    const apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getallattendancebystudentidEndpoint}';
     final requestBody = jsonEncode({'studentId': studentId});
 
     final response = await http.post(Uri.parse(apiUrl),
