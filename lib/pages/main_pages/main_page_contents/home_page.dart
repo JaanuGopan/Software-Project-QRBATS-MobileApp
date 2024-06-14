@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qrbats_sp/api_services/ModuleService.dart';
+import 'package:qrbats_sp/components/modulecomponents/module_enrolled_item.dart';
+import 'package:qrbats_sp/components/modulecomponents/module_enrollement_item.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:qrbats_sp/api_services/ModuleService.dart';
 
 class Home extends StatefulWidget {
   final String token;
@@ -15,6 +16,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late int studentId;
+  List<Module> moduleList = [];
+  bool isLoading = true;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -24,103 +28,90 @@ class _HomeState extends State<Home> {
     _fetchEnrolledModuleData(context, studentId);
   }
 
-  List<EnrolledModule> moduleList = [];
+  Future<void> _fetchEnrolledModuleData(BuildContext context, int studentId) async {
+    try {
+      final List<Module> enrolledModuleList = await ModuleService.getAllEnrolledModule(context, studentId);
+      setState(() {
+        moduleList = enrolledModuleList;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Failed to load modules';
+        isLoading = false;
+      });
+    }
+  }
 
-  Future<void> _fetchEnrolledModuleData(
-      BuildContext context, int studentId) async {
-    final List<EnrolledModule> enrolledModuleList =
-    await ModuleService.getAllEnrolledModule(context, studentId);
-    setState(() {
-      moduleList = enrolledModuleList;
-    });
+  void _unEnrollModule(int moduleId) async {
+    if (moduleId.isFinite) {
+      await ModuleService.moduleUnEnrollment(context, moduleId, studentId);
+      _fetchEnrolledModuleData(context, studentId); // Refresh module list after enrollment
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            const Center(
-                child: Text(
-                  "Enrolled Modules",
-                  style: TextStyle(fontSize: 18, color: Colors.black),
-                )),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                  height: screenHeight * 0.7,
-                  width: screenWidth * 0.9,
-                  decoration: _buildContainerDecoration(),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                          columns: const [
-                            DataColumn(
-                                label: Text('No', style: TextStyle(fontSize: 10))),
-                            DataColumn(
-                                label: Text('Module Name',
-                                    style: TextStyle(fontSize: 10))),
-                            DataColumn(
-                                label: Text('ModuleCode',
-                                    style: TextStyle(fontSize: 10))),
-                            DataColumn(
-                                label: Text('View', style: TextStyle(fontSize: 10))),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          height: screenHeight,
+          width: screenWidth,
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SingleChildScrollView(
+                  child: Container(
+                    height: screenHeight * 0.75,
+                    width: screenWidth * 0.95,
+                    padding: const EdgeInsets.all(9.0),
+                    decoration: _buildContainerDecoration(),
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : errorMessage.isNotEmpty
+                        ? Center(child: Text(errorMessage))
+                        : ListView.builder(
+                      itemCount: moduleList.length,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            if (index == 0)
+                              const Text(
+                                "Enrolled Modules",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            if (index == 0) const SizedBox(height: 10),
+                            ModuleEnrolledContent(
+                              module: moduleList[index],
+                              number: index + 1,
+                            ),
                           ],
-                          rows: moduleList.map((module) {
-                            return DataRow(cells: [
-                              DataCell(Text('${moduleList.indexOf(module) + 1}',
-                                  style: const TextStyle(fontSize: 10))),
-                              DataCell(Text(module.moduleName,
-                                  style: const TextStyle(fontSize: 10))),
-                              DataCell(Text(module.moduleCode,
-                                  style: const TextStyle(fontSize: 10))),
-                              DataCell(IconButton(
-                                icon: Icon(Icons.arrow_drop_down),
-                                iconSize: 20,
-                                onPressed: () {
-                                  // Define the action to perform when the button is pressed
-                                  _viewModuleDetails(module);
-                                },
-                              )),
-                            ]);
-                          }).toList()))),
-            )
-          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _viewModuleDetails(EnrolledModule module) {
-    // Navigate to module details or perform any desired action
-    print('Viewing details for module: ${module.moduleName}');
-  }
-
   BoxDecoration _buildContainerDecoration() {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
-      border: Border(
-        top: BorderSide(
-          color: Color(0xFF086494),
-          width: 6.0,
-        ),
-        bottom: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        left: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        right: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
+      border: Border.all(
+        color: Colors.black,
+        width: 1.0,
       ),
     );
   }
