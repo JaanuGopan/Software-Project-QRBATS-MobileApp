@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/pages/getStart_page.dart';
+import 'package:qrbats_sp/pages/main_pages/main_page_contents/module_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main_page_contents/home_page.dart';
@@ -12,7 +13,7 @@ import 'main_page_contents/setting_page.dart';
 class MainPage extends StatefulWidget {
   final int pageIndex;
   final String token;
-  const MainPage({Key? key, this.pageIndex=1, this.token = ""}) : super(key: key);
+  const MainPage({Key? key, this.pageIndex=2, this.token = ""}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -51,6 +52,7 @@ class _MainPageState extends State<MainPage> {
     // Add your other pages to this list
     List<Widget> pages = [
       Home(token: widget.token,),
+      ModulePage(token: widget.token,),
       QRCodeScan(token: widget.token,),
       HistoryPage(token: widget.token,),
       SettingPage()
@@ -175,6 +177,10 @@ class _MainPageState extends State<MainPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.school_outlined),
+              label: 'Module',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.qr_code),
