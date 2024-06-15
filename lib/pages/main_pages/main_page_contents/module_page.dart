@@ -182,8 +182,8 @@ class _ModulePageState extends State<ModulePage> {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
       border: Border.all(
-        color: Colors.black,
-        width: 1.0,
+        color: Colors.grey,
+        width: 0,
       ),
     );
   }

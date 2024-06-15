@@ -1,19 +1,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 import '../api_config/api_constants.dart';
 import '../models/AttendanceHistoryData.dart';
 
-class EventAttendedHistoryService{
+class LectureAttendedHistoryService {
   static Future<List<AttendanceData>> fetchAttendanceList(int studentId) async {
-    const apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getallattendancebystudentidEndpoint}';
-    final requestBody = jsonEncode({'studentId': studentId});
+    final String apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getAllAttendanceHistoryByStudentIdUrl}/$studentId';
 
-    final response = await http.post(Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'}, body: requestBody);
+    final response = await http.get(Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'});
 
-    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = jsonDecode(response.body);

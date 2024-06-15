@@ -11,7 +11,7 @@ class ApiConstants {
   static const String studentGenerateOTP = '/api/v1/otp/generateotp';
   static const String studentVerifyOtp = '/api/v1/otp/otpverification';
   static const String markAttendanceEndpoint = '/api/v1/attendance/markattendance';
-  static const String getallattendancebystudentidEndpoint = '/api/v1/attendance/getallattendancebystudentid';
+  static const String getAllAttendanceByStudentIdUrl = '/api/v1/lectureattendance/getallattendancehistorybystudentid';
   static const String getAttendanceDistance = '/api/v1/location/getdistance';
   static const String lectureAttendanceMarking = '/api/v1/lectureattendance/markattendance';
   static const String getAllModuleByStudentId = '/api/v1/module/getallmodulesbystudentid';
@@ -19,4 +19,5 @@ class ApiConstants {
   static const String moduleEnrollmentUrl = '/api/v1/module/moduleenrollment';
   static const String moduleUnEnrollmentUrl = '/api/v1/module/moduleunenrollment';
   static const String getAllLecturesByModuleCode = '/api/v1/lecture/getalllecturebymodulecode';
+  static const String getAllAttendanceHistoryByStudentIdUrl = '/api/v1/lectureattendance/getallattendancehistorybystudentid';
 }
