@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/components/modulecomponents/module_enrolled_item.dart';
-import 'package:qrbats_sp/components/modulecomponents/module_enrollement_item.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/api_services/ModuleService.dart';
 
@@ -28,9 +27,11 @@ class _HomeState extends State<Home> {
     _fetchEnrolledModuleData(context, studentId);
   }
 
-  Future<void> _fetchEnrolledModuleData(BuildContext context, int studentId) async {
+  Future<void> _fetchEnrolledModuleData(
+      BuildContext context, int studentId) async {
     try {
-      final List<Module> enrolledModuleList = await ModuleService.getAllEnrolledModule(context, studentId);
+      final List<Module> enrolledModuleList =
+          await ModuleService.getAllEnrolledModule(context, studentId);
       setState(() {
         moduleList = enrolledModuleList;
         isLoading = false;
@@ -46,7 +47,8 @@ class _HomeState extends State<Home> {
   void _unEnrollModule(int moduleId) async {
     if (moduleId.isFinite) {
       await ModuleService.moduleUnEnrollment(context, moduleId, studentId);
-      _fetchEnrolledModuleData(context, studentId); // Refresh module list after enrollment
+      _fetchEnrolledModuleData(
+          context, studentId); // Refresh module list after enrollment
     }
   }
 
@@ -64,7 +66,6 @@ class _HomeState extends State<Home> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
@@ -76,26 +77,27 @@ class _HomeState extends State<Home> {
                     child: isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : errorMessage.isNotEmpty
-                        ? Center(child: Text(errorMessage))
-                        : ListView.builder(
-                      itemCount: moduleList.length,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            if (index == 0)
-                              const Text(
-                                "Enrolled Modules",
-                                style: TextStyle(fontSize: 20),
+                            ? Center(child: Text(errorMessage))
+                            : ListView.builder(
+                                itemCount: moduleList.length,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      if (index == 0)
+                                        const Text(
+                                          "Enrolled Modules",
+                                          style: TextStyle(fontSize: 20),
+                                        ),
+                                      if (index == 0)
+                                        const SizedBox(height: 10),
+                                      ModuleEnrolledContent(
+                                        module: moduleList[index],
+                                        number: index + 1,
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
-                            if (index == 0) const SizedBox(height: 10),
-                            ModuleEnrolledContent(
-                              module: moduleList[index],
-                              number: index + 1,
-                            ),
-                          ],
-                        );
-                      },
-                    ),
                   ),
                 ),
               ),
@@ -110,8 +112,8 @@ class _HomeState extends State<Home> {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
       border: Border.all(
-        color: Colors.black,
-        width: 1.0,
+        color: Colors.grey,
+        width: 0,
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LectureService.dart';
+import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
 import 'package:intl/intl.dart';
@@ -58,6 +61,48 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
       });
     } else{
       CustomSnackBar.showError(context, "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+    }
+  }
+
+  double latitude = 0.0;
+  double longitude = 0.0;
+
+  Future<void> getLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    setState(() {
+      latitude = position.latitude;
+      longitude = position.longitude;
+    });
+    print('Latitude: ${position.latitude}');
+    print('Longitude: ${position.longitude}');
+  }
+
+  Future<void> checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Handle case when location permission is denied
+        return;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Handle case when location permission is permanently denied
+      return;
+    }
+    getLocation(); // Permission granted, get the location
+  }
+
+  Future<void> markLectureAttendance(int studentId, String moduleCode,
+      double latitude, double longitude, BuildContext context) async {
+    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
+        studentId, moduleCode, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+
+      });
     }
   }
 
@@ -126,11 +171,11 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
         ? Center(child: Text(errorMessage))
         : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: lectures.map((lecture) => _buildLectureRow(lecture)).toList(),
+      children: lectures.map((lecture) => _buildLectureRow(context,lecture)).toList(),
     );
   }
 
-  Widget _buildLectureRow(Lecture lecture) {
+  Widget _buildLectureRow(BuildContext context,Lecture lecture) {
     final timeFormat = DateFormat('HH:mm');
 
     return Padding(
@@ -148,15 +193,15 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
             ),
           ],
         ),
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
-            SizedBox(width: 25),
+            const SizedBox(width: 25),
             Text(
               "${lectures.indexOf(lecture) + 1}.",
               style: TextStyle(fontSize: 12, color: Colors.black),
             ),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
             Flexible(
               child: Text(
                 lecture.lectureName,
@@ -164,21 +209,21 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
             Text(
               lecture.lectureDay,
               style: TextStyle(fontSize: 12, color: Colors.black),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Text(
               timeFormat.format(lecture.lectureStartTime),
               style: TextStyle(fontSize: 12, color: Colors.black),
             ),
-            Spacer(),
+            const Spacer(),
             OutlinedButton(
-              onPressed: () {},
+              onPressed: () =>markAttendancePopup(context, () => checkLocationPermission()),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Colors.green),
+                side: const BorderSide(color: Colors.green),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),

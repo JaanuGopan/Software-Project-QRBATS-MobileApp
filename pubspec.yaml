@@ -74,6 +74,8 @@ flutter:
     - lib/assets/loading/loading-carga.json
     - lib/assets/loading/loading1.json
     - lib/assets/qrcode/qrcode.png
+    - lib/assets/qrcode/scanning_qr.png
+    - lib/assets/qrcode/barcode-scanner.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

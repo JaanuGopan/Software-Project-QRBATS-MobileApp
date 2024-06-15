@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/pages/getStart_page.dart';
+import 'package:qrbats_sp/pages/main_pages/main_page_contents/attendance_history_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/module_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -54,8 +55,8 @@ class _MainPageState extends State<MainPage> {
       Home(token: widget.token,),
       ModulePage(token: widget.token,),
       QRCodeScan(token: widget.token,),
-      HistoryPage(token: widget.token,),
-      SettingPage()
+      AttendanceHistoryPage(token: widget.token,),
+      SettingPage(token: widget.token,)
       // Add more pages as needed
     ];
 

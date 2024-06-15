@@ -160,13 +160,14 @@ class _QRCodeScanState extends State<QRCodeScan> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 30),
-              TextBlue(
-                text: "Scan QR Code to Mark Attendance",
-                fontSize: 20,
+              SizedBox(height: 20),
+              Text(
+                "Scan QR Code to Mark Attendance",
+                style: TextStyle(fontSize: 15),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 20),
               Container(
+                width: screenWidth * 0.8,
                 margin: EdgeInsets.only(
                     left: screenWidth * 0.07, right: screenWidth * 0.07),
                 decoration: BoxDecoration(
@@ -174,19 +175,19 @@ class _QRCodeScanState extends State<QRCodeScan> {
                   border: Border(
                     top: BorderSide(
                       color: Color(0xFF086494),
-                      width: 2.0,
+                      width: 1.0,
                     ),
                     bottom: BorderSide(
                       color: Color(0xFF086494),
-                      width: 2.0,
+                      width: 1.0,
                     ),
                     left: BorderSide(
                       color: Color(0xFF086494),
-                      width: 2.0,
+                      width: 1.0,
                     ),
                     right: BorderSide(
                       color: Color(0xFF086494),
-                      width: 2.0,
+                      width: 1.0,
                     ),
                   ),
                 ),
@@ -197,21 +198,28 @@ class _QRCodeScanState extends State<QRCodeScan> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Image(
-                          image: AssetImage("lib/assets/qrcode/qrcode.png"),
-                          height: screenHeight * 0.1,
+                          image: AssetImage(
+                              "lib/assets/qrcode/barcode-scanner.png"),
+                          height: 70,
                         ),
                       ),
                     ),
                     SizedBox(width: 10),
-                    MyButtonDS(
-                      onTap: () {
-                        checkLocationPermission();
-                        scanQRCode();
-                      },
-                      text: "Scan QR Code",
-                      width: screenWidth * 0.35,
-                      fontSize: screenWidth * 0.035,
-                    ),
+                    OutlinedButton(
+                        onPressed: () {
+                          checkLocationPermission();
+                          scanQRCode();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Color(0xFF086494)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text(
+                          "Scan QR Code",
+                          style: TextStyle(color: Color(0xFF086494)),
+                        )),
                     Spacer(),
                   ],
                 ),
@@ -239,15 +247,20 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     Row(
                       children: [
                         Spacer(),
-                        MyButtonDS(
-                          onTap: () {
-                            getLocation();
-                            //getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
-                          },
-                          text: "Refresh Location",
-                          width: screenWidth * 0.4,
-                          fontSize: screenWidth * 0.035,
-                        ),
+                        OutlinedButton(
+                            onPressed: () {
+                              getLocation();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.orange),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: Text(
+                              "Refresh Location",
+                              style: TextStyle(color: Colors.orange),
+                            )),
                         Spacer(),
                       ],
                     ),
@@ -274,8 +287,8 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     ),
                     SizedBox(height: 10),
                     //if (distance <= 30.0)
-                      MyButtonDS(
-                        onTap: () {
+                    OutlinedButton(
+                        onPressed: () {
                           markLectureAttendance(
                             studentId,
                             qrCodeDetails!.moduleCode,
@@ -284,9 +297,16 @@ class _QRCodeScanState extends State<QRCodeScan> {
                             context,
                           );
                         },
-                        text: "Mark Attendance",
-                        width: 200,
-                      ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.green),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text(
+                          "Mark Attendance",
+                          style: TextStyle(color: Colors.green),
+                        )),
                   ],
                 ),
             ],

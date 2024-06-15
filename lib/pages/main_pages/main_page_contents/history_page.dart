@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/components/texts/TextBlue.dart';
 
-import '../../../api_services/EventAttendedHistoryService.dart';
+import '../../../api_services/LectureAttendedHistoryService.dart';
 import '../../../models/AttendanceHistoryData.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -29,8 +29,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> _fetchAttendanceData() async {
     try {
-      final List<AttendanceData> attendanceList = await EventAttendedHistoryService.fetchAttendanceList(studentId);
-      attendanceList.sort((a, b) => b.attendedDateTime.compareTo(a.attendedDateTime)); // Sort by descending date and time
+      final List<AttendanceData> attendanceList = await LectureAttendedHistoryService.fetchAttendanceList(studentId);
+      //attendanceList.sort((a, b) => b.attendedDateTime.compareTo(a.attendedDateTime)); // Sort by descending date and time
       setState(() {
         _attendanceList = attendanceList;
         print(attendanceList);
@@ -74,9 +74,9 @@ class _HistoryPageState extends State<HistoryPage> {
                       rows: _attendanceList.map((attendance) {
                         return DataRow(cells: [
                           DataCell(Text('${_attendanceList.indexOf(attendance) + 1}', style: TextStyle(fontSize: 10))),
-                          DataCell(Text(attendance.eventName, style: TextStyle(fontSize: 10))),
-                          DataCell(Text('${attendance.attendedDateTime.toString().split(' ')[0]}', style: TextStyle(fontSize: 10))),
-                          DataCell(Text('${attendance.attendedDateTime.toString().split(' ')[1].split('.')[0]}', style: TextStyle(fontSize: 10))),
+                          DataCell(Text(attendance.lectureName, style: TextStyle(fontSize: 10))),
+                          //DataCell(Text('${attendance.attendedDateTime.toString().split(' ')[0]}', style: TextStyle(fontSize: 10))),
+                          //DataCell(Text('${attendance.attendedDateTime.toString().split(' ')[1].split('.')[0]}', style: TextStyle(fontSize: 10))),
                         ]);
                       }).toList(),
                     ),
