@@ -6,6 +6,35 @@ import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class ModuleService {
+
+  static Future<Module> getModuleByModuleCode(BuildContext context, String moduleCode) async {
+    final Uri apiUrl = Uri.parse(
+        '${ApiConstants.baseUrl}${ApiConstants.getModuleByModuleCode}?moduleCode=$moduleCode');
+    try {
+      final http.Response response = await http.get(apiUrl, headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      });
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        Module returnModule = Module.fromJson(responseData);
+        return returnModule;
+      } else {
+        String errorMessage;
+        if (response.statusCode == 400) {
+          errorMessage = response.body.toString();
+        } else {
+          errorMessage = "Unexpected error occurred: ${response.statusCode}";
+        }
+        CustomSnackBar.showError(context, errorMessage);
+        throw Exception(errorMessage);
+      }
+    } catch (error) {
+      CustomSnackBar.showError(context, "Error In Getting Module.");
+      throw Exception("Error In Getting Module: ${error.toString()}");
+    }
+  }
+
   static Future<List<Module>> getAllModule(BuildContext context, int studentId) async {
 
     final Uri apiUrl = Uri.parse(

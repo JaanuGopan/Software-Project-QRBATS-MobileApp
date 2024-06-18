@@ -8,12 +8,10 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LocationService.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_small.dart';
-import 'package:qrbats_sp/components/texts/TextBlue.dart';
+import 'package:qrbats_sp/api_services/ModuleService.dart';
+import 'package:qrbats_sp/components/scanqrcode_components/scanned_module_component.dart';
+import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class QRCodeScan extends StatefulWidget {
   final String token;
@@ -37,7 +35,9 @@ class _QRCodeScanState extends State<QRCodeScan> {
 
   String? result;
   LectureQRCodeDetails? qrCodeDetails;
+  Module? scannedModule;
   bool showQRCodeDetails = false;
+  bool showScannedModule = false;
   double latitude = 0.0;
   double longitude = 0.0;
   double distance = 99999;
@@ -59,36 +59,23 @@ class _QRCodeScanState extends State<QRCodeScan> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Handle case when location permission is denied
         return;
       }
     }
-
     if (permission == LocationPermission.deniedForever) {
-      // Handle case when location permission is permanently denied
       return;
     }
-
-    getLocation(); // Permission granted, get the location
+    getLocation();
   }
-
-  /* // Replace this key with your decryption key (32 bytes for AES-256)
-
-  QRCodeDetails? decryptQRCodeData(String encryptedData)  {
-    final key = encrypt.Key.fromUtf8('uDhHvDXPKJUJSMVdx8JSYamDTu18iLTVTzg/Ohy05no=');
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    final decrypted = encrypter.decrypt64(encryptedData, iv: iv);
-    qrCodeDetails = QRCodeDetails.fromJson(jsonDecode(decrypted));
-    return qrCodeDetails;
-    */ /*setState(() {
-      qrCodeDetails = QRCodeDetails.fromJson(jsonDecode(decrypted));
-      showQRCodeDetails = true;
-    });*/ /*
-  }*/
 
   Future<void> scanQRCode() async {
     try {
+      setState(() {
+        showScannedModule=false;
+        scannedModule = null;
+
+      });
+
       result = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666",
         "cancel",
@@ -99,11 +86,20 @@ class _QRCodeScanState extends State<QRCodeScan> {
       if (result != null) {
         setState(() {
           try {
-            setState(() {
-              qrCodeDetails =
-                  LectureQRCodeDetails.fromJson(jsonDecode(result!));
-              showQRCodeDetails = true;
-            });
+            Map<String, dynamic> details = json.decode(result!);
+            if (details['eventName'].toString().isNotEmpty) {
+              setState(() {});
+            }
+            String scannedModuleCode = details['moduleCode'];
+            print("Sanned Module Code : " + scannedModuleCode);
+            if (scannedModuleCode.isNotEmpty) {
+              getModule(scannedModuleCode);
+              setState(() {
+                qrCodeDetails =
+                    LectureQRCodeDetails.fromJson(jsonDecode(result!));
+                showQRCodeDetails = true;
+              });
+            }
             //getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
           } catch (e) {
             debugPrint("Error parsing QR code data: $e");
@@ -115,6 +111,15 @@ class _QRCodeScanState extends State<QRCodeScan> {
     }
     if (!mounted) return;
     print("THE RESULT IS $result");
+  }
+
+  Future<void> getModule(String moduleCode) async {
+    Module module =
+        await ModuleService.getModuleByModuleCode(context, moduleCode);
+    setState(() {
+      scannedModule = module;
+      showScannedModule = true;
+    });
   }
 
   Future<void> markAttendance(int eventID, int attendeeID, double latitude,
@@ -228,22 +233,18 @@ class _QRCodeScanState extends State<QRCodeScan> {
               if (showQRCodeDetails && qrCodeDetails != null)
                 Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    SizedBox(height: 10),
+                    Column(
                       children: [
-                        Text("QRCode Details"),
+                        showScannedModule
+                            ? Container(
+                                width: screenWidth*0.9,
+                                child: ScannedModule(module: scannedModule!,studentId: studentId,))
+                            : const Center(child: CircularProgressIndicator()),
                       ],
                     ),
-                    SizedBox(height: 10),
-                    if (qrCodeDetails!.moduleCode != null)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Module : "),
-                          Text(qrCodeDetails!.moduleCode ?? ''),
-                        ],
-                      ),
-                    SizedBox(height: 10),
+
+                    /* SizedBox(height: 20,),
                     Row(
                       children: [
                         Spacer(),
@@ -258,7 +259,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
                               ),
                             ),
                             child: Text(
-                              "Refresh Location",
+                              "Verify Location",
                               style: TextStyle(color: Colors.orange),
                             )),
                         Spacer(),
@@ -268,10 +269,10 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Distance : "),
-                        Text("${distance.toStringAsFixed(3)} m"),
+                        Text("Location Verification : "),
+                        //Text("${distance.toStringAsFixed(3)} m"),
                         SizedBox(
-                          width: 10,
+                          width: 5,
                         ),
                         if (distance <= 30.0)
                           const Icon(
@@ -306,7 +307,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
                         child: Text(
                           "Mark Attendance",
                           style: TextStyle(color: Colors.green),
-                        )),
+                        )),*/
                   ],
                 ),
             ],
