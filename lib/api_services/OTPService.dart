@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
-
 import '../api_config/api_constants.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 

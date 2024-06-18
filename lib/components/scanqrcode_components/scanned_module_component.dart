@@ -99,16 +99,6 @@ class _ScannedModuleState extends State<ScannedModule> {
     getLocation(); // Permission granted, get the location
   }
 
-  /*Future<void> markLectureAttendance(int studentId, String moduleCode,
-      double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
-        studentId, moduleCode, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {
-
-      });
-    }
-  }*/
 
   void _handleMarkAttendance(int lectureId) async{
     await checkLocationPermission();
@@ -240,18 +230,24 @@ class _ScannedModuleState extends State<ScannedModule> {
                       "Time : ${timeFormat.format(lecture.lectureStartTime)}",
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
+                    SizedBox(height: 4),
+                    Text(
+                      "Venue : ${lecture!.lectureVenue}",
+                      style: TextStyle(fontSize: 12, color: Colors.black),
+                    ),
 
                   ],
                 ),
               ),
             ),
 
-            const Spacer(),
+            //const Spacer(),
+            const SizedBox(width: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 OutlinedButton(
-                  onPressed: () =>markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId)),
+                  onPressed: () =>markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId),lecture),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.green),
                     shape: RoundedRectangleBorder(

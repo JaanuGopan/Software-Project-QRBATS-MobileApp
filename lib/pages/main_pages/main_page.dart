@@ -68,21 +68,22 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFF086494),
+
           title: Center(
             child: Text(
               "Sky Ticker",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF086494),
+                color: Colors.white,
               ),
             ),
           ),
           leading: IconButton(
             icon: Icon(
               Icons.menu,
-              color: Color(0xFF086494),
+              color: Colors.white,
             ),
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer();
@@ -93,7 +94,7 @@ class _MainPageState extends State<MainPage> {
               onPressed: _logout,
               icon: Icon(
                 Icons.logout,
-                color: Color(0xFF086494),
+                color: Colors.white,
               ),
             ),
           ],
@@ -191,11 +192,6 @@ class _MainPageState extends State<MainPage> {
               icon: Icon(Icons.history),
               label: 'History',
             ),
-
-            /*BottomNavigationBarItem(
-              icon: Icon(Icons.schedule),
-              label: 'Shedule',
-            ),*/
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Settings',

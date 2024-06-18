@@ -1,22 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LectureService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:intl/intl.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
+import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class ModuleEnrolledContent extends StatefulWidget {
   final Module module;
   final int number;
+  final int studentId;
 
   const ModuleEnrolledContent({
     super.key,
     required this.module,
     required this.number,
+    required this.studentId,
   });
 
   @override
@@ -28,8 +30,6 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   List<Lecture> lectures = [];
   bool isLecturesLoading = true;
   String errorMessage = "";
-
-
 
   Future<void> _fetchLecturesByModuleCode(BuildContext context, String moduleCode) async {
     setState(() {
@@ -55,11 +55,11 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     if (!showLecturesList && lectures.isEmpty) {
       await _fetchLecturesByModuleCode(context, widget.module.moduleCode);
     }
-    if(lectures.isNotEmpty){
+    if (lectures.isNotEmpty) {
       setState(() {
         showLecturesList = !showLecturesList;
       });
-    } else{
+    } else {
       CustomSnackBar.showError(context, "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
     }
   }
@@ -95,19 +95,23 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     getLocation(); // Permission granted, get the location
   }
 
-  Future<void> markLectureAttendance(int studentId, String moduleCode,
-      double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
-        studentId, moduleCode, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {
+  void _handleMarkAttendance(int lectureId) async {
+    await checkLocationPermission();
+    await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+  }
 
-      });
+  Future<void> markLectureAttendance(int studentId, int lectureId, double latitude, double longitude, BuildContext context) async {
+    bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
+        studentId, lectureId, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
       padding: EdgeInsets.all(8.0),
       margin: EdgeInsets.symmetric(vertical: 4.0),
@@ -126,29 +130,27 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(width: 10),
-              Text(widget.number.toString(), style: TextStyle(fontSize: 16)),
-              SizedBox(width: 40),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+              Text(widget.number.toString(), style: TextStyle(fontSize: _getFontSize(screenWidth))),
+              SizedBox(width: 10),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       widget.module.moduleCode,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: _getFontSize(screenWidth), fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       widget.module.moduleName,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.grey),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Spacer(),
               IconButton(
                 onPressed: handleShowLecture,
                 icon: Icon(
@@ -171,12 +173,13 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
         ? Center(child: Text(errorMessage))
         : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: lectures.map((lecture) => _buildLectureRow(context,lecture)).toList(),
+      children: lectures.map((lecture) => _buildLectureRow(context, lecture)).toList(),
     );
   }
 
-  Widget _buildLectureRow(BuildContext context,Lecture lecture) {
-    final timeFormat = DateFormat('HH:mm');
+  Widget _buildLectureRow(BuildContext context, Lecture lecture) {
+    final timeFormat = DateFormat('HH:mm a');
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -193,50 +196,88 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10),
         child: Row(
           children: [
-            const SizedBox(width: 25),
-            Text(
-              "${lectures.indexOf(lecture) + 1}.",
-              style: TextStyle(fontSize: 12, color: Colors.black),
-            ),
-            const SizedBox(width: 15),
-            Flexible(
-              child: Text(
-                lecture.lectureName,
-                style: TextStyle(fontSize: 10, color: Colors.black),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 15),
-            Text(
-              lecture.lectureDay,
-              style: TextStyle(fontSize: 12, color: Colors.black),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              timeFormat.format(lecture.lectureStartTime),
-              style: TextStyle(fontSize: 12, color: Colors.black),
-            ),
-            const Spacer(),
-            OutlinedButton(
-              onPressed: () =>markAttendancePopup(context, () => checkLocationPermission()),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.green),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+            SizedBox(width: 5),
+            Column(
+              children: [
+                Text(
+                  "${lectures.indexOf(lecture) + 1}.",
+                  style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
                 ),
-              ),
-              child: const Text(
-                "Attend",
-                style: TextStyle(fontSize: 12, color: Colors.green),
+              ],
+            ),
+            SizedBox(width: 15,),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lecture.lectureName,
+                    style: TextStyle(fontSize: _getFontSize(screenWidth), color: Colors.black, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Day: ${lecture.lectureDay}",
+                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Start Time: ${timeFormat.format(lecture.lectureStartTime)}",
+                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "End Time: ${timeFormat.format(lecture.lectureEndTime)}",
+                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Venue: ${lecture.lectureVenue}",
+                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            SizedBox(width: 10),
+            Spacer(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                OutlinedButton(
+                  onPressed: () => markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId), lecture),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.green),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: Text(
+                    "Attend",
+                    style: TextStyle(fontSize: _getFontSize(screenWidth), color: Colors.green),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
+  }
+
+  double _getFontSize(double screenWidth, {bool isSubtext = false}) {
+    if (screenWidth < 360) {
+      return isSubtext ? 8 : 10;
+    } else if (screenWidth < 720) {
+      return isSubtext ? 10 : 12;
+    } else {
+      return isSubtext ? 12 : 14;
+    }
   }
 }

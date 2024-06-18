@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
       BuildContext context, int studentId) async {
     try {
       final List<Module> enrolledModuleList =
-          await ModuleService.getAllEnrolledModule(context, studentId);
+      await ModuleService.getAllEnrolledModule(context, studentId);
       setState(() {
         moduleList = enrolledModuleList;
         isLoading = false;
@@ -48,7 +48,7 @@ class _HomeState extends State<Home> {
     if (moduleId.isFinite) {
       await ModuleService.moduleUnEnrollment(context, moduleId, studentId);
       _fetchEnrolledModuleData(
-          context, studentId); // Refresh module list after enrollment
+          context, studentId); // Refresh module list after unenrollment
     }
   }
 
@@ -59,52 +59,61 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: Container(
-                    height: screenHeight * 0.75,
-                    width: screenWidth * 0.95,
-                    padding: const EdgeInsets.all(9.0),
-                    decoration: _buildContainerDecoration(),
-                    child: isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : errorMessage.isNotEmpty
-                            ? Center(child: Text(errorMessage))
-                            : ListView.builder(
-                                itemCount: moduleList.length,
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      if (index == 0)
-                                        const Text(
-                                          "Enrolled Modules",
-                                          style: TextStyle(fontSize: 20),
-                                        ),
-                                      if (index == 0)
-                                        const SizedBox(height: 10),
-                                      ModuleEnrolledContent(
-                                        module: moduleList[index],
-                                        number: index + 1,
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(9.0),
+                  decoration: _buildContainerDecoration(),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : errorMessage.isNotEmpty
+                      ? Center(child: Text(errorMessage))
+                      : moduleList.isEmpty
+                      ? const Center(child: Text("No Enrolled Modules"))
+                      : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Center(
+                        child: Text(
+                          "Enrolled Modules",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildEnrolledModuleList(),
+                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEnrolledModuleList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: moduleList.length,
+      itemBuilder: (context, index) {
+        return Column(
+          children: [
+            ModuleEnrolledContent(
+              module: moduleList[index],
+              number: index + 1,
+              studentId: studentId,
+            ),
+            const SizedBox(height: 10),
+          ],
+        );
+      },
     );
   }
 
@@ -112,8 +121,8 @@ class _HomeState extends State<Home> {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
       border: Border.all(
-        color: Colors.grey,
-        width: 0,
+        color: Color(0xFF086494),
+        width: 0.2,
       ),
     );
   }

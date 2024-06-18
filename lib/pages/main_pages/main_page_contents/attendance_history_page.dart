@@ -8,6 +8,7 @@ import '../../../models/AttendanceHistoryData.dart';
 
 class AttendanceHistoryPage extends StatefulWidget {
   final String token;
+
   const AttendanceHistoryPage({Key? key, this.token = ""}) : super(key: key);
 
   @override
@@ -15,7 +16,6 @@ class AttendanceHistoryPage extends StatefulWidget {
 }
 
 class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
-  late double _fontSizeFactor;
   List<AttendanceData> _attendanceList = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -49,60 +49,46 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Center(child: Text("Attendance History", style: TextStyle(fontSize: 18),)),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                height: screenHeight * 0.7,
-                width: screenWidth * 0.95,
-                decoration: _buildContainerDecoration(),
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : errorMessage.isNotEmpty
-                    ? Center(child: Text(errorMessage))
-                    : Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ListView.builder(
-                                        itemCount: _attendanceList.length,
-                                        itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          if (index == 0) const SizedBox(height: 10),
-                          AttendanceHistoryItem(
-                            attendanceData: _attendanceList[index],
-                            number: index + 1,
-                          ),
-                        ],
-                      );
-                                        },
-                                      ),
-                    ),
-              ),
-            ),
-          ],
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : errorMessage.isNotEmpty
+            ? Center(child: Text(errorMessage))
+            : _buildAttendanceList(),
       ),
     );
   }
 
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border.all(
-        color: Colors.grey,
-        width: 0,
+  Widget _buildAttendanceList() {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            Text(
+              'Attendance History',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: _attendanceList.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0,left: 10,right: 10),
+                  child: AttendanceHistoryItem(
+                    attendanceData: _attendanceList[index],
+                    number: index + 1,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

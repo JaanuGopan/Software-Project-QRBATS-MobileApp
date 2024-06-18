@@ -35,7 +35,7 @@ class _ModulePageState extends State<ModulePage> {
   Future<void> _fetchAllModuleData(BuildContext context, int studentId) async {
     try {
       final List<Module> modulesList =
-          await ModuleService.getAllModule(context, studentId);
+      await ModuleService.getAllModule(context, studentId);
       setState(() {
         allModuleList = modulesList;
         _calculateNotEnrolledModules();
@@ -53,7 +53,7 @@ class _ModulePageState extends State<ModulePage> {
       BuildContext context, int studentId) async {
     try {
       final List<Module> modulesList =
-          await ModuleService.getAllEnrolledModule(context, studentId);
+      await ModuleService.getAllEnrolledModule(context, studentId);
       setState(() {
         allEnrolledModuleList = modulesList;
         _calculateNotEnrolledModules();
@@ -70,7 +70,7 @@ class _ModulePageState extends State<ModulePage> {
   void _calculateNotEnrolledModules() {
     if (true) {
       final enrolledModuleIds =
-          allEnrolledModuleList.map((module) => module.moduleId).toSet();
+      allEnrolledModuleList.map((module) => module.moduleId).toSet();
       notEnrolledModuleList = allModuleList
           .where((module) => !enrolledModuleIds.contains(module.moduleId))
           .toList();
@@ -95,53 +95,53 @@ class _ModulePageState extends State<ModulePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: screenHeight,
-          width: screenWidth,
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: Container(
-                    height: screenHeight * 0.75,
-                    width: screenWidth * 0.95,
-                    padding: const EdgeInsets.all(9.0),
-                    decoration: _buildContainerDecoration(),
-                    child: isAllModuleLoading || isAllEnrolledModuleLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : errorMessage.isNotEmpty
-                            ? Center(child: Text(errorMessage))
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Center(
-                                    child: Text(
-                                      "Enrolled Modules",
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  if(allEnrolledModuleList.isNotEmpty) _buildEnrolledModuleList(),
-                                  if(allEnrolledModuleList.isEmpty) Center(child: Text("No Enrolled Modules."),),
-                                  const SizedBox(height: 20),
-                                  const Center(
-                                    child: Text(
-                                      "Modules Enrollment",
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  if(notEnrolledModuleList.isNotEmpty) _buildNotEnrolledModuleList(),
-                                  if(notEnrolledModuleList.isEmpty) Center(child: Text("No Modules For Enrollemnt."),)
-                                ],
-                              ),
+                child: Container(
+                  padding: const EdgeInsets.all(9.0),
+                  decoration: _buildContainerDecoration(),
+                  child: isAllModuleLoading || isAllEnrolledModuleLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : errorMessage.isNotEmpty
+                      ? Center(child: Text(errorMessage))
+                      : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Center(
+                        child: Text(
+                          "Enrolled Modules",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      if (allEnrolledModuleList.isNotEmpty)
+                        _buildEnrolledModuleList(),
+                      if (allEnrolledModuleList.isEmpty)
+                        const Center(
+                          child: Text("No Enrolled Modules."),
+                        ),
+                      const SizedBox(height: 20),
+                      const Center(
+                        child: Text(
+                          "Modules Enrollment",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      if (notEnrolledModuleList.isNotEmpty)
+                        _buildNotEnrolledModuleList(),
+                      if (notEnrolledModuleList.isEmpty)
+                        const Center(
+                          child: Text("No Modules For Enrollment."),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -155,6 +155,7 @@ class _ModulePageState extends State<ModulePage> {
   Widget _buildEnrolledModuleList() {
     return ListView.builder(
       shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemCount: allEnrolledModuleList.length,
       itemBuilder: (context, index) {
         return ModuleUnEnrollContent(
@@ -169,6 +170,7 @@ class _ModulePageState extends State<ModulePage> {
   Widget _buildNotEnrolledModuleList() {
     return ListView.builder(
       shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemCount: notEnrolledModuleList.length,
       itemBuilder: (context, index) {
         return ModuleEnrollContent(

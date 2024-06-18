@@ -14,7 +14,7 @@ class CustomSnackBar {
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[800],
         content: Text(message),
       ),
     );
@@ -22,7 +22,7 @@ class CustomSnackBar {
   static void showSuccess(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green[700],
         content: Text(message),
       ),
     );
@@ -30,7 +30,7 @@ class CustomSnackBar {
   static void showWarning(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.yellow,
+        backgroundColor: Colors.orange,
         content: Text(message),
       ),
     );
