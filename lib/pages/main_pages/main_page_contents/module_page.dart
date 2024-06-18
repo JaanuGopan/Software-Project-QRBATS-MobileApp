@@ -68,7 +68,7 @@ class _ModulePageState extends State<ModulePage> {
   }
 
   void _calculateNotEnrolledModules() {
-    if (allModuleList.isNotEmpty && allEnrolledModuleList.isNotEmpty) {
+    if (true) {
       final enrolledModuleIds =
           allEnrolledModuleList.map((module) => module.moduleId).toSet();
       notEnrolledModuleList = allModuleList
@@ -128,7 +128,8 @@ class _ModulePageState extends State<ModulePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  _buildEnrolledModuleList(),
+                                  if(allEnrolledModuleList.isNotEmpty) _buildEnrolledModuleList(),
+                                  if(allEnrolledModuleList.isEmpty) Center(child: Text("No Enrolled Modules."),),
                                   const SizedBox(height: 20),
                                   const Center(
                                     child: Text(
@@ -137,7 +138,8 @@ class _ModulePageState extends State<ModulePage> {
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  _buildNotEnrolledModuleList(),
+                                  if(notEnrolledModuleList.isNotEmpty) _buildNotEnrolledModuleList(),
+                                  if(notEnrolledModuleList.isEmpty) Center(child: Text("No Modules For Enrollemnt."),)
                                 ],
                               ),
                   ),

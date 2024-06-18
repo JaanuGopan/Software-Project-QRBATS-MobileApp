@@ -1,4 +1,4 @@
-class QRCodeDetails {
+class EventQRCodeDetails {
   int eventId;
   String eventName;
   String? moduleName;
@@ -9,7 +9,7 @@ class QRCodeDetails {
   String eventVenue;
   int eventAssignedUserId;
 
-  QRCodeDetails({
+  EventQRCodeDetails({
     required this.eventId,
     required this.eventName,
     this.moduleName,
@@ -21,8 +21,8 @@ class QRCodeDetails {
     required this.eventAssignedUserId,
   });
 
-  factory QRCodeDetails.fromJson(Map<String, dynamic> json) {
-    return QRCodeDetails(
+  factory EventQRCodeDetails.fromJson(Map<String, dynamic> json) {
+    return EventQRCodeDetails(
       eventId: json['eventId'],
       eventName: json['eventName'],
       moduleName: json['moduleName'],
