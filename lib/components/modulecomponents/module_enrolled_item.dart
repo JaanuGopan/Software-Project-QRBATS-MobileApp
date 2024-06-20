@@ -30,6 +30,8 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   List<Lecture> lectures = [];
   bool isLecturesLoading = true;
   String errorMessage = "";
+  bool isProcessing = false; // Add this state variable
+  int processingLectureId = -1;
 
   Future<void> _fetchLecturesByModuleCode(BuildContext context, String moduleCode) async {
     setState(() {
@@ -68,43 +70,77 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   double longitude = 0.0;
 
   Future<void> getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      latitude = position.latitude;
-      longitude = position.longitude;
-    });
-    print('Latitude: ${position.latitude}');
-    print('Longitude: ${position.longitude}');
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        CustomSnackBar.showError(context, 'Location services are disabled.');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          CustomSnackBar.showError(context, 'Location permission denied.');
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        CustomSnackBar.showError(context, 'Location permission permanently denied.');
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10), // Add a timeout to avoid waiting indefinitely
+      );
+
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+      });
+
+      print('Latitude: ${position.latitude}');
+      print('Longitude: ${position.longitude}');
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to get location: $e');
+    }
   }
 
   Future<void> checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Handle case when location permission is denied
-        return;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Handle case when location permission is permanently denied
-      return;
-    }
-    getLocation(); // Permission granted, get the location
+    await getLocation();
   }
 
   void _handleMarkAttendance(int lectureId) async {
-    await checkLocationPermission();
-    await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+    setState(() {
+      isProcessing = true; // Set isProcessing to true when starting
+      processingLectureId = lectureId;
+    });
+    try {
+      await checkLocationPermission();
+      await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+    } finally {
+      setState(() {
+        isProcessing = false; // Set isProcessing to false when done
+        processingLectureId = -1;
+      });
+    }
   }
 
-  Future<void> markLectureAttendance(int studentId, int lectureId, double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
-        studentId, lectureId, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {});
+  Future<void> markLectureAttendance(int studentId, int lectureId,
+      double latitude, double longitude, BuildContext context) async {
+    try {
+      bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
+          studentId, lectureId, latitude, longitude, context);
+      if (isCloseDetails) {
+        setState(() {
+          // Refresh the state if necessary
+        });
+      }
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     }
   }
 
@@ -250,7 +286,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                OutlinedButton(
+                isProcessing && processingLectureId==lecture.lectureId
+                    ? CircularProgressIndicator() // Show progress indicator when processing
+                    : OutlinedButton(
                   onPressed: () => markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId), lecture),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.green),

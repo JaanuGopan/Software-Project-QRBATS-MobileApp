@@ -3,6 +3,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/pages/getStart_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/attendance_history_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/module_page.dart';
+import 'package:qrbats_sp/pages/main_pages/main_page_contents/profile_setting_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main_page_contents/home_page.dart';
@@ -56,7 +57,8 @@ class _MainPageState extends State<MainPage> {
       ModulePage(token: widget.token,),
       QRCodeScan(token: widget.token,),
       AttendanceHistoryPage(token: widget.token,),
-      SettingPage(token: widget.token,)
+      ProfileSettingPage(token: widget.token),
+      //SettingPage(token: widget.token,)
       // Add more pages as needed
     ];
 

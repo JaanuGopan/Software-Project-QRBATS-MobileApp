@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import '../../../components/texts/TextBlue.dart';
+import 'package:qrbats_sp/api_services/StudentUpdateSettingService.dart';
 
 class SettingPage extends StatefulWidget {
   final String token;
-  const SettingPage({super.key, this.token = ""});
+
+  const SettingPage({Key? key, required this.token}) : super(key: key);
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -16,79 +17,130 @@ class _SettingPageState extends State<SettingPage> {
   late TextEditingController semesterController;
   late TextEditingController roleController;
   late TextEditingController nameController;
-  late TextEditingController departmentController;
   late TextEditingController indexController;
+  late TextEditingController passwordController;
+  late TextEditingController passwordConfirmController;
+  String userName = "";
+
+  String? selectedDepartment; // Track selected department
+  String? selectedSemester; // Track selected semester
 
   @override
   void initState() {
     super.initState();
-    //userDetails = Jwt.parseJwt(widget.token);
-    Map<String, dynamic> userDetails = JwtDecoder.decode(widget.token);
+    userDetails = JwtDecoder.decode(widget.token);
+    userName = userDetails['studentUserName'];
     emailController = TextEditingController(text: userDetails['studentEmail']);
     semesterController = TextEditingController(text: userDetails['currentSemester'].toString());
     roleController = TextEditingController(text: userDetails['studentRole']);
     nameController = TextEditingController(text: userDetails['studentName']);
-    departmentController = TextEditingController(text: userDetails['departmentId'].toString());
     indexController = TextEditingController(text: userDetails['indexNumber']);
+    passwordController = TextEditingController(text: "");
+    passwordConfirmController = TextEditingController(text: "");
+
+    // Initialize selectedDepartment with the current department if not null
+    selectedDepartment = userDetails['departmentId'] != null ? userDetails['departmentId'].toString() : null;
+
+    // Initialize selectedSemester with the current semester if not null
+    selectedSemester = userDetails['currentSemester'] != null ? userDetails['currentSemester'].toString() : null;
   }
 
-  void _updateDetails() {
+
+  /*void _updateDetails() {
     setState(() {
       userDetails['studentEmail'] = emailController.text;
-      userDetails['currentSemester'] = int.parse(semesterController.text);
+      userDetails['currentSemester'] = int.parse(selectedSemester!);
       userDetails['studentRole'] = roleController.text;
       userDetails['studentName'] = nameController.text;
-      userDetails['departmentId'] = int.parse(departmentController.text);
+      userDetails['departmentId'] = int.parse(selectedDepartment!);
       userDetails['indexNumber'] = indexController.text;
     });
-    // Here, you would send the updated details to your backend server.
-    // For demonstration, we'll simply print the updated details.
+
+    // Assuming StudentUpdateSettingService.updateStudent requires all these parameters
+    StudentUpdateSettingService.updateStudent(
+      context,
+      userName,
+      "", // Update password logic can be added here
+      "", // Update confirm password logic can be added here
+      nameController.text,
+      indexController.text,
+      emailController.text,
+      roleController.text,
+      int.parse(selectedDepartment!),
+      int.parse(selectedSemester!),
+    );
+
     print('Updated details: $userDetails');
-  }
+  }*/
+
+  List<Map<String, dynamic>> departmentList = [
+    {"name": "DEIE", "id": 1},
+    {"name": "DCOM", "id": 2},
+    {"name": "DMME", "id": 3},
+    {"name": "DCEE", "id": 4},
+    {"name": "DMENA", "id": 5},
+  ];
+
+  List<Map<String, dynamic>> semesterList = [
+    {"name": "1", "id": 1},
+    {"name": "2", "id": 2},
+    {"name": "3", "id": 3},
+    {"name": "4", "id": 4},
+    {"name": "5", "id": 5},
+    {"name": "6", "id": 6},
+    {"name": "7", "id": 7},
+    {"name": "8", "id": 8},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              Center(child: Text("Profile Setting", style: TextStyle(fontSize: 18),),),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  height: screenHeight * 0.75,
-                  width: screenWidth * 0.9,
-                  decoration: _buildContainerDecoration(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        _buildTextField("Email", emailController),
-                        _buildTextField("Semester", semesterController),
-                        _buildTextField("Role", roleController),
-                        _buildTextField("Name", nameController),
-                        _buildTextField("Department ID", departmentController),
-                        _buildTextField("Index Number", indexController),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _updateDetails,
-                          child: Text("Update"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+        padding: EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 10),
+            Center(
+              child: Text(
+                'Profile Setting',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 20),
+            _buildTextField("Name", nameController),
+            _buildTextField("Email", emailController),
+            _buildDropdownField(
+              "Semester",
+              semesterList,
+              selectedSemester,
+                  (newValue) {
+                setState(() {
+                  selectedSemester = newValue!['id'].toString();
+                });
+              },
+            ),
+            _buildDropdownField(
+              "Department",
+              departmentList,
+              selectedDepartment,
+                  (newValue) {
+                setState(() {
+                  selectedDepartment = newValue!['id'].toString();
+                });
+              },
+            ),
+            _buildTextField("Index Number", indexController),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: (){},
+                child: const Text("Update"),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -96,23 +148,38 @@ class _SettingPageState extends State<SettingPage> {
 
   Widget _buildTextField(String label, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
       ),
     );
   }
 
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border.all(
-        color: Colors.grey,
-        width: 0,
+  Widget _buildDropdownField(
+      String label,
+      List<Map<String, dynamic>> options,
+      String? value,
+      ValueChanged<Map<String, dynamic>?> onChanged,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: DropdownButtonFormField<Map<String, dynamic>>(
+        value: options.firstWhere((element) => element['id'].toString() == value),
+        onChanged: onChanged,
+        items: options.map((option) {
+          return DropdownMenuItem<Map<String, dynamic>>(
+            value: option,
+            child: Text(option['name']),
+          );
+        }).toList(),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
       ),
     );
   }
