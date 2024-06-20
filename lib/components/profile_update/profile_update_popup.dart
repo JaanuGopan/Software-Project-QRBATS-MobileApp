@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 
-void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module module) {
+void showUpdateProfile(BuildContext context, Function onUpdate) {
   TextEditingController enrollmentKeyController = TextEditingController();
   showDialog(
     context: context,
@@ -16,7 +16,7 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
               ListTile(
                 title: Center(
                   child: const Text(
-                    "Module Enrollment",
+                    "Profile Update",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -27,21 +27,8 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      module.moduleName,
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "ModuleCode : ${module!.moduleCode}",
+                      "Are You Sure You Want To Update?",
                       style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                    SizedBox(height: 4),
-                    TextField(
-                      controller: enrollmentKeyController,
-                      decoration: InputDecoration(
-                        hintText: "Enrollment Key",
-                      ),
                     ),
                   ],
                 ),
@@ -59,7 +46,7 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      onEnroll(enrollmentKeyController.text);
+                      onUpdate();
                       Navigator.of(context).pop();
                     },
                     style: OutlinedButton.styleFrom(
@@ -69,7 +56,7 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
                       ),
                     ),
                     child: const Text(
-                      "Enroll",
+                      "Update",
                       style: TextStyle(fontSize: 12, color: Colors.green),
                     ),
                   ),

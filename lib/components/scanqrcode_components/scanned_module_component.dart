@@ -9,13 +9,16 @@ import 'package:qrbats_sp/models/Lecture.dart';
 import 'package:intl/intl.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
 
+
 class ScannedModule extends StatefulWidget {
   final Module module;
   final int studentId;
+
   const ScannedModule({
-    super.key,
-    required this.module, required this.studentId,
-  });
+    Key? key,
+    required this.module,
+    required this.studentId,
+  }) : super(key: key);
 
   @override
   State<ScannedModule> createState() => _ScannedModuleState();
@@ -26,8 +29,11 @@ class _ScannedModuleState extends State<ScannedModule> {
   List<Lecture> lectures = [];
   bool isLecturesLoading = true;
   String errorMessage = "";
+  bool isProcessing = false; // Add this state variable
+  int processingLectureId = -1;
 
-
+  double latitude = 0.0;
+  double longitude = 0.0;
 
   Future<void> _fetchLecturesByModuleCode(BuildContext context, String moduleCode) async {
     setState(() {
@@ -48,9 +54,9 @@ class _ScannedModuleState extends State<ScannedModule> {
       });
     }
   }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     handleShowLecture();
   }
@@ -59,72 +65,89 @@ class _ScannedModuleState extends State<ScannedModule> {
     if (!showLecturesList && lectures.isEmpty) {
       await _fetchLecturesByModuleCode(context, widget.module.moduleCode);
     }
-    if(lectures.isNotEmpty){
+    if (lectures.isNotEmpty) {
       setState(() {
         showLecturesList = !showLecturesList;
       });
-    } else{
+    } else {
       CustomSnackBar.showError(context, "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
     }
   }
 
-  double latitude = 0.0;
-  double longitude = 0.0;
-
   Future<void> getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      latitude = position.latitude;
-      longitude = position.longitude;
-    });
-    print('Latitude: ${position.latitude}');
-    print('Longitude: ${position.longitude}');
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        CustomSnackBar.showError(context, 'Location services are disabled.');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          CustomSnackBar.showError(context, 'Location permission denied.');
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        CustomSnackBar.showError(context, 'Location permission permanently denied.');
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10), // Add a timeout to avoid waiting indefinitely
+      );
+
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+      });
+
+      print('Latitude: ${position.latitude}');
+      print('Longitude: ${position.longitude}');
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to get location: $e');
+    }
   }
 
   Future<void> checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Handle case when location permission is denied
-        return;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      // Handle case when location permission is permanently denied
-      return;
-    }
-    getLocation(); // Permission granted, get the location
+    await getLocation();
   }
 
-  /*Future<void> markLectureAttendance(int studentId, String moduleCode,
-      double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
-        studentId, moduleCode, latitude, longitude, context);
-    if (isCloseDetails) {
+  void _handleMarkAttendance(int lectureId) async {
+    setState(() {
+      isProcessing = true; // Set isProcessing to true when starting
+      processingLectureId = lectureId;
+    });
+    try {
+      await checkLocationPermission();
+      await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+    } finally {
       setState(() {
-
+        isProcessing = false; // Set isProcessing to false when done
+        processingLectureId = -1;
       });
     }
-  }*/
-
-  void _handleMarkAttendance(int lectureId) async{
-    await checkLocationPermission();
-    await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
   }
+
   Future<void> markLectureAttendance(int studentId, int lectureId,
       double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
-        studentId, lectureId, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {
-
-      });
+    try {
+      bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
+          studentId, lectureId, latitude, longitude, context);
+      if (isCloseDetails) {
+        setState(() {
+          // Refresh the state if necessary
+        });
+      }
+    } catch (e) {
+      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -189,11 +212,11 @@ class _ScannedModuleState extends State<ScannedModule> {
         ? Center(child: Text(errorMessage))
         : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: lectures.map((lecture) => _buildLectureRow(context,lecture)).toList(),
+      children: lectures.map((lecture) => _buildLectureRow(context, lecture)).toList(),
     );
   }
 
-  Widget _buildLectureRow(BuildContext context,Lecture lecture) {
+  Widget _buildLectureRow(BuildContext context, Lecture lecture) {
     final timeFormat = DateFormat('HH:mm a');
 
     return Padding(
@@ -211,7 +234,7 @@ class _ScannedModuleState extends State<ScannedModule> {
             ),
           ],
         ),
-        padding: const EdgeInsets.only(left: 0,right: 0,top: 20,bottom: 20),
+        padding: const EdgeInsets.only(left: 0, right: 0, top: 20, bottom: 20),
         child: Row(
           children: [
             const SizedBox(width: 25),
@@ -227,7 +250,7 @@ class _ScannedModuleState extends State<ScannedModule> {
                   children: [
                     Text(
                       lecture.lectureName,
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4),
@@ -240,18 +263,23 @@ class _ScannedModuleState extends State<ScannedModule> {
                       "Time : ${timeFormat.format(lecture.lectureStartTime)}",
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
-
+                    SizedBox(height: 4),
+                    Text(
+                      "Venue : ${lecture.lectureVenue}",
+                      style: TextStyle(fontSize: 12, color: Colors.black),
+                    ),
                   ],
                 ),
               ),
             ),
-
-            const Spacer(),
+            const SizedBox(width: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                OutlinedButton(
-                  onPressed: () =>markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId)),
+                isProcessing && processingLectureId==lecture.lectureId
+                    ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
+                    : OutlinedButton(
+                  onPressed: () => markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId), lecture),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.green),
                     shape: RoundedRectangleBorder(

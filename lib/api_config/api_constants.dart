@@ -7,6 +7,7 @@ class ApiConstants {
   static const String checkStudentIndexNoEndpoint = '/api/v1/mobile/checkstudentindexno';
   static const String checkStudentUserNameEndpoint = '/api/v1/mobile/checkstudentusername';
   static const String studentRegister = '/api/v1/mobile/signup';
+  static const String updateStudentUrl = '/api/v1/mobile/updatestudent';
   static const String studentlogin = '/api/v1/mobile/signin';
   static const String studentGenerateOTP = '/api/v1/otp/generateotp';
   static const String studentVerifyOtp = '/api/v1/otp/otpverification';

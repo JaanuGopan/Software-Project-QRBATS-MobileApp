@@ -35,51 +35,57 @@ class _StartingPageState extends State<StartingPage> {
           child: Column(
             children: <Widget>[
               SizedBox(
-                height: h / 5,
-                //width: w,
+                height: h * 0.3,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 50, bottom: 50),
+                  padding: EdgeInsets.symmetric(vertical: h * 0.05),
                   child: Text(
                     "W E L C O M E",
                     style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF086494)),
+                      fontSize: h * 0.05,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF086494),
+                    ),
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 30),
-                child: Container(
-                  height: h / 2.5,
-                  width: w*0.8,
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("lib/assets/logo/logo.png"))),
+              Container(
+                height: h * 0.3,
+                width: w * 0.7,
+                margin: EdgeInsets.only(bottom: h * 0.05),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("lib/assets/logo/logo.png"),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               Container(
-                height: h / 3,
+                height: h * 0.3,
                 width: w,
+                padding: EdgeInsets.symmetric(horizontal: w * 0.1),
                 decoration: BoxDecoration(
-                    color: Color(0xFF086494),
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40))),
+                  color: Color(0xFF086494),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                  ),
+                ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Lottie.asset('lib/assets/loading/loading1.json',
-                        width: 200, height: 200, fit: BoxFit.fill),
+                    Lottie.asset(
+                      'lib/assets/loading/loading1.json',
+                      width: w * 0.5,
+                      height: h * 0.15,
+                      fit: BoxFit.contain,
+                    ),
+                    SizedBox(height: h * 0.02),
                     Padding(
-                      padding: const EdgeInsets.only(
-                        top: 20,
-                        right: 40,
-                        left: 40,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: w * 0.1),
                       child: Text(
                         "This is the best app to take attendance using QR code with GPS tracking",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: h * 0.02,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -88,7 +94,7 @@ class _StartingPageState extends State<StartingPage> {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

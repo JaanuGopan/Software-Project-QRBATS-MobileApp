@@ -1,11 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:qrbats_sp/api_services/dto/LectureAttendanceResponse.dart';
-
 import '../api_config/api_constants.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
@@ -83,23 +79,23 @@ class LectureAttendanceService {
 
       if (response.statusCode == 200) {
         // Registration successful
-        CustomSnackBar.showSnackBar(context, "Attendance marked successfully.");
+        CustomSnackBar.showSuccess(context, "Attendance marked successfully.");
         return true;
 
       } else if(response.statusCode == 400){
-        CustomSnackBar.showSnackBar(context, response.body.toString());
+        CustomSnackBar.showError(context, response.body.toString());
         print('Failed to mark attendance: ${response.statusCode}');
         return false;
       }
       else {
         // Registration failed
-        CustomSnackBar.showSnackBar(context, "Failed to mark attendance.");
+        CustomSnackBar.showError(context, "Failed to mark attendance.");
         print('Failed to mark attendance: ${response.statusCode}');
         // Handle error
         return false;
       }
     }catch(error){
-      CustomSnackBar.showSnackBar(context, "Error in marking attendance.");
+      CustomSnackBar.showError(context, "Error in marking attendance.");
       print('Error in marking attendance: $error');
       return false;
     }

@@ -15,10 +15,20 @@ class ModuleUnEnrollContent extends StatelessWidget {
     required this.onUnEnroll,
   });
 
+  double _getFontSize(double screenWidth, {bool isSubtext = false}) {
+    if (screenWidth < 360) {
+      return isSubtext ? 10 : 12;
+    } else if (screenWidth < 720) {
+      return isSubtext ? 12 : 14;
+    } else {
+      return isSubtext ? 14 : 16;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
       padding: EdgeInsets.all(8.0),
       margin: EdgeInsets.symmetric(vertical: 4.0),
@@ -37,24 +47,49 @@ class ModuleUnEnrollContent extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: 10,),
-          Text(number.toString(), style: TextStyle(fontSize: 16)),
-          SizedBox(width: 40,),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(module.moduleCode, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(module.moduleName, style: TextStyle(fontSize: 14,color: Colors.grey)),
-              ],
+          SizedBox(width: 10),
+          Text(
+            number.toString(),
+            style: TextStyle(fontSize: _getFontSize(screenWidth)),
+          ),
+          SizedBox(width: 40),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    module.moduleCode,
+                    style: TextStyle(
+                      fontSize: _getFontSize(screenWidth),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    module.moduleName,
+                    style: TextStyle(
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.grey,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ),
-          Spacer(),
           IconButton(
-            onPressed: () => showUnEnrollmentDialog(context, () => onUnEnroll(module.moduleId)),
-            icon: Icon(Icons.delete_forever_outlined,color: Colors.red,),
+            onPressed: () => showUnEnrollmentDialog(
+              context,
+                  () => onUnEnroll(module.moduleId),
+              module
+            ),
+            icon: Icon(
+              Icons.delete_forever_outlined,
+              color: Colors.red,
+            ),
           ),
         ],
       ),
