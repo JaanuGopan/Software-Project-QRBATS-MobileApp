@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:qrbats_sp/components/logout_popup/logout_popup.dart';
 import 'package:qrbats_sp/pages/getStart_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/attendance_history_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/module_page.dart';
 import 'package:qrbats_sp/pages/main_pages/main_page_contents/profile_setting_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'main_page_contents/home_page.dart';
-import 'main_page_contents/history_page.dart';
 import 'main_page_contents/qr_scan_page.dart';
-import 'main_page_contents/setting_page.dart';
 
 
 class MainPage extends StatefulWidget {
@@ -93,7 +91,7 @@ class _MainPageState extends State<MainPage> {
           ),
           actions: [
             IconButton(
-              onPressed: _logout,
+              onPressed: (){showLogoutPopup(context, ()=>_logout());},
               icon: Icon(
                 Icons.logout,
                 color: Colors.white,
@@ -138,7 +136,7 @@ class _MainPageState extends State<MainPage> {
                   // Handle drawer item 1
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MainPage(pageIndex: 3,token: widget.token,)),
+                    MaterialPageRoute(builder: (context) => MainPage(pageIndex: 4,token: widget.token,)),
                   );
                   // Navigator.pop(context); // Close the drawer
                 },
@@ -150,7 +148,7 @@ class _MainPageState extends State<MainPage> {
                   // Handle drawer item 2
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MainPage(pageIndex: 3,token: widget.token,)),
+                    MaterialPageRoute(builder: (context) => MainPage(pageIndex: 4,token: widget.token,)),
                   );
                   //Navigator.pop(context); // Close the drawer
                 },
@@ -158,7 +156,7 @@ class _MainPageState extends State<MainPage> {
               ListTile(
                 leading: Icon(Icons.logout,color: Color(0xFF086494),size: 35,),
                 title: Text('Logout',style: TextStyle(color: Color(0xFF086494),fontSize: 20)),
-                onTap: _logout,
+                onTap: (){showLogoutPopup(context, ()=>_logout());},
               ),
               // Add more list items as needed
             ],
