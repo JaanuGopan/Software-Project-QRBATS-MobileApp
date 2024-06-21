@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/components/attendance_history/attendance_history_component.dart';
-import 'package:qrbats_sp/components/texts/TextBlue.dart';
-
 import '../../../api_services/LectureAttendedHistoryService.dart';
 import '../../../models/AttendanceHistoryData.dart';
 
@@ -63,23 +61,26 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
   }
 
   Widget _buildAttendanceList() {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Text(
-              'Attendance History',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            ListView.builder(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(height: 10),
+        Center(
+          child: Text(
+            'Attendance History',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(height: 10),
+        Expanded(
+          child: SingleChildScrollView(
+            child: ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: _attendanceList.length,
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.only(top: 8.0,left: 10,right: 10),
+                  padding: const EdgeInsets.only(top: 8.0, left: 10, right: 10),
                   child: AttendanceHistoryItem(
                     attendanceData: _attendanceList[index],
                     number: index + 1,
@@ -87,9 +88,15 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                 );
               },
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: AttendanceHistoryPage(token: "sampleToken"),
+  ));
 }
