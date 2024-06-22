@@ -5,13 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:qrbats_sp/api_services/EventService.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
-import 'package:qrbats_sp/api_services/LocationService.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/api_services/ModuleService.dart';
+import 'package:qrbats_sp/components/scanqrcode_components/scanned_event_component.dart';
 import 'package:qrbats_sp/components/scanqrcode_components/scanned_module_component.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
+import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class QRCodeScan extends StatefulWidget {
   final String token;
@@ -35,9 +37,12 @@ class _QRCodeScanState extends State<QRCodeScan> {
 
   String? result;
   LectureQRCodeDetails? qrCodeDetails;
+  EventQRCodeDetails? scannedEventQRCodeDetails;
+  bool showEventQrCodeDetails = false;
   Module? scannedModule;
   bool showQRCodeDetails = false;
   bool showScannedModule = false;
+  bool showScannedDetails = false;
   double latitude = 0.0;
   double longitude = 0.0;
   double distance = 99999;
@@ -71,47 +76,62 @@ class _QRCodeScanState extends State<QRCodeScan> {
   Future<void> scanQRCode() async {
     try {
       setState(() {
-        showScannedModule=false;
+        showScannedModule = false;
         scannedModule = null;
-
+        showScannedDetails = false;
+        showQRCodeDetails = false;
+        showEventQrCodeDetails = false;
+        scannedEventQRCodeDetails = null;
       });
 
       result = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666",
-        "cancel",
+        "Cancel",
         true,
         ScanMode.QR,
       );
+
       debugPrint("Scanned QR Code: $result");
-      if (result != null) {
-        setState(() {
-          try {
-            Map<String, dynamic> details = json.decode(result!);
-            if (details['eventName'].toString().isNotEmpty) {
-              setState(() {});
+
+      if (result != null && result != "-1") {
+        try {
+          Map<String, dynamic> details = json.decode(result!);
+
+          if (details.containsKey('eventId') && details['eventId'] != null) {
+            String scannedEventId = details['eventId'].toString();
+            if (scannedEventId.isNotEmpty) {
+              getEvent(int.parse(scannedEventId));
+              setState(() {
+                showScannedDetails = true;
+              });
             }
+          } else if (details.containsKey('moduleCode') && details['moduleCode'] != null) {
             String scannedModuleCode = details['moduleCode'];
-            print("Sanned Module Code : " + scannedModuleCode);
             if (scannedModuleCode.isNotEmpty) {
               getModule(scannedModuleCode);
               setState(() {
-                qrCodeDetails =
-                    LectureQRCodeDetails.fromJson(jsonDecode(result!));
+                qrCodeDetails = LectureQRCodeDetails.fromJson(details);
                 showQRCodeDetails = true;
               });
             }
-            //getLocationDistance(qrCodeDetails!.eventVenue, latitude, longitude);
-          } catch (e) {
-            debugPrint("Error parsing QR code data: $e");
+          } else {
+            CustomSnackBar.showError(context, "Scanned QR Code is not valid.");
           }
-        });
+        } catch (e) {
+          debugPrint("Error parsing QR code data: $e");
+          CustomSnackBar.showError(context, "Error parsing QR code data.");
+        }
+      } else {
+        CustomSnackBar.showError(context, "Scanning canceled or failed.");
       }
     } on PlatformException {
-      result = "not scan";
+      result = "Failed to scan QR Code.";
+      CustomSnackBar.showError(context, result!);
     }
     if (!mounted) return;
-    print("THE RESULT IS $result");
+    debugPrint("THE RESULT IS $result");
   }
+
 
   Future<void> getModule(String moduleCode) async {
     Module module =
@@ -120,6 +140,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
       scannedModule = module;
       showScannedModule = true;
     });
+    print(module.toString());
   }
 
   Future<void> markAttendance(int eventID, int attendeeID, double latitude,
@@ -142,6 +163,15 @@ class _QRCodeScanState extends State<QRCodeScan> {
         showQRCodeDetails = false;
       });
     }
+  }
+
+  Future<void> getEvent(int eventId) async {
+    EventQRCodeDetails eventQRCodeDetails =
+        await EventService.getEventByEventId(context, eventId);
+    setState(() {
+      scannedEventQRCodeDetails = eventQRCodeDetails;
+      showEventQrCodeDetails = true;
+    });
   }
 
   /*Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {
@@ -238,14 +268,30 @@ class _QRCodeScanState extends State<QRCodeScan> {
                       children: [
                         showScannedModule
                             ? Container(
-                                width: screenWidth*0.9,
-                                child: ScannedModule(module: scannedModule!,studentId: studentId,))
+                                width: screenWidth * 0.9,
+                                child: ScannedModule(
+                                  module: scannedModule!,
+                                  studentId: studentId,
+                                ))
                             : const Center(child: CircularProgressIndicator()),
                       ],
                     ),
-
                   ],
                 ),
+              showEventQrCodeDetails && scannedEventQRCodeDetails !=null ?
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: ScannedEvent(event: scannedEventQRCodeDetails!, studentId: studentId),
+                        ),
+                      ],
+                    )
+                  ],
+                ): showScannedDetails ? const Center(child: CircularProgressIndicator()) : Container(),
             ],
           ),
         ),

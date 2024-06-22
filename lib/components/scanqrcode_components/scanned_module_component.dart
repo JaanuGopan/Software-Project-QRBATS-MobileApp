@@ -9,7 +9,6 @@ import 'package:qrbats_sp/models/Lecture.dart';
 import 'package:intl/intl.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
 
-
 class ScannedModule extends StatefulWidget {
   final Module module;
   final int studentId;
@@ -35,14 +34,16 @@ class _ScannedModuleState extends State<ScannedModule> {
   double latitude = 0.0;
   double longitude = 0.0;
 
-  Future<void> _fetchLecturesByModuleCode(BuildContext context, String moduleCode) async {
+  Future<void> _fetchLecturesByModuleCode(
+      BuildContext context, String moduleCode) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
     });
 
     try {
-      final List<Lecture> lecturesList = await LectureService.getAllLectureByModuleCode(context, moduleCode);
+      final List<Lecture> lecturesList =
+          await LectureService.getAllLectureByModuleCode(context, moduleCode);
       setState(() {
         lectures = lecturesList;
         isLecturesLoading = false;
@@ -70,7 +71,8 @@ class _ScannedModuleState extends State<ScannedModule> {
         showLecturesList = !showLecturesList;
       });
     } else {
-      CustomSnackBar.showError(context, "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+      CustomSnackBar.showError(context,
+          "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
     }
   }
 
@@ -91,13 +93,15 @@ class _ScannedModuleState extends State<ScannedModule> {
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        CustomSnackBar.showError(context, 'Location permission permanently denied.');
+        CustomSnackBar.showError(
+            context, 'Location permission permanently denied.');
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10), // Add a timeout to avoid waiting indefinitely
+        timeLimit: Duration(
+            seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
       setState(() {
@@ -123,7 +127,8 @@ class _ScannedModuleState extends State<ScannedModule> {
     });
     try {
       await checkLocationPermission();
-      await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+      await markLectureAttendance(
+          widget.studentId, lectureId, latitude, longitude, context);
     } catch (e) {
       CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
@@ -137,8 +142,9 @@ class _ScannedModuleState extends State<ScannedModule> {
   Future<void> markLectureAttendance(int studentId, int lectureId,
       double latitude, double longitude, BuildContext context) async {
     try {
-      bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
-          studentId, lectureId, latitude, longitude, context);
+      bool isCloseDetails =
+          await LectureAttendanceService.markLectureAttendanceByLectureId(
+              studentId, lectureId, latitude, longitude, context);
       if (isCloseDetails) {
         setState(() {
           // Refresh the state if necessary
@@ -180,7 +186,8 @@ class _ScannedModuleState extends State<ScannedModule> {
                   children: [
                     Text(
                       widget.module.moduleCode,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       widget.module.moduleName,
@@ -193,7 +200,9 @@ class _ScannedModuleState extends State<ScannedModule> {
               IconButton(
                 onPressed: handleShowLecture,
                 icon: Icon(
-                  showLecturesList ? CupertinoIcons.multiply_square : Icons.menu_open,
+                  showLecturesList
+                      ? CupertinoIcons.multiply_square
+                      : Icons.menu_open,
                   color: showLecturesList ? Colors.red : Colors.green,
                 ),
               ),
@@ -209,11 +218,13 @@ class _ScannedModuleState extends State<ScannedModule> {
     return isLecturesLoading
         ? Center(child: CircularProgressIndicator())
         : errorMessage.isNotEmpty
-        ? Center(child: Text(errorMessage))
-        : Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: lectures.map((lecture) => _buildLectureRow(context, lecture)).toList(),
-    );
+            ? Center(child: Text(errorMessage))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: lectures
+                    .map((lecture) => _buildLectureRow(context, lecture))
+                    .toList(),
+              );
   }
 
   Widget _buildLectureRow(BuildContext context, Lecture lecture) {
@@ -250,7 +261,10 @@ class _ScannedModuleState extends State<ScannedModule> {
                   children: [
                     Text(
                       lecture.lectureName,
-                      style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4),
@@ -276,21 +290,24 @@ class _ScannedModuleState extends State<ScannedModule> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                isProcessing && processingLectureId==lecture.lectureId
+                isProcessing && processingLectureId == lecture.lectureId
                     ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
                     : OutlinedButton(
-                  onPressed: () => markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId), lecture),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.green),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: const Text(
-                    "Attend",
-                    style: TextStyle(fontSize: 12, color: Colors.green),
-                  ),
-                ),
+                        onPressed: () => markAttendancePopup(
+                            context,
+                            () => _handleMarkAttendance(lecture.lectureId),
+                            lecture),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.green),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: const Text(
+                          "Attend",
+                          style: TextStyle(fontSize: 12, color: Colors.green),
+                        ),
+                      ),
               ],
             ),
             SizedBox(width: 10),
