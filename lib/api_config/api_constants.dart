@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String ipAddress = '192.168.1.11';
+  static const String ipAddress = '192.168.43.136';
   static const String baseUrl = 'http://$ipAddress:8080';
   static const String mobileBaseUrl = 'http://$ipAddress:8080';
   static const String baseUrlEmulater = 'http://10.0.2.2:8080';
@@ -23,4 +23,6 @@ class ApiConstants {
   static const String moduleUnEnrollmentUrl = '/api/v1/module/moduleunenrollment';
   static const String getAllLecturesByModuleCode = '/api/v1/lecture/getalllecturebymodulecode';
   static const String getAllAttendanceHistoryByStudentIdUrl = '/api/v1/lectureattendance/getallattendancehistorybystudentid';
+  static const String getEventByEventId = '/api/v1/event/geteventbyeventid';
+  static const String getEventAttendanceHistoryUrl = '/api/v1/attendance/getallattendancebystudentid';
 }

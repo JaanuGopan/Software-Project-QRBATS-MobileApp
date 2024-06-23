@@ -16,8 +16,8 @@ class MarkAttendanceService{
       ) async {
     final Uri apiUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.markAttendanceEndpoint}');
     Map<String, dynamic> attendanceData = {
-      "eventID": eventID,
-      "attendeeID": attendeeID,
+      "eventId": eventID,
+      "attendeeId": attendeeID,
       "attendanceDate": DateFormat('yyyy-MM-dd').format(DateTime.now()),
       "attendanceTime": DateFormat('HH:mm:ss').format(DateTime.now()),
       "locationGPSLatitude": locationGPSLatitude,
@@ -36,14 +36,17 @@ class MarkAttendanceService{
 
       if (response.statusCode == 200) {
         // Registration successful
-        CustomSnackBar.showSnackBar(context, "Attendance marked successfully.");
+        CustomSnackBar.showSuccess(context, "Attendance marked successfully.");
         return true;
 
-      } else {
+      } else if(response.statusCode == 400) {
         // Registration failed
-        CustomSnackBar.showSnackBar(context, "Failed to mark attendance.");
+        CustomSnackBar.showError(context, response.body);
         print('Failed to mark attendance: ${response.statusCode}');
         // Handle error
+        return false;
+      }else{
+        CustomSnackBar.showSnackBar(context, "Error In Mark Event Attendance.");
         return false;
       }
     } catch (error) {
