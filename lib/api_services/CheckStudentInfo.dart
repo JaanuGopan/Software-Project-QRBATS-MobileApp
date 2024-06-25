@@ -47,13 +47,13 @@ class CheckStudentInfo {
           responses[1].statusCode == 200 && responses[1].body == "true";
 
       if (emailExists && indexNoExists) {
-        CustomSnackBar.showSnackBar(
+        CustomSnackBar.showError(
             context, 'The email address and index number already exist.');
       } else if (emailExists) {
-        CustomSnackBar.showSnackBar(
+        CustomSnackBar.showError(
             context, 'The email address already exists.');
       } else if (indexNoExists) {
-        CustomSnackBar.showSnackBar(
+        CustomSnackBar.showError(
             context, 'The index number already exists.');
       } else {
         function();

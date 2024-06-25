@@ -1,7 +1,8 @@
 class ApiConstants {
   static const String ipAddress = '192.168.1.11';
-  static const String baseUrl = 'http://$ipAddress:8080';
-  static const String mobileBaseUrl = 'http://$ipAddress:8080';
+  static const String awsIpAddress = '13.51.170.30';
+  static const String baseUrl = 'http://$awsIpAddress:8082';
+  static const String mobileBaseUrl = 'http://$awsIpAddress:8082';
   static const String baseUrlEmulater = 'http://10.0.2.2:8080';
   static const String checkStudentEmailEndpoint = '/api/v1/mobile/checkstudentemail';
   static const String checkStudentIndexNoEndpoint = '/api/v1/mobile/checkstudentindexno';
