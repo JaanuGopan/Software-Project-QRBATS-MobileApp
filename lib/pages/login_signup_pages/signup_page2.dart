@@ -22,7 +22,7 @@ class _SignUp2State extends State<SignUp2> {
   String? selectedCurrentSemester;
   String? selectedStudentRole;
 
-  final List<String> departmentList = ["Select One","DEIE", "DCOM", "DMME", "DMENA", "DCEE"];
+  final List<String> departmentList = ["Select One","DEIE", "DCOM", "DMME","DCEE" ,"DMENA"];
   final List<String> semesterList = ["Select One","1", "2", "3", "4", "5","6","7","8"];
 
   void previousPage() {

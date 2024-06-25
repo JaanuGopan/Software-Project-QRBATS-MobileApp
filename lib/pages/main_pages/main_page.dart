@@ -42,7 +42,7 @@ class _MainPageState extends State<MainPage> {
     // Navigate to the starting page (login page)
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => OpennigPage()),
+      MaterialPageRoute(builder: (context) => OpeningPage()),
     );
   }
 

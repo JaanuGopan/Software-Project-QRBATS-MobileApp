@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String ipAddress = '192.168.43.136';
+  static const String ipAddress = '192.168.1.11';
   static const String baseUrl = 'http://$ipAddress:8080';
   static const String mobileBaseUrl = 'http://$ipAddress:8080';
   static const String baseUrlEmulater = 'http://10.0.2.2:8080';
