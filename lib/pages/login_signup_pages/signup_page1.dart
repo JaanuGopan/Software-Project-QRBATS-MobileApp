@@ -1,17 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
-import '../../api_config/api_constants.dart';
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 import '../../validations/SignUpInputValidations.dart';
-import '../../widgets/snackbar/custom_snackbar.dart';
 import '../getStart_page.dart';
-import '../main_pages/main_page.dart';
 import 'login_page.dart';
-import 'package:http/http.dart' as http;
 
 import 'otp_verification_page.dart';
 
@@ -74,7 +69,7 @@ class _Signup1State extends State<Signup1> {
   void previousPage() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) {
-          return OpennigPage();
+          return OpeningPage();
         }));
   }
 

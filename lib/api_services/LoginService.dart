@@ -31,7 +31,7 @@ class LoginService {
         var myToken = jsonResponse['token'];
         print(myToken);
         preferences.setString("token", myToken);
-        CustomSnackBar.showSnackBar(context, 'Welcome To SkyTicker.'); // Use CustomSnackBar
+        CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.'); // Use CustomSnackBar
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {
@@ -39,7 +39,7 @@ class LoginService {
           }),
         );
       } else {
-        CustomSnackBar.showSnackBar(context, 'Please check user name or password.'); // Use CustomSnackBar
+        CustomSnackBar.showError(context, 'Please check user name or password.'); // Use CustomSnackBar
       }
     } catch (error) {
       // Catch any errors that occur during the HTTP request

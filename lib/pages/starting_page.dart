@@ -19,7 +19,7 @@ class _StartingPageState extends State<StartingPage> {
     Future.delayed(Duration(seconds: 4), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => OpennigPage()),
+        MaterialPageRoute(builder: (context) => OpeningPage()),
       );
     });
   }
