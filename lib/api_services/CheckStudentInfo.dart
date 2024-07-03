@@ -57,7 +57,7 @@ class CheckStudentInfo {
             context, 'The index number already exists.');
       } else {
         function();
-        OTPServoces.generateOTP(context, email);
+        OTPServices.generateOTP(context, email);
       }
     } catch (error) {
       print('Error: $error');
