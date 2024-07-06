@@ -12,26 +12,26 @@ class RegistrationHelper {
       ApiConstants.checkStudentUserNameEndpoint;
 
   static Future<void> register(
-      BuildContext context,
-      String username,
-      String password,
-      String confirmPassword,
-      String studentName,
-      String indexNumber,
-      String email,
-      String studentRole,
-      int departmentId,
-      int currentSemester,
-      ) async {
-
+    BuildContext context,
+    String username,
+    String password,
+    String confirmPassword,
+    String studentName,
+    String indexNumber,
+    String email,
+    String studentRole,
+    int departmentId,
+    int currentSemester,
+  ) async {
     if (password != confirmPassword) {
       // Use CustomSnackBar to show the snackbar
-      CustomSnackBar.showSnackBar(context, 'Passwords do not match.');
+      CustomSnackBar.showWarning(context, 'Passwords do not match.');
       return; // Exit function if passwords don't match
     }
-    final Uri apiUrlSignup = Uri.parse('$mobileBaseUrl$studentRegisterEndpoint');
+    final Uri apiUrlSignup =
+        Uri.parse('$mobileBaseUrl$studentRegisterEndpoint');
     final Uri apiUrlCheckUserName =
-    Uri.parse('$mobileBaseUrl$checkStudentUserNameEndpoint');
+        Uri.parse('$mobileBaseUrl$checkStudentUserNameEndpoint');
 
     Map<String, dynamic> userData = {
       'userName': username,
@@ -66,8 +66,8 @@ class RegistrationHelper {
           );
 
           if (registerResponse.statusCode == 200) {
-            // Registration successful
-            print("Student registered successfully");
+            CustomSnackBar.showSuccess(context,
+                "Account Successfully Created, Please Login Your Account.");
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Login()),
@@ -79,7 +79,7 @@ class RegistrationHelper {
           }
         } else {
           // Username already exists, show snackbar
-          CustomSnackBar.showSnackBar(context, 'The User Name already exists.');
+          CustomSnackBar.showWarning(context, 'The User Name already exists.');
         }
       } else {
         // Handle error if failed to check username

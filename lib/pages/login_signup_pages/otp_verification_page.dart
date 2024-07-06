@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
 import 'package:qrbats_sp/api_services/OTPService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
-import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
-import '../../validations/SignUpInputValidations.dart';
-import '../../widgets/snackbar/custom_snackbar.dart';
-import '../getStart_page.dart';
-import '../main_pages/main_page.dart';
-import 'login_page.dart';
-import 'package:http/http.dart' as http;
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
@@ -32,13 +23,14 @@ class OtpVerificationPage extends StatefulWidget {
 class _OtpVerificationPageState extends State<OtpVerificationPage> {
   final TextEditingController _otpController = TextEditingController();
 
-
-
-  void nextPage(){
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) {
-          return SignUp2(studentName: widget.studentName,email: widget.email,indexNumber: widget.indexNumber,);
-        }));
+  void nextPage() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return SignUp2(
+        studentName: widget.studentName,
+        email: widget.email,
+        indexNumber: widget.indexNumber,
+      );
+    }));
   }
 
   @override
@@ -59,55 +51,84 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                 flex: 1,
                 child: Container(
                   color: Colors.white,
-                  child: Center(child: TextBlue(text: "OTP Verification", fontSize: 25)),
+                  child: Center(
+                      child: TextBlue(text: "OTP Verification", fontSize: 25)),
                 ),
               ),
               Expanded(
                 flex: 8,
                 child: Container(
                   color: Colors.white,
-                  child: Center(child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      height: screenHeight * 0.65,
-                      width: screenWidth * 0.9,
-                      decoration: _buildContainerDecoration(),
-                      child: Center(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 30),
-                              TextBlue(text: "Enter the OTP sent to ${widget.email}", fontSize: 20),
-                              SizedBox(height: 40),
-                              MyTextField(
-                                controller: _otpController,
-                                hintText: "Enter OTP",
-                                width: screenWidth * 0.8,
-                                obscureText: false,
-                                icon: Icon(Icons.lock_outline),
-                              ),
-                              SizedBox(height: 40),
-                              MyButtonDS(
-                                  onTap: (){
-                                    OTPServoces.verifyOTP(
-                                        context,
-                                        widget.email,
-                                        _otpController.text,
-                                        nextPage
-                                    );
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        height: screenHeight * 0.65,
+                        width: screenWidth * 0.9,
+                        decoration: _buildContainerDecoration(),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 30),
+                                TextBlue(
+                                    text: "Enter the OTP sent to",
+                                    fontSize: 20),
+                                TextBlue(text: "${widget.email}", fontSize: 20),
+                                SizedBox(height: 40),
+                                MyTextField(
+                                  controller: _otpController,
+                                  hintText: "Enter OTP",
+                                  width: screenWidth * 0.8,
+                                  obscureText: false,
+                                  icon: Icon(Icons.lock_outline),
+                                ),
+                                SizedBox(height: 40),
+                                OutlinedButton(
+                                  onPressed: () => {
+                                    OTPServices.verifyOTP(context, widget.email,
+                                        _otpController.text, nextPage)
                                   },
-                                  text: "Verify OTP",
-                                  width: 150),
-                              SizedBox(height: 20,),
-                              MyButtonDS(onTap:() {
-                                  OTPServoces.generateOTP(context, widget.email);
-                                }, text: "Resend OTP", width: 150),
-                            ],
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.green),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Verify OTP",
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.green),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                OutlinedButton(
+                                  onPressed: () => {
+                                    OTPServices.generateOTP(
+                                        context, widget.email)
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.orange),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Resend OTP",
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.orange),
+                                  ),
+                                ),
+
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),),
+                  ),
                 ),
               ),
               Expanded(
@@ -119,12 +140,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       children: [
                         Row(
                           children: [
-                            SizedBox(width: 20,),
+                            SizedBox(
+                              width: 20,
+                            ),
                             Spacer(),
-                            SizedBox(width: 20,),
+                            SizedBox(
+                              width: 20,
+                            ),
                           ],
                         ),
-                        SizedBox(height: screenHeight*0.007,),
+                        SizedBox(
+                          height: screenHeight * 0.007,
+                        ),
                       ],
                     ),
                   ),
