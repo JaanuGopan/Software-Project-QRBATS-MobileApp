@@ -48,7 +48,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           _isOTPSend = false;
         });
         await ForgotPasswordService.sendOTPForForgotPassword(context, email);
-        showOTPVerificationPopup(context, email);
       } finally {
         setState(() {
           _isOTPSend = true;

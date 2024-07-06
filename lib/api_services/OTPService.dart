@@ -52,22 +52,18 @@ class OTPServices{
       );
       if (otpVerificationResponse.statusCode == 200) {
         final bool isOTPVerified = jsonDecode(otpVerificationResponse.body);
-        print(otp);
-        print(otpVerificationResponse.body);
-        print(isOTPVerified);
         if(isOTPVerified){
           CustomSnackBar.showSuccess(context, 'OTP verified.'); // Use CustomSnackBar
           function();
         }else{
           CustomSnackBar.showError(context, 'You entered Wrong OTP.'); // Use CustomSnackBar
         }
-      } else {
-        CustomSnackBar.showError(context, 'Invalid Request.'); // Use CustomSnackBar
+      } else if(otpVerificationResponse.statusCode == 400){
+        CustomSnackBar.showError(context, otpVerificationResponse.body.toString()); // Use CustomSnackBar
       }
 
-
     }catch(e){
-      CustomSnackBar.showError(context, 'Invalid Request.');
+      CustomSnackBar.showError(context, 'Error In OTP Verification.');
     }
   }
 

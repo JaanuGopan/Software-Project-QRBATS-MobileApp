@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/OTPService.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
+import 'dart:async';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 
@@ -22,6 +23,36 @@ class OtpVerificationPage extends StatefulWidget {
 
 class _OtpVerificationPageState extends State<OtpVerificationPage> {
   final TextEditingController _otpController = TextEditingController();
+  bool showResendOTPButton = false;
+  late Timer _timer;
+  int _remainingTime = 300; // 5 minutes in seconds
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_remainingTime > 0) {
+        setState(() {
+          _remainingTime--;
+        });
+      } else {
+        setState(() {
+          showResendOTPButton = true;
+          _timer.cancel();
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   void nextPage() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -31,6 +62,46 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         indexNumber: widget.indexNumber,
       );
     }));
+  }
+
+  String get _formattedTime {
+    final minutes = (_remainingTime ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_remainingTime % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  bool _isLoadingResendOTP = false;
+
+  Future<void> handleResendOTP() async {
+    try {
+      setState(() {
+        _isLoadingResendOTP = true;
+      });
+      await OTPServices.generateOTP(context, widget.email);
+    } finally {
+      setState(() {
+        _isLoadingResendOTP = false;
+        showResendOTPButton = false;
+        _remainingTime = 300;
+        _startTimer();
+      });
+    }
+  }
+
+  bool _isVerifyOTPLoading = false;
+
+  Future<void> handleVerifyOTP() async {
+    try {
+      setState(() {
+        _isVerifyOTPLoading = true;
+      });
+      OTPServices.verifyOTP(
+          context, widget.email, _otpController.text, nextPage);
+    } finally {
+      setState(() {
+        _isVerifyOTPLoading = false;
+      });
+    }
   }
 
   @override
@@ -84,44 +155,56 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   icon: Icon(Icons.lock_outline),
                                 ),
                                 SizedBox(height: 40),
-                                OutlinedButton(
-                                  onPressed: () => {
-                                    OTPServices.verifyOTP(context, widget.email,
-                                        _otpController.text, nextPage)
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.green),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    "Verify OTP",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.green),
-                                  ),
-                                ),
+                                _isVerifyOTPLoading ? Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : OutlinedButton(
+                                        onPressed: () => {handleVerifyOTP()},
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(
+                                              color: Colors.green),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "Verify OTP",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.green),
+                                        ),
+                                      ),
                                 SizedBox(
                                   height: 20,
                                 ),
-                                OutlinedButton(
-                                  onPressed: () => {
-                                    OTPServices.generateOTP(
-                                        context, widget.email)
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.orange),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    "Resend OTP",
-                                    style: TextStyle(
-                                        fontSize: 15, color: Colors.orange),
-                                  ),
-                                ),
-
+                                showResendOTPButton
+                                    ? _isLoadingResendOTP
+                                        ? Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : OutlinedButton(
+                                            onPressed: () =>
+                                                {handleResendOTP()},
+                                            style: OutlinedButton.styleFrom(
+                                              side: const BorderSide(
+                                                  color: Colors.orange),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              "Resend OTP",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.orange),
+                                            ),
+                                          )
+                                    : Center(
+                                        child: Text(
+                                            "The OTP Is Expired In $_formattedTime"),
+                                      ) // timer
                               ],
                             ),
                           ),
