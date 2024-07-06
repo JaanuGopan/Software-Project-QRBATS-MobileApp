@@ -30,7 +30,7 @@ class CustomSnackBar {
   static void showWarning(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.orange[900],
         content: Text(message),
       ),
     );

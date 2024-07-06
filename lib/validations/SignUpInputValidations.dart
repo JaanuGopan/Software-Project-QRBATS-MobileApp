@@ -6,14 +6,14 @@ class SignUpInputValidations{
   static bool validateInputs(String studentName, String indexNo, String email,BuildContext context) {
     // Validate student name
     if (studentName.isEmpty) {
-      CustomSnackBar.showSnackBar(context, 'Please enter student name.');
+      CustomSnackBar.showWarning(context, 'Please enter student name.');
       return false;
     }
 
     // Validate index number
     RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
     if (!indexNoRegex.hasMatch(indexNo)) {
-      CustomSnackBar.showSnackBar(context, 'Please enter a valid index number (e.g., EG/20XX/XXXX).');
+      CustomSnackBar.showWarning(context, 'Please enter a valid index number (e.g., EG/20XX/XXXX).');
       return false;
     }
 
