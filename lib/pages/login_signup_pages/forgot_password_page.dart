@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
+import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
+import 'package:qrbats_sp/components/forgot_password_component/otp_verification_popup.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/reset_password_page.dart';
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
-import '../getStart_page.dart';
 import '../../widgets/snackbar/custom_snackbar.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -18,17 +18,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
 
-  void resetPassword() {
-    // Implement password reset logic here
-    // For example, send a reset password link to the provided email
-    String email = _emailController.text;
-    // Example: Send reset password link to the provided email
-    print('Reset password link sent to $email');
-    // Show a snackbar to inform the user that the reset password link has been sent
-    CustomSnackBar.showSnackBar(context, 'Reset password link sent to $email');
 
-    Navigator.push(context, MaterialPageRoute(builder: (context){return ResetPasswordPage();}));
-  }
 
   void navigateToLoginPage() {
     Navigator.push(
@@ -39,9 +29,38 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  void sendOTP(){
+  bool showOTPVerifyWindow = false;
 
+  void _handleOpenAndCloseVerifyOTP() {
+    setState(() {
+      showOTPVerifyWindow = !showOTPVerifyWindow;
+    });
   }
+
+  bool _isOTPSend = true;
+
+  Future<void> sendOTP(BuildContext context, String email) async {
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+    if (email.isNotEmpty && emailRegex.hasMatch(email)) {
+      try {
+        setState(() {
+          _isOTPSend = false;
+        });
+        await ForgotPasswordService.sendOTPForForgotPassword(context, email);
+        showOTPVerificationPopup(context, email);
+      } finally {
+        setState(() {
+          _isOTPSend = true;
+        });
+      }
+    } else {
+      CustomSnackBar.showError(context, "Please Enter a Valid Email.");
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +98,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         decoration: _buildContainerDecoration(),
                         child: SingleChildScrollView(
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(height: 30),
+
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 20),
+                                child: Center(
+                                  child: Text(
+                                    "You need to enter the email address, and then you will receive an OTP sent to that email.",
+                                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 40,),
                               TextBlue(
                                 text: "Email Address",
                                 fontSize: 20,
@@ -94,21 +126,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 icon: Icon(Icons.email),
                               ),
                               SizedBox(height: 20),
-                              MyButtonDS(onTap: sendOTP, text: "Send OTP", width: 200),
-                              SizedBox(height: 30),
-                              TextBlue(
-                                text: "Enter The OTP",
-                                fontSize: 20,
-                              ),
-                              SizedBox(height: 10),
-                              MyTextField(
-                                controller: _emailController,
-                                hintText: "enter OTP",
-                                width: screenWidth * 0.8,
-                                obscureText: false,
-                                icon: Icon(Icons.lock_outline),
-                              ),
-                              SizedBox(height: 20),
+                              _isOTPSend ? OutlinedButton(
+                                  onPressed: () {
+                                    sendOTP(context, _emailController.text);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(color: Color(0xFF086494)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Send OTP",
+                                    style: TextStyle(color: Color(0xFF086494)),
+                                  ))
+                                  : Center(child: CircularProgressIndicator(),),
+
                             ],
                           ),
                         ),
@@ -133,7 +166,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               icon: Icons.arrow_back,
                             ),
                             Spacer(),
-                            MyButtonDS(onTap: resetPassword, text: "Reset Password", width: 200),
 
                             SizedBox(width: 20),
                           ],

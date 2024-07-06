@@ -33,14 +33,16 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   bool isProcessing = false; // Add this state variable
   int processingLectureId = -1;
 
-  Future<void> _fetchLecturesByModuleCode(BuildContext context, String moduleCode) async {
+  Future<void> _fetchLecturesByModuleCode(
+      BuildContext context, String moduleCode) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
     });
 
     try {
-      final List<Lecture> lecturesList = await LectureService.getAllLectureByModuleCode(context, moduleCode);
+      final List<Lecture> lecturesList =
+          await LectureService.getAllLectureByModuleCode(context, moduleCode);
       setState(() {
         lectures = lecturesList;
         isLecturesLoading = false;
@@ -62,7 +64,8 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
         showLecturesList = !showLecturesList;
       });
     } else {
-      CustomSnackBar.showError(context, "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+      CustomSnackBar.showError(context,
+          "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
     }
   }
 
@@ -86,13 +89,15 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        CustomSnackBar.showError(context, 'Location permission permanently denied.');
+        CustomSnackBar.showError(
+            context, 'Location permission permanently denied.');
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10), // Add a timeout to avoid waiting indefinitely
+        timeLimit: Duration(
+            seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
       setState(() {
@@ -118,7 +123,8 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     });
     try {
       await checkLocationPermission();
-      await markLectureAttendance(widget.studentId, lectureId, latitude, longitude, context);
+      await markLectureAttendance(
+          widget.studentId, lectureId, latitude, longitude, context);
     } catch (e) {
       CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
@@ -132,8 +138,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   Future<void> markLectureAttendance(int studentId, int lectureId,
       double latitude, double longitude, BuildContext context) async {
     try {
-      bool isCloseDetails = await LectureAttendanceService.markLectureAttendanceByLectureId(
-          studentId, lectureId, latitude, longitude, context);
+      bool isCloseDetails =
+          await LectureAttendanceService.markLectureAttendanceByLectureId(
+              studentId, lectureId, latitude, longitude, context);
       if (isCloseDetails) {
         setState(() {
           // Refresh the state if necessary
@@ -168,7 +175,8 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
           Row(
             children: [
               SizedBox(width: 10),
-              Text(widget.number.toString(), style: TextStyle(fontSize: _getFontSize(screenWidth))),
+              Text(widget.number.toString(),
+                  style: TextStyle(fontSize: _getFontSize(screenWidth))),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -176,12 +184,16 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                   children: [
                     Text(
                       widget.module.moduleCode,
-                      style: TextStyle(fontSize: _getFontSize(screenWidth), fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: _getFontSize(screenWidth),
+                          fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       widget.module.moduleName,
-                      style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.grey),
+                      style: TextStyle(
+                          fontSize: _getFontSize(screenWidth, isSubtext: true),
+                          color: Colors.grey),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -190,7 +202,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               IconButton(
                 onPressed: handleShowLecture,
                 icon: Icon(
-                  showLecturesList ? CupertinoIcons.multiply_square : Icons.menu_open,
+                  showLecturesList
+                      ? CupertinoIcons.multiply_square
+                      : Icons.menu_open,
                   color: showLecturesList ? Colors.red : Colors.green,
                 ),
               ),
@@ -206,11 +220,13 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     return isLecturesLoading
         ? Center(child: CircularProgressIndicator())
         : errorMessage.isNotEmpty
-        ? Center(child: Text(errorMessage))
-        : Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: lectures.map((lecture) => _buildLectureRow(context, lecture)).toList(),
-    );
+            ? Center(child: Text(errorMessage))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: lectures
+                    .map((lecture) => _buildLectureRow(context, lecture))
+                    .toList(),
+              );
   }
 
   Widget _buildLectureRow(BuildContext context, Lecture lecture) {
@@ -240,42 +256,57 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               children: [
                 Text(
                   "${lectures.indexOf(lecture) + 1}.",
-                  style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                  style: TextStyle(
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.black),
                 ),
               ],
             ),
-            SizedBox(width: 15,),
+            SizedBox(
+              width: 15,
+            ),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     lecture.lectureName,
-                    style: TextStyle(fontSize: _getFontSize(screenWidth), color: Colors.black, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: _getFontSize(screenWidth),
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
                   Text(
                     "Day: ${lecture.lectureDay}",
-                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    style: TextStyle(
+                        fontSize: _getFontSize(screenWidth, isSubtext: true),
+                        color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
                   Text(
                     "Start Time: ${timeFormat.format(lecture.lectureStartTime)}",
-                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    style: TextStyle(
+                        fontSize: _getFontSize(screenWidth, isSubtext: true),
+                        color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
                   Text(
                     "End Time: ${timeFormat.format(lecture.lectureEndTime)}",
-                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    style: TextStyle(
+                        fontSize: _getFontSize(screenWidth, isSubtext: true),
+                        color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
                   Text(
                     "Venue: ${lecture.lectureVenue}",
-                    style: TextStyle(fontSize: _getFontSize(screenWidth, isSubtext: true), color: Colors.black),
+                    style: TextStyle(
+                        fontSize: _getFontSize(screenWidth, isSubtext: true),
+                        color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -286,21 +317,26 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                isProcessing && processingLectureId==lecture.lectureId
+                isProcessing && processingLectureId == lecture.lectureId
                     ? CircularProgressIndicator() // Show progress indicator when processing
                     : OutlinedButton(
-                  onPressed: () => markAttendancePopup(context, () => _handleMarkAttendance(lecture.lectureId), lecture),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.green),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: Text(
-                    "Attend",
-                    style: TextStyle(fontSize: _getFontSize(screenWidth), color: Colors.green),
-                  ),
-                ),
+                        onPressed: () => markAttendancePopup(
+                            context,
+                            () => _handleMarkAttendance(lecture.lectureId),
+                            lecture),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.green),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        child: Text(
+                          "Attend",
+                          style: TextStyle(
+                              fontSize: _getFontSize(screenWidth),
+                              color: Colors.green),
+                        ),
+                      ),
               ],
             ),
           ],

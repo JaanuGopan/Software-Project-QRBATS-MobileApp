@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String ipAddress = '192.168.1.12';
+  static const String ipAddress = '192.168.43.136';
   static const String awsIpAddress = '13.51.170.30';
   static const String baseUrl = 'http://$ipAddress:8082';
   static const String mobileBaseUrl = 'http://$ipAddress:8082';
@@ -26,4 +26,7 @@ class ApiConstants {
   static const String getAllAttendanceHistoryByStudentIdUrl = '/api/v1/lectureattendance/getallattendancehistorybystudentid';
   static const String getEventByEventId = '/api/v1/event/geteventbyeventid';
   static const String getEventAttendanceHistoryUrl = '/api/v1/attendance/getallattendancebystudentid';
+  static const String sendOTPForForgotPassword = '/api/v1/mobile/forgotpasswordsendotp';
+  static const String verifyOTPForForgotPassword = '/api/v1/mobile/forgotpasswordverifyotp';
+  static const String resetPasswordUrl = '/api/v1/mobile/resetPassword';
 }
