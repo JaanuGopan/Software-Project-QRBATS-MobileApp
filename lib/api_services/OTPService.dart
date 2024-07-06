@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../api_config/api_constants.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
-class OTPServoces{
+class OTPServices{
 
   static Future<void> generateOTP(BuildContext context, String studentEmail) async {
     final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentGenerateOTP}');
@@ -23,14 +23,14 @@ class OTPServoces{
       );
       if (response.statusCode == 200) {
 
-        CustomSnackBar.showSnackBar(context, 'Please check your email.');
+        CustomSnackBar.showSuccess(context, 'Please check your email.');
       } else {
-        CustomSnackBar.showSnackBar(context, 'Invalid Request.'); // Use CustomSnackBar
+        CustomSnackBar.showError(context, 'Invalid Request.'); // Use CustomSnackBar
       }
 
 
     }catch(e){
-      CustomSnackBar.showSnackBar(context, 'Invalid Request.');
+      CustomSnackBar.showError(context, 'Invalid Request.');
     }
   }
 
@@ -56,18 +56,18 @@ class OTPServoces{
         print(otpVerificationResponse.body);
         print(isOTPVerified);
         if(isOTPVerified){
-          CustomSnackBar.showSnackBar(context, 'OTP verified.'); // Use CustomSnackBar
+          CustomSnackBar.showSuccess(context, 'OTP verified.'); // Use CustomSnackBar
           function();
         }else{
-          CustomSnackBar.showSnackBar(context, 'You entered Wrong OTP.'); // Use CustomSnackBar
+          CustomSnackBar.showError(context, 'You entered Wrong OTP.'); // Use CustomSnackBar
         }
       } else {
-        CustomSnackBar.showSnackBar(context, 'Invalid Request.'); // Use CustomSnackBar
+        CustomSnackBar.showError(context, 'Invalid Request.'); // Use CustomSnackBar
       }
 
 
     }catch(e){
-      CustomSnackBar.showSnackBar(context, 'Invalid Request.');
+      CustomSnackBar.showError(context, 'Invalid Request.');
     }
   }
 

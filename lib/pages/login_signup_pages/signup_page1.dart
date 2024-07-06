@@ -10,7 +10,6 @@ import 'login_page.dart';
 
 import 'otp_verification_page.dart';
 
-
 class Signup1 extends StatefulWidget {
   const Signup1({super.key});
 
@@ -19,94 +18,95 @@ class Signup1 extends StatefulWidget {
 }
 
 class _Signup1State extends State<Signup1> {
-
   final _studentNameTextController = TextEditingController();
   final _indexNumberTextController = TextEditingController();
   final _emailTextController = TextEditingController();
 
   void nextPage() {
-    if(
-    SignUpInputValidations.validateInputs(
-      _studentNameTextController.text,
-      _indexNumberTextController.text,
-      _emailTextController.text,
-      context
-    )
-    ){
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) {
-            return SignUp2(studentName: _studentNameTextController.text,email: _emailTextController.text,indexNumber: _indexNumberTextController.text,);
-          }));
-    }else{
-    }
+    if (SignUpInputValidations.validateInputs(_studentNameTextController.text,
+        _indexNumberTextController.text, _emailTextController.text, context)) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return SignUp2(
+          studentName: _studentNameTextController.text,
+          email: _emailTextController.text,
+          indexNumber: _indexNumberTextController.text,
+        );
+      }));
+    } else {}
   }
 
-  void otpVeryficationPage() {
-    if (
-    SignUpInputValidations.validateInputs(
+  void otpVerificationPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return OtpVerificationPage(
+          studentName: _studentNameTextController.text,
+          email: _emailTextController.text,
+          indexNumber: _indexNumberTextController.text,
+        );
+      }),
+    );
+  }
+
+  void previousPage() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return OpeningPage();
+    }));
+  }
+
+  void loginPage() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Login();
+    }));
+  }
+
+  Future<void> handleVerifySignupStep1() async {
+    bool _isValidInputs = SignUpInputValidations.validateInputs(
       _studentNameTextController.text,
       _indexNumberTextController.text,
       _emailTextController.text,
       context,
-    )
-    ) {
-      Navigator.push(
+    );
+
+    if (_isValidInputs) {
+      CheckStudentInfo.checkStudentInfo(
+        _emailTextController.text,
+        _indexNumberTextController.text,
+        otpVerificationPage,
         context,
-        MaterialPageRoute(builder: (context) {
-          return OtpVerificationPage(
-            studentName: _studentNameTextController.text,
-            email: _emailTextController.text,
-            indexNumber: _indexNumberTextController.text,
-          );
-        }),
       );
-    } else {
-      // Handle validation errors if any
     }
   }
 
-
-  void previousPage() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) {
-          return OpeningPage();
-        }));
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _indexNumberTextController.text = "EG/20XX/XXXX";
   }
-
-  void loginPage() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) {
-          return Login();
-        }));
-  }
-
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Column(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: Colors.white,
+      body: Container(
+        height: screenHeight,
+        width: screenWidth,
+        color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Center(child: TextBlue(text: "SignUp", fontSize: 25)),
                 ),
-              ),
-              Expanded(
-                flex: 8,
-                child: Container(
-                  color: Colors.white,
-                  child: Center(child: Padding(
+                Center(
+                  child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Container(
-                      height: screenHeight * 0.65,
                       width: screenWidth * 0.9,
                       decoration: _buildContainerDecoration(),
                       child: SingleChildScrollView(
@@ -143,66 +143,65 @@ class _Signup1State extends State<Signup1> {
                               icon: Icon(Icons.email),
                             ),
                             SizedBox(height: 40),
-
-
                           ],
                         ),
                       ),
                     ),
-                  ),),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  color: Colors.white,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Spacer(),
-                            Text(
-                              "If you already have an account? ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 10, color: Colors.black),
-                            ),
-                            TextButton(onPressed: loginPage, child: Text("SignIn", style: TextStyle(color: Color(0xFF086494)),)),
-                            Spacer(),
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            SizedBox(width: 20,),
-                            RoundButton(onTap: previousPage,icon: Icons.arrow_back,),
-                            Spacer(),
-                            RoundButton(
-                              onTap: () {
-                                CheckStudentInfo.checkStudentInfo(
-                                  _emailTextController.text,
-                                  _indexNumberTextController.text,
-                                  otpVeryficationPage,
-                                  context,
-                                );
-                              },
-                              icon: Icons.arrow_forward,
-                            ),
-                            SizedBox(width: 20,),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight*0.007,),
-                      ],
-                    ),
                   ),
                 ),
-              ),
-            ],
+                Center(
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      Text(
+                        "If you already have an account? ",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 10, color: Colors.black),
+                      ),
+                      TextButton(
+                          onPressed: loginPage,
+                          child: Text(
+                            "SignIn",
+                            style: TextStyle(color: Color(0xFF086494)),
+                          )),
+                      Spacer(),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.11,
+                ),
+                Center(
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      RoundButton(
+                        onTap: previousPage,
+                        icon: Icons.arrow_back,
+                      ),
+                      Spacer(),
+                      RoundButton(
+                        onTap: () {
+                          handleVerifySignupStep1();
+                        },
+                        icon: Icons.arrow_forward,
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
   BoxDecoration _buildContainerDecoration() {
     return BoxDecoration(
       borderRadius: BorderRadius.circular(10.0),
@@ -226,5 +225,4 @@ class _Signup1State extends State<Signup1> {
       ),
     );
   }
-
 }
