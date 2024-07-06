@@ -60,6 +60,8 @@ class _Signup1State extends State<Signup1> {
     }));
   }
 
+  bool _isLoadingForOTPVerificationPage = false;
+
   Future<void> handleVerifySignupStep1() async {
     bool _isValidInputs = SignUpInputValidations.validateInputs(
       _studentNameTextController.text,
@@ -69,12 +71,22 @@ class _Signup1State extends State<Signup1> {
     );
 
     if (_isValidInputs) {
-      CheckStudentInfo.checkStudentInfo(
-        _emailTextController.text,
-        _indexNumberTextController.text,
-        otpVerificationPage,
-        context,
-      );
+      try {
+        setState(() {
+          _isLoadingForOTPVerificationPage = true;
+        });
+        await CheckStudentInfo.checkStudentInfo(
+          _emailTextController.text,
+          _indexNumberTextController.text,
+          otpVerificationPage,
+          context,
+        );
+      } finally {
+        // TODO
+        setState(() {
+          _isLoadingForOTPVerificationPage = false;
+        });
+      }
     }
   }
 
@@ -182,12 +194,16 @@ class _Signup1State extends State<Signup1> {
                         icon: Icons.arrow_back,
                       ),
                       Spacer(),
-                      RoundButton(
-                        onTap: () {
-                          handleVerifySignupStep1();
-                        },
-                        icon: Icons.arrow_forward,
-                      ),
+                      _isLoadingForOTPVerificationPage
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : RoundButton(
+                              onTap: () {
+                                handleVerifySignupStep1();
+                              },
+                              icon: Icons.arrow_forward,
+                            ),
                       SizedBox(
                         width: 20,
                       ),
