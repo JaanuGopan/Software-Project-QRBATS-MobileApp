@@ -100,6 +100,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
           if (details.containsKey('eventId') && details['eventId'] != null) {
             String scannedEventId = details['eventId'].toString();
             if (scannedEventId.isNotEmpty) {
+              print("The Event Id Is : "+scannedEventId);
               getEvent(int.parse(scannedEventId));
               setState(() {
                 showScannedDetails = true;
@@ -166,12 +167,19 @@ class _QRCodeScanState extends State<QRCodeScan> {
   }
 
   Future<void> getEvent(int eventId) async {
-    EventQRCodeDetails eventQRCodeDetails =
-        await EventService.getEventByEventId(context, eventId);
-    setState(() {
-      scannedEventQRCodeDetails = eventQRCodeDetails;
-      showEventQrCodeDetails = true;
-    });
+    try {
+      EventQRCodeDetails eventQRCodeDetails =
+          await EventService.getEventByEventId(context, eventId);
+
+      setState(() {
+        scannedEventQRCodeDetails = eventQRCodeDetails;
+        showEventQrCodeDetails = true;
+      });
+    } on Exception catch (e) {
+      // TODO
+    }
+
+
   }
 
   /*Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {

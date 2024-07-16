@@ -16,6 +16,7 @@ class EventService{
       await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       });
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         EventQRCodeDetails scannedEvent = EventQRCodeDetails.fromJson(responseData);
@@ -24,7 +25,7 @@ class EventService{
         CustomSnackBar.showError(context, response.body.toString());
         throw Exception(response.body.toString());
       } else {
-        throw Exception("Error In Getting Event.");
+        throw Exception("Error In Getting Event");
       }
     } catch (error) {
       CustomSnackBar.showError(context, "Error In Getting Event.");

@@ -29,7 +29,6 @@ class LoginService {
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         var myToken = jsonResponse['token'];
-        print(myToken);
         preferences.setString("token", myToken);
         CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.'); // Use CustomSnackBar
         Navigator.push(
@@ -42,8 +41,8 @@ class LoginService {
         CustomSnackBar.showError(context, 'Please check user name or password.'); // Use CustomSnackBar
       }
     } catch (error) {
-      // Catch any errors that occur during the HTTP request
       print('Error registering user: $error');
+      CustomSnackBar.showError(context, "Error In Login Service, Try Again.");
     }
   }
 }
