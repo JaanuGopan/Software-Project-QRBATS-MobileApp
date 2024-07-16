@@ -3,7 +3,6 @@ class EventQRCodeDetails {
   String eventName;
   String? moduleName;
   String eventDate;
-  String eventValidDate;
   String eventTime;
   String eventEndTime;
   String eventVenue;
@@ -14,7 +13,6 @@ class EventQRCodeDetails {
     required this.eventName,
     this.moduleName,
     required this.eventDate,
-    required this.eventValidDate,
     required this.eventTime,
     required this.eventEndTime,
     required this.eventVenue,
@@ -27,7 +25,6 @@ class EventQRCodeDetails {
       eventName: json['eventName'],
       moduleName: json['moduleName'],
       eventDate: json['eventDate'],
-      eventValidDate: json['eventValidDate'],
       eventTime: json['eventTime'],
       eventEndTime: json['eventEndTime'],
       eventVenue: json['eventVenue'],
