@@ -1,9 +1,9 @@
 class ApiConstants {
-  static const String ipAddress = 'https://intelligent-creation-skyticker-backend-8761.up.railway.app';
-  static const String devIp = 'http://localhost:8080';
+  static const String facultyHostedNgrokIp = 'https://lionfish-wondrous-catfish.ngrok-free.app'; // This is hosted on faculty server backend IP
+  static const String facultyLocalIp = 'http://10.50.227.44:8080'; // For Android App this IP is not working so use ngrok IP
   static const String awsIpAddress = '13.51.170.30';
-  static const String baseUrl = ipAddress;
-  static const String mobileBaseUrl = ipAddress;
+  static const String baseUrl = facultyHostedNgrokIp;
+  static const String mobileBaseUrl = facultyHostedNgrokIp;
   static const String baseUrlEmulater = 'http://10.0.2.2:8082';
   static const String checkStudentEmailEndpoint = '/api/v1/mobile/checkstudentemail';
   static const String checkStudentIndexNoEndpoint = '/api/v1/mobile/checkstudentindexno';
