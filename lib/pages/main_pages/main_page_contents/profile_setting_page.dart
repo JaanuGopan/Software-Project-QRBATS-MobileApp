@@ -29,14 +29,14 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     super.initState();
     // Mock userDetails for demonstration (replace with actual logic to decode JWT)
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["studentId"];
-    emailController = TextEditingController(text: jwtDecodedToken["studentEmail"]);
-    semesterController = TextEditingController(text: jwtDecodedToken["currentSemester"].toString());
-    roleController = TextEditingController(text: jwtDecodedToken["studentRole"].toString());
-    nameController = TextEditingController(text: jwtDecodedToken["studentName"]);
+    studentId = jwtDecodedToken["userId"];
+    emailController = TextEditingController(text: jwtDecodedToken["email"]);
+    semesterController = TextEditingController(text: jwtDecodedToken["semester"].toString());
+    roleController = TextEditingController(text: jwtDecodedToken["role"].toString());
+    nameController = TextEditingController(text: jwtDecodedToken["firstName"]);
     indexController = TextEditingController(text: jwtDecodedToken["indexNumber"]);
     selectedDepartment = jwtDecodedToken["departmentId"].toString(); // Mocked department ID
-    selectedSemester = jwtDecodedToken["currentSemester"].toString(); // Mocked semester ID
+    selectedSemester = jwtDecodedToken["semester"].toString(); // Mocked semester ID
   }
 
   @override

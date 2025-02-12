@@ -91,13 +91,6 @@ class _Signup1State extends State<Signup1> {
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _indexNumberTextController.text = "EG/20XX/XXXX";
-  }
-
-  @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -139,7 +132,7 @@ class _Signup1State extends State<Signup1> {
                             SizedBox(height: 10),
                             MyTextField(
                               controller: _indexNumberTextController,
-                              hintText: "index number",
+                              hintText: "EG/20XX/XXXX",
                               width: screenWidth * 0.8,
                               obscureText: false,
                               icon: Icon(Icons.numbers),

@@ -31,17 +31,17 @@ class RegistrationHelper {
     final Uri apiUrlSignup =
         Uri.parse('$mobileBaseUrl$studentRegisterEndpoint');
     final Uri apiUrlCheckUserName =
-        Uri.parse('$mobileBaseUrl$checkStudentUserNameEndpoint');
+        Uri.parse('$mobileBaseUrl$checkStudentUserNameEndpoint?userName=$username');
 
     Map<String, dynamic> userData = {
       'userName': username,
       'password': password,
-      'studentName': studentName,
+      'firstName': studentName,
       'indexNumber': indexNumber,
-      'studentEmail': email,
-      'studentRole': studentRole,
+      'email': email,
+      'role': studentRole,
       'departmentId': departmentId,
-      'currentSemester': currentSemester,
+      'semester': currentSemester,
     };
 
     try {
@@ -49,8 +49,7 @@ class RegistrationHelper {
         apiUrlCheckUserName,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({'studentUserName': username}),
+        }
       );
       print(checkUserNameResponse.body);
 

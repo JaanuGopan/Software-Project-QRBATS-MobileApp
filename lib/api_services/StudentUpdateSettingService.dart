@@ -33,15 +33,15 @@ class StudentUpdateSettingService {
       return; // Exit function if passwords don't match
     }
     Map<String, dynamic> userData = {
-      'id':studentId,
-      'userName': username=="" ? null:username,
-      'password': password=="" ? null:password,
-      'studentName': studentName,
+      'userId':studentId,
+      'userName': username=="" ? null : username,
+      'password': password=="" ? null : password,
+      'firstName': studentName,
       'indexNumber': indexNumber,
-      'studentEmail': email,
-      'studentRole': studentRole=="" ? null:studentRole,
+      'email': email,
+      'role': studentRole=="" ? null:studentRole,
       'departmentId': departmentId,
-      'currentSemester': currentSemester,
+      'semester': currentSemester,
 
     };
     final Uri studentUpdateUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.updateStudentUrl}');

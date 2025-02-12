@@ -30,7 +30,7 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
   void initState() {
     super.initState();
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["studentId"];
+    studentId = jwtDecodedToken["userId"];
     _fetchAttendanceData(studentId);
     _fetchEventAttendanceData(studentId);
   }

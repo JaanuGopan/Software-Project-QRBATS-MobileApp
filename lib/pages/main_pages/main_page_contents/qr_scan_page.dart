@@ -29,10 +29,9 @@ class _QRCodeScanState extends State<QRCodeScan> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["studentId"];
+    studentId = jwtDecodedToken["userId"];
   }
 
   String? result;

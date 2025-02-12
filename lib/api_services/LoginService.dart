@@ -7,38 +7,36 @@ import '../../pages/main_pages/main_page.dart';
 import '../widgets/snackbar/custom_snackbar.dart'; // Import CustomSnackBar class
 
 class LoginService {
-  static Future<void> login(BuildContext context, String username, String password) async {
+  static Future<void> login(BuildContext context, String userName, String password) async {
     late SharedPreferences preferences;
     preferences = await SharedPreferences.getInstance();
 
-    final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentlogin}');
-    final Map<String, dynamic> userData = {
-      'studentUserName': username,
-      'password': password,
-    };
+    final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentlogin}?userName=$userName&password=$password');
 
     try {
-      final http.Response response = await http.post(
+      final http.Response response = await http.get(
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(userData),
+        }
       );
 
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-        var myToken = jsonResponse['token'];
-        preferences.setString("token", myToken);
-        CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.'); // Use CustomSnackBar
+        var authToken = jsonResponse['token'];
+        preferences.setString("token", authToken);
+        CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {
-            return MainPage(token: myToken);
+            return MainPage(token: authToken);
           }),
         );
       } else {
-        CustomSnackBar.showError(context, 'Please check user name or password.'); // Use CustomSnackBar
+        if(response.statusCode == 400) {
+          CustomSnackBar.showError(context, response.body.toString());
+        } 
+        CustomSnackBar.showError(context, 'Error In Login Service');
       }
     } catch (error) {
       print('Error registering user: $error');

@@ -69,7 +69,7 @@ class _SignUp2State extends State<SignUp2> {
             studentName: widget.studentName,
             indexNumber: widget.indexNumber,
             email: widget.email,
-            studentRole: "UORSTUDENT",
+            studentRole: "STUDENT",
             departmentId: selectedDepartmentId,
             currentSemester: selectedSemester,
           );

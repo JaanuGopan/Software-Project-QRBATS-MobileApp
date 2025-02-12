@@ -28,10 +28,9 @@ class _MainPageState extends State<MainPage> {
   late String userName;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Map<String,dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    userName = jwtDecodedToken["studentName"];
+    userName = jwtDecodedToken["firstName"];
     _currentIndex = widget.pageIndex;
   }
 
