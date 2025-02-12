@@ -2,12 +2,16 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../api_config/api_constants.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
 class LectureAttendanceService {
   static Future<bool> markLectureAttendance(int studentId, String moduleCode,
       double latitude, double longitude, BuildContext context) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
 
     final Uri apiUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.lectureAttendanceMarking}');
     Map<String, dynamic> lectureAttendanceData = {
@@ -25,6 +29,7 @@ class LectureAttendanceService {
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode(lectureAttendanceData),
       );
@@ -57,6 +62,9 @@ class LectureAttendanceService {
   static Future<bool> markLectureAttendanceByLectureId(int studentId, int lectureId,
       double latitude, double longitude, BuildContext context) async {
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.lectureAttendanceMarkingByLectureId}');
     Map<String, dynamic> lectureAttendanceData = {
       "studentId": studentId,
@@ -73,6 +81,7 @@ class LectureAttendanceService {
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode(lectureAttendanceData),
       );

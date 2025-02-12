@@ -4,15 +4,21 @@ import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ModuleService {
 
   static Future<Module> getModuleByModuleCode(BuildContext context, String moduleCode) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.getModuleByModuleCode}?moduleCode=$moduleCode');
     try {
       final http.Response response = await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $authToken',
       });
 
       if (response.statusCode == 200) {
@@ -37,12 +43,16 @@ class ModuleService {
 
   static Future<List<Module>> getAllModule(BuildContext context, int studentId) async {
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.getAllModuleByStudentId}/${studentId}');
     try {
       final http.Response response =
           await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $authToken',
       });
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
@@ -63,6 +73,10 @@ class ModuleService {
   }
 
   static Future<void> moduleEnrollment(BuildContext context,int moduleId,int studentId,String enrollmentKey) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.moduleEnrollmentUrl}?moduleId=$moduleId&studentId=$studentId&enrollmentKey=$enrollmentKey');
     try {
@@ -70,6 +84,7 @@ class ModuleService {
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
       );
 
@@ -90,6 +105,10 @@ class ModuleService {
   }
 
   static Future<void> moduleUnEnrollment(BuildContext context,int moduleId,int studentId) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.moduleUnEnrollmentUrl}?moduleId=$moduleId&studentId=$studentId');
     try {
@@ -97,6 +116,7 @@ class ModuleService {
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
       );
 
@@ -118,12 +138,16 @@ class ModuleService {
 
   static Future<List<Module>> getAllEnrolledModule(BuildContext context, int studentId) async {
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.getAllEnrolledModuleByStudentId}/${studentId}');
     try {
       final http.Response response =
       await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $authToken',
       });
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);

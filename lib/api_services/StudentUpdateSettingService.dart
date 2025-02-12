@@ -23,6 +23,10 @@ class StudentUpdateSettingService {
     int departmentId,
     int currentSemester,
   ) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     if (password != confirmPassword) {
       // Use CustomSnackBar to show the snackbar
       CustomSnackBar.showWarning(context, 'Passwords do not match.');
@@ -47,6 +51,7 @@ class StudentUpdateSettingService {
         studentUpdateUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode(userData),
       );

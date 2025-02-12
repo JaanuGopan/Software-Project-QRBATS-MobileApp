@@ -1,14 +1,21 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../api_config/api_constants.dart';
 import 'package:http/http.dart' as http;
 
 class LocationService{
   static Future<double> findLocationDistance(String locationName, double latitude,double longitude) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
     final apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getAttendanceDistance}';
     final requestBody = jsonEncode({'locationName': locationName,'latitude':latitude,'longitude':longitude});
 
     final response = await http.post(Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'}, body: requestBody);
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        }, body: requestBody);
 
     if (response.statusCode == 200) {
       return double.parse(response.body);

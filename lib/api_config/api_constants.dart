@@ -1,8 +1,9 @@
 class ApiConstants {
-  static const String ipAddress = 'intelligent-creation-skyticker-backend-8761.up.railway.app';
+  static const String ipAddress = 'https://intelligent-creation-skyticker-backend-8761.up.railway.app';
+  static const String devIp = 'http://localhost:8080';
   static const String awsIpAddress = '13.51.170.30';
-  static const String baseUrl = 'https://$ipAddress';
-  static const String mobileBaseUrl = 'https://$ipAddress';
+  static const String baseUrl = ipAddress;
+  static const String mobileBaseUrl = ipAddress;
   static const String baseUrlEmulater = 'http://10.0.2.2:8082';
   static const String checkStudentEmailEndpoint = '/api/v1/mobile/checkstudentemail';
   static const String checkStudentIndexNoEndpoint = '/api/v1/mobile/checkstudentindexno';

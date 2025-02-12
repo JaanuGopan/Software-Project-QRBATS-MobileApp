@@ -5,16 +5,22 @@ import 'package:qrbats_sp/api_config/api_constants.dart';
 import 'package:qrbats_sp/models/EventAttendanceHistoryData.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventService{
   static Future<EventQRCodeDetails> getEventByEventId(
       BuildContext context, int eventId) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.getEventByEventId}/$eventId');
     try {
       final http.Response response =
       await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $authToken',
       });
 
       if (response.statusCode == 200) {
@@ -35,12 +41,16 @@ class EventService{
 
   static Future<List<EventAttendanceHistory>> getEventAttendanceHistory(
       BuildContext context, int studentId) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
+
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.getEventAttendanceHistoryUrl}/$studentId');
     try {
       final http.Response response =
       await http.get(apiUrl, headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $authToken',
       });
 
       if (response.statusCode == 200) {

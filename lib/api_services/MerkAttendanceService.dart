@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class MarkAttendanceService{
@@ -14,6 +15,8 @@ class MarkAttendanceService{
       double locationGPSLongitude,
       BuildContext context
       ) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? authToken = preferences.getString("token");
     final Uri apiUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.markAttendanceEndpoint}');
     Map<String, dynamic> attendanceData = {
       "eventId": eventID,
@@ -30,6 +33,7 @@ class MarkAttendanceService{
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode(attendanceData),
       );
