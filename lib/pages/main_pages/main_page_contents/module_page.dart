@@ -27,7 +27,7 @@ class _ModulePageState extends State<ModulePage> {
   void initState() {
     super.initState();
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["studentId"];
+    studentId = jwtDecodedToken["userId"];
     _fetchAllModuleData(context, studentId);
     _fetchAllEnrolledModuleData(context, studentId);
   }

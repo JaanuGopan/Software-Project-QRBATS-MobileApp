@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["studentId"];
+    studentId = jwtDecodedToken["userId"];
     _fetchEnrolledModuleData(context, studentId);
   }
 

@@ -71,7 +71,7 @@ class _MyTextFieldState extends State<MyTextField> {
           filled: true,
           hintText: widget.hintText,
           hintStyle: TextStyle(
-            color: Color(0xFF086494), // Changed hint text color
+            color: Color(0xFF888888), // Changed hint text color
           ),
         ),
       ),

@@ -8,20 +8,14 @@ import '../widgets/snackbar/custom_snackbar.dart';
 class CheckStudentInfo {
   static Future<void> checkStudentInfo(
       String email,
-      String indexNo,
+      String indexNumber,
       Function function,
       BuildContext context,
       ) async {
     final Uri apiUrlEmail =
-    Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.checkStudentEmailEndpoint}');
+    Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.checkStudentEmailEndpoint}?email=$email');
     final Uri apiUrlIndexNo =
-    Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.checkStudentIndexNoEndpoint}');
-    Map<String, dynamic> emailData = {
-      'studentEmail': email,
-    };
-    Map<String, dynamic> indexNoData = {
-      'studentIndexNo': indexNo,
-    };
+    Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.checkStudentIndexNoEndpoint}?indexNumber=$indexNumber');
 
     try {
       final List<http.Response> responses = await Future.wait([
@@ -29,15 +23,13 @@ class CheckStudentInfo {
           apiUrlEmail,
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(emailData),
+          }
         ),
         http.post(
           apiUrlIndexNo,
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: jsonEncode(indexNoData),
         ),
       ]);
 
