@@ -5,7 +5,7 @@ class EnrolledModuleAttendance extends StatelessWidget {
   final Module enrolledModule;
   final int number;
   final double attendancePercentage;
-  final Function(String moduleCode, int moduleId) onTap;
+  final Function(Module module) onTap;
 
   const EnrolledModuleAttendance({
     super.key,
@@ -18,7 +18,7 @@ class EnrolledModuleAttendance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(enrolledModule.moduleCode, enrolledModule.moduleId),
+      onTap: () => onTap(enrolledModule),
       child: Container(
         padding: const EdgeInsets.all(12.0),
         margin: const EdgeInsets.symmetric(vertical: 6.0),
@@ -61,24 +61,12 @@ class EnrolledModuleAttendance extends StatelessWidget {
             SizedBox(
               width: 40,
               height: 40,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CircularProgressIndicator(
-                    value: attendancePercentage / 100,
-                    strokeWidth: 5,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        attendancePercentage > 80 ? Colors.green : Colors.red),
-                  ),
-                  Center(
-                    child: Text(
-                      '${attendancePercentage.toStringAsFixed(0)}%',
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+              child: IconButton(
+                onPressed: () => onTap(enrolledModule),
+                icon: Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.green,
+                ),
               ),
             ),
           ],

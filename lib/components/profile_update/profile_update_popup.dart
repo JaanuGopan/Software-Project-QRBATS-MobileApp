@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
 
 void showUpdateProfile(BuildContext context, Function onUpdate) {
   TextEditingController enrollmentKeyController = TextEditingController();
@@ -44,20 +43,20 @@ void showUpdateProfile(BuildContext context, Function onUpdate) {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
                       onUpdate();
                       Navigator.of(context).pop();
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Update",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],

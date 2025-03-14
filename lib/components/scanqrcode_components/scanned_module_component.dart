@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LectureService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:intl/intl.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
 
 class ScannedModule extends StatefulWidget {
@@ -35,7 +35,7 @@ class _ScannedModuleState extends State<ScannedModule> {
   double longitude = 0.0;
 
   Future<void> _fetchLecturesByModuleCode(
-      BuildContext context, String moduleCode) async {
+      BuildContext context, int moduleId) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
@@ -43,7 +43,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
     try {
       final List<Lecture> lecturesList =
-          await LectureService.getAllLectureByModuleCode(context, moduleCode);
+          await LectureService.getAllLectureByModuleCode(context, moduleId);
       setState(() {
         lectures = lecturesList;
         isLecturesLoading = false;
@@ -64,7 +64,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   void handleShowLecture() async {
     if (!showLecturesList && lectures.isEmpty) {
-      await _fetchLecturesByModuleCode(context, widget.module.moduleCode);
+      await _fetchLecturesByModuleCode(context, widget.module.id);
     }
     if (lectures.isNotEmpty) {
       setState(() {
@@ -127,8 +127,7 @@ class _ScannedModuleState extends State<ScannedModule> {
     });
     try {
       await checkLocationPermission();
-      await markLectureAttendance(
-          widget.studentId, lectureId, latitude, longitude, context);
+      await markLectureAttendance(lectureId, latitude, longitude, context);
     } catch (e) {
       CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
@@ -139,12 +138,12 @@ class _ScannedModuleState extends State<ScannedModule> {
     }
   }
 
-  Future<void> markLectureAttendance(int studentId, int lectureId,
-      double latitude, double longitude, BuildContext context) async {
+  Future<void> markLectureAttendance(int lectureId, double latitude,
+      double longitude, BuildContext context) async {
     try {
       bool isCloseDetails =
           await LectureAttendanceService.markLectureAttendanceByLectureId(
-              studentId, lectureId, latitude, longitude, context);
+              lectureId, latitude, longitude, context);
       if (isCloseDetails) {
         setState(() {
           // Refresh the state if necessary
@@ -260,7 +259,7 @@ class _ScannedModuleState extends State<ScannedModule> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      lecture.lectureName,
+                      lecture.name,
                       style: const TextStyle(
                           fontSize: 12,
                           color: Colors.black,
@@ -269,7 +268,7 @@ class _ScannedModuleState extends State<ScannedModule> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      "Day : ${lecture.lectureDay}",
+                      "Date : ${lecture.lectureDate}",
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                     SizedBox(height: 4),
@@ -279,7 +278,7 @@ class _ScannedModuleState extends State<ScannedModule> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      "Venue : ${lecture.lectureVenue}",
+                      "Venue : ${lecture.locationName}",
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ],
@@ -290,13 +289,11 @@ class _ScannedModuleState extends State<ScannedModule> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                isProcessing && processingLectureId == lecture.lectureId
+                isProcessing && processingLectureId == lecture.id
                     ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
                     : OutlinedButton(
-                        onPressed: () => markAttendancePopup(
-                            context,
-                            () => _handleMarkAttendance(lecture.lectureId),
-                            lecture),
+                        onPressed: () => markAttendancePopup(context,
+                            () => _handleMarkAttendance(lecture.id), lecture),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.green),
                           shape: RoundedRectangleBorder(

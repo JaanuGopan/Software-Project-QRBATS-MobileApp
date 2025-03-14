@@ -1,78 +1,33 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:qrbats_sp/models/StudentAttendanceHistory.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LectureService {
+  // 🔹 Get all lectures by module code
   static Future<List<Lecture>> getAllLectureByModuleCode(
-      BuildContext context, String moduleCode) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getAllLecturesByModuleCode}?moduleCode=$moduleCode');
+      BuildContext context, int moduleId) async {
+    final String endpoint =
+        '${ApiConstants.getAllLecturesByModuleCode}?moduleId=$moduleId';
+
     try {
-      final http.Response response =
-          await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $authToken',
-      });
-      if (response.statusCode == 200) {
+      // Use the GET method from ApiService
+      final response = await ApiService.get(endpoint, context);
+
+      if (response != null && response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
         List<Lecture> lecturesList =
             responseData.map((data) => Lecture.fromJson(data)).toList();
         return lecturesList;
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
       } else {
-        throw Exception("Error In Getting Lectures.");
+        throw Exception("Error in getting lectures.");
       }
     } catch (error) {
-      CustomSnackBar.showError(context, "Error In Getting Lectures.");
-      throw Exception("Error In Getting Lectures.");
-    }
-  }
-
-  static Future<StudentAttendanceHistoryDto> getStudentAttendanceByModuleId(
-      BuildContext context, int moduleId, int studentId) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getStudentAttendanceByModuleId}?moduleId=$moduleId&studentId=$studentId');
-
-    try {
-      final http.Response response = await http.get(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $authToken',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Decode the JSON response
-        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-
-        // Parse JSON into DTO
-        StudentAttendanceHistoryDto studentAttendanceHistoryDto =
-            StudentAttendanceHistoryDto.fromJson(jsonResponse);
-        return studentAttendanceHistoryDto;
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
-      } else {
-        throw Exception("Error in getting attendance for this module.");
-      }
-    } catch (error) {
-      CustomSnackBar.showError(
-          context, "Error in getting attendance for this module.");
-      throw Exception("Error in getting attendance for this module.");
+      CustomSnackBar.showError(context, "Error in getting lectures.");
+      rethrow;
     }
   }
 }

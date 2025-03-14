@@ -1,37 +1,27 @@
 import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ModuleService {
+  // 🔹 Get Module by Module Code
+  static Future<Module> getModuleByModuleCode(
+      BuildContext context, String moduleCode) async {
+    final endpoint =
+        '${ApiConstants.getModuleByModuleCode}?moduleCode=$moduleCode';
 
-  static Future<Module> getModuleByModuleCode(BuildContext context, String moduleCode) async {
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getModuleByModuleCode}?moduleCode=$moduleCode');
     try {
-      final http.Response response = await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $authToken',
-      });
+      final response = await ApiService.get(endpoint, context);
 
-      if (response.statusCode == 200) {
+      if (response != null && response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         Module returnModule = Module.fromJson(responseData);
         return returnModule;
       } else {
-        String errorMessage;
-        if (response.statusCode == 400) {
-          errorMessage = response.body.toString();
-        } else {
-          errorMessage = "Unexpected error occurred: ${response.statusCode}";
-        }
+        String errorMessage = response?.body ?? "Unexpected error occurred.";
         CustomSnackBar.showError(context, errorMessage);
         throw Exception(errorMessage);
       }
@@ -41,131 +31,88 @@ class ModuleService {
     }
   }
 
-  static Future<List<Module>> getAllModule(BuildContext context, int studentId) async {
+  // 🔹 Get All Modules
+  static Future<List<Module>> getAllModule(BuildContext context) async {
+    final endpoint = ApiConstants.getAllModuleByStudentId;
 
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getAllModuleByStudentId}/${studentId}');
     try {
-      final http.Response response =
-          await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $authToken',
-      });
-      if (response.statusCode == 200) {
+      final response = await ApiService.get(endpoint, context);
+
+      if (response != null && response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-        return responseData
-            .map((data) => Module.fromJson(data))
-            .toList();
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
+        return responseData.map((data) => Module.fromJson(data)).toList();
       } else {
-        throw Exception("Error In Getting Modules.");
+        String errorMessage = response?.body ?? "Unexpected error occurred.";
+        CustomSnackBar.showError(context, errorMessage);
+        throw Exception(errorMessage);
       }
     } catch (error) {
-      CustomSnackBar.showError(
-          context, "Error In Getting Modules.");
+      CustomSnackBar.showError(context, "Error In Getting Modules.");
       throw Exception("Error In Getting Modules.");
     }
   }
 
-  static Future<void> moduleEnrollment(BuildContext context,int moduleId,int studentId,String enrollmentKey) async {
+  // 🔹 Enroll in a Module
+  static Future<void> moduleEnrollment(
+      BuildContext context, int moduleId, String enrollmentKey) async {
+    final endpoint =
+        '${ApiConstants.moduleEnrollmentUrl}?moduleId=$moduleId&enrollmentKey=$enrollmentKey';
 
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.moduleEnrollmentUrl}?moduleId=$moduleId&studentId=$studentId&enrollmentKey=$enrollmentKey');
     try {
-      final http.Response response = await http.post(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $authToken',
-        },
-      );
+      final response = await ApiService.post(endpoint, {}, context);
 
-      if(response.statusCode == 200){
+      if (response != null && response.statusCode == 200) {
         CustomSnackBar.showSuccess(context, "Module Successfully Enrolled.");
-      } else if(response.statusCode == 400){
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
-      } else{
-        throw Exception("Error In Getting Enrolled Modules.");
-      }
-    }catch(error){
-      CustomSnackBar.showError(
-          context, "Error In Module Enrollment.");
-      throw Exception("Error In Module Enrollment.");
-    }
-
-  }
-
-  static Future<void> moduleUnEnrollment(BuildContext context,int moduleId,int studentId) async {
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.moduleUnEnrollmentUrl}?moduleId=$moduleId&studentId=$studentId');
-    try {
-      final http.Response response = await http.delete(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $authToken',
-        },
-      );
-
-      if(response.statusCode == 200){
-        CustomSnackBar.showSuccess(context, "Module Successfully UnEnrolled.");
-      } else if(response.statusCode == 400){
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
-      } else{
-        throw Exception("Error In Module UnEnrollment.");
-      }
-    }catch(error){
-      CustomSnackBar.showError(
-          context, "Error In Module UnEnrollment.");
-      throw Exception("Error In Module UnEnrollment.");
-    }
-
-  }
-
-  static Future<List<Module>> getAllEnrolledModule(BuildContext context, int studentId) async {
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getAllEnrolledModuleByStudentId}/${studentId}');
-    try {
-      final http.Response response =
-      await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $authToken',
-      });
-      if (response.statusCode == 200) {
-        final List<dynamic> responseData = jsonDecode(response.body);
-        return responseData
-            .map((data) => Module.fromJson(data))
-            .toList();
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
       } else {
-        throw Exception("Error In Getting Enrolled Modules.");
+        String errorMessage = response?.body ?? "Unexpected error occurred.";
+        CustomSnackBar.showError(context, errorMessage);
+        throw Exception(errorMessage);
       }
     } catch (error) {
-      CustomSnackBar.showError(
-          context, "Error In Getting Enrolled Modules.");
+      CustomSnackBar.showError(context, "Error In Module Enrollment.");
+      throw Exception("Error In Module Enrollment.");
+    }
+  }
+
+  // 🔹 Unenroll from a Module
+  static Future<void> moduleUnEnrollment(
+      BuildContext context, int moduleId) async {
+    final endpoint = '${ApiConstants.moduleUnEnrollmentUrl}?moduleId=$moduleId';
+
+    try {
+      final response = await ApiService.delete(endpoint, context);
+
+      if (response != null && response.statusCode == 200) {
+        CustomSnackBar.showSuccess(context, "Module Successfully UnEnrolled.");
+      } else {
+        String errorMessage = response?.body ?? "Unexpected error occurred.";
+        CustomSnackBar.showError(context, errorMessage);
+        throw Exception(errorMessage);
+      }
+    } catch (error) {
+      CustomSnackBar.showError(context, "Error In Module UnEnrollment.");
+      throw Exception("Error In Module UnEnrollment.");
+    }
+  }
+
+  // 🔹 Get All Enrolled Modules
+  static Future<List<Module>> getAllEnrolledModule(BuildContext context) async {
+    final endpoint = ApiConstants.getAllEnrolledModuleByStudentId;
+
+    try {
+      final response = await ApiService.get(endpoint, context);
+
+      if (response != null && response.statusCode == 200) {
+        final List<dynamic> responseData = jsonDecode(response.body);
+        return responseData.map((data) => Module.fromJson(data)).toList();
+      } else {
+        String errorMessage = response?.body ?? "Unexpected error occurred.";
+        CustomSnackBar.showError(context, errorMessage);
+        throw Exception(errorMessage);
+      }
+    } catch (error) {
+      CustomSnackBar.showError(context, "Error In Getting Enrolled Modules.");
       throw Exception("Error In Getting Enrolled Modules.");
     }
   }
-
-
 }

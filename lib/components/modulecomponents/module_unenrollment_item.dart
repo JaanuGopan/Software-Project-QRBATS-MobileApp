@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/components/modulecomponents/ModuleUnEnrolmentPopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
@@ -82,10 +81,7 @@ class ModuleUnEnrollContent extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => showUnEnrollmentDialog(
-              context,
-                  () => onUnEnroll(module.moduleId),
-              module
-            ),
+                context, () => onUnEnroll(module.id), module),
             icon: Icon(
               Icons.delete_forever_outlined,
               color: Colors.red,

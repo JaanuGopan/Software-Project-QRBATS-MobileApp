@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
-import '../../components/buttons/round_button.dart';
+import 'package:qrbats_sp/components/buttons/round_button.dart';
+import 'package:qrbats_sp/components/text_field/list_input_field.dart';
+
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 import '../../validations/SignUpInputValidations.dart';
 import '../getStart_page.dart';
 import 'login_page.dart';
-
 import 'otp_verification_page.dart';
 
 class Signup1 extends StatefulWidget {
@@ -17,23 +17,34 @@ class Signup1 extends StatefulWidget {
   State<Signup1> createState() => _Signup1State();
 }
 
+final List<String> departmentList = [
+  "DEIE",
+  "DCOM",
+  "DMME",
+  "DCEE",
+  "DMENA",
+];
+final List<String> semesterList = ["1", "2", "3", "4", "5", "6", "7", "8"];
+
+final List<String> studentBatchList = [
+  '20',
+  '21',
+  '22',
+  '23',
+  '24',
+  '25',
+  '26',
+  '27',
+];
+
 class _Signup1State extends State<Signup1> {
   final _studentNameTextController = TextEditingController();
   final _indexNumberTextController = TextEditingController();
   final _emailTextController = TextEditingController();
-
-  void nextPage() {
-    if (SignUpInputValidations.validateInputs(_studentNameTextController.text,
-        _indexNumberTextController.text, _emailTextController.text, context)) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SignUp2(
-          studentName: _studentNameTextController.text,
-          email: _emailTextController.text,
-          indexNumber: _indexNumberTextController.text,
-        );
-      }));
-    } else {}
-  }
+  String? selectedDepartment;
+  String? selectedCurrentSemester;
+  String? selectedStudentRole;
+  String? selectedStudentBatch;
 
   void otpVerificationPage() {
     Navigator.push(
@@ -43,34 +54,50 @@ class _Signup1State extends State<Signup1> {
           studentName: _studentNameTextController.text,
           email: _emailTextController.text,
           indexNumber: _indexNumberTextController.text,
+          studentRole: "STUDENT",
+          departmentId: departmentList.indexOf(selectedDepartment!),
+          currentSemester: semesterList.indexOf(selectedCurrentSemester!),
+          studentBatch: int.parse(selectedStudentBatch!),
         );
+        /* return OtpVerificationPage(
+          studentName: "John Doe",
+          email: "john.doe@example.com",
+          indexNumber: "EG/2020/1234",
+          studentRole: "STUDENT",
+          departmentId: 1, // Assuming "DEIE" is selected
+          currentSemester: 2, // Assuming "2" is selected
+          studentBatch: 21, // Assuming '21' is selected
+        ); */
       }),
     );
   }
 
   void previousPage() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return OpeningPage();
+      return const OpeningPage();
     }));
   }
 
   void loginPage() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Login();
+      return const Login();
     }));
   }
 
   bool _isLoadingForOTPVerificationPage = false;
 
   Future<void> handleVerifySignupStep1() async {
-    bool _isValidInputs = SignUpInputValidations.validateInputs(
+    bool isValidInputs = SignUpInputValidations.validateInputs(
       _studentNameTextController.text,
       _indexNumberTextController.text,
       _emailTextController.text,
+      selectedDepartment,
+      selectedCurrentSemester,
+      selectedStudentBatch,
       context,
     );
 
-    if (_isValidInputs) {
+    if (isValidInputs) {
       try {
         setState(() {
           _isLoadingForOTPVerificationPage = true;
@@ -82,7 +109,6 @@ class _Signup1State extends State<Signup1> {
           context,
         );
       } finally {
-        // TODO
         setState(() {
           _isLoadingForOTPVerificationPage = false;
         });
@@ -92,146 +118,167 @@ class _Signup1State extends State<Signup1> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        color: Colors.white,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 20),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(child: TextBlue(text: "SignUp", fontSize: 25)),
-                ),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      width: screenWidth * 0.9,
-                      decoration: _buildContainerDecoration(),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            SizedBox(height: 30),
-                            TextBlue(text: "Student Name", fontSize: 20),
-                            SizedBox(height: 10),
-                            MyTextField(
-                              controller: _studentNameTextController,
-                              hintText: "student name",
-                              width: screenWidth * 0.8,
-                              obscureText: false,
-                              icon: Icon(Icons.drive_file_rename_outline),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Center(child: TextBlue(text: "SignUp", fontSize: 30)),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  TextBlue(text: "Student Name", fontSize: 15)),
+                          MyTextField(
+                            controller: _studentNameTextController,
+                            hintText: "student name",
+                            width: double.infinity,
+                            obscureText: false,
+                            icon: const Icon(Icons.drive_file_rename_outline),
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  TextBlue(text: "Index Number", fontSize: 15)),
+                          MyTextField(
+                            controller: _indexNumberTextController,
+                            hintText: "EG/20XX/XXXX",
+                            width: double.infinity,
+                            obscureText: false,
+                            icon: const Icon(Icons.numbers),
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  TextBlue(text: "Department", fontSize: 15)),
+                          _buildListInputField(
+                            hintText: "select one",
+                            width: double.infinity,
+                            icon: Icons.list_sharp,
+                            options: departmentList,
+                            onChanged: (selectedValue) {
+                              selectedDepartment = selectedValue;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Semester", fontSize: 15)),
+                          _buildListInputField(
+                            hintText: "select one",
+                            width: double.infinity,
+                            icon: Icons.list_sharp,
+                            options: semesterList,
+                            onChanged: (selectedValue) {
+                              selectedCurrentSemester = selectedValue;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Student Batch", fontSize: 15)),
+                          _buildListInputField(
+                            hintText: "select one",
+                            width: double.infinity,
+                            icon: Icons.list_sharp,
+                            options: studentBatchList,
+                            onChanged: (selectedValue) {
+                              selectedStudentBatch = selectedValue;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Email Address", fontSize: 15)),
+                          MyTextField(
+                            controller: _emailTextController,
+                            hintText: "email",
+                            width: double.infinity,
+                            obscureText: false,
+                            icon: const Icon(Icons.email),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Spacer(),
+                              const Text("Already have an account? "),
+                              TextButton(
+                                onPressed: loginPage,
+                                child: const Text(
+                                  "SignIn",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xFF086494),
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Color(0xFF086494),
+                                    decorationStyle: TextDecorationStyle.solid,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: _isLoadingForOTPVerificationPage
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF086494),
+                                      ),
+                                    )
+                                  : RoundButton(
+                                      onTap: handleVerifySignupStep1,
+                                      icon: Icons.arrow_forward,
+                                    ),
                             ),
-                            SizedBox(height: 40),
-                            TextBlue(text: "Index Number", fontSize: 20),
-                            SizedBox(height: 10),
-                            MyTextField(
-                              controller: _indexNumberTextController,
-                              hintText: "EG/20XX/XXXX",
-                              width: screenWidth * 0.8,
-                              obscureText: false,
-                              icon: Icon(Icons.numbers),
-                            ),
-                            SizedBox(height: 40),
-                            TextBlue(text: "Email Address", fontSize: 20),
-                            SizedBox(height: 10),
-                            MyTextField(
-                              controller: _emailTextController,
-                              hintText: "email",
-                              width: screenWidth * 0.8,
-                              obscureText: false,
-                              icon: Icon(Icons.email),
-                            ),
-                            SizedBox(height: 40),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                Center(
-                  child: Row(
-                    children: [
-                      Spacer(),
-                      Text(
-                        "If you already have an account? ",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 10, color: Colors.black),
-                      ),
-                      TextButton(
-                          onPressed: loginPage,
-                          child: Text(
-                            "SignIn",
-                            style: TextStyle(color: Color(0xFF086494)),
-                          )),
-                      Spacer(),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.11,
-                ),
-                Center(
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RoundButton(
-                        onTap: previousPage,
-                        icon: Icons.arrow_back,
-                      ),
-                      Spacer(),
-                      _isLoadingForOTPVerificationPage
-                          ? Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : RoundButton(
-                              onTap: () {
-                                handleVerifySignupStep1();
-                              },
-                              icon: Icons.arrow_forward,
-                            ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
 
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border(
-        top: BorderSide(
-          color: Color(0xFF086494),
-          width: 6.0,
-        ),
-        bottom: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        left: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        right: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-      ),
-    );
-  }
+Widget _buildListInputField({
+  required String hintText,
+  required double width,
+  required IconData icon,
+  required List<String> options,
+  required Function(String?) onChanged,
+}) {
+  return ListInputFieldWidget(
+    hintText: hintText,
+    width: width,
+    icon: Icon(icon),
+    options: options,
+    onChanged: onChanged,
+  );
 }

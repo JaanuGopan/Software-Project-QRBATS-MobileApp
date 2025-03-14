@@ -1,75 +1,58 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
-import 'package:qrbats_sp/api_config/api_constants.dart';
-import 'package:qrbats_sp/models/EventAttendanceHistoryData.dart';
-import 'package:qrbats_sp/models/QRCodeDetails.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class EventService{
+import 'package:flutter/material.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
+
+import '../api_config/api_constants.dart';
+import '../models/EventAttendanceHistoryData.dart';
+import '../models/QRCodeDetails.dart';
+import '../widgets/snackbar/custom_snackbar.dart';
+
+class EventService {
+  /// 🔹 Fetch Event Details by Event ID
   static Future<EventQRCodeDetails> getEventByEventId(
       BuildContext context, int eventId) async {
+    final String endpoint = '${ApiConstants.getEventByEventId}/$eventId';
 
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getEventByEventId}/$eventId');
     try {
-      final http.Response response =
-      await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $authToken',
-      });
+      final response = await ApiService.get(endpoint, context);
+      if (response == null) {
+        throw Exception("Error in getting event.");
+      }
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        EventQRCodeDetails scannedEvent = EventQRCodeDetails.fromJson(responseData);
-        return scannedEvent;
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
+        return EventQRCodeDetails.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception("Error In Getting Event");
+        throw Exception(response.body.toString());
       }
     } catch (error) {
-      CustomSnackBar.showError(context, "Error In Getting Event.");
-      throw Exception("Error In Getting Event.");
+      CustomSnackBar.showError(context, "Error in getting event.");
+      throw Exception("Error in getting event.");
     }
   }
 
+  /// 🔹 Fetch Event Attendance History by Student ID
   static Future<List<EventAttendanceHistory>> getEventAttendanceHistory(
-      BuildContext context, int studentId) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
+      BuildContext context) async {
+    final String endpoint = '${ApiConstants.getEventAttendanceHistoryUrl}';
 
-    final Uri apiUrl = Uri.parse(
-        '${ApiConstants.baseUrl}${ApiConstants.getEventAttendanceHistoryUrl}/$studentId');
     try {
-      final http.Response response =
-      await http.get(apiUrl, headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $authToken',
-      });
+      final response = await ApiService.get(endpoint, context);
+      if (response == null) {
+        throw Exception("Error in getting event history.");
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-        List<EventAttendanceHistory> history = responseData
+        return responseData
             .map((data) => EventAttendanceHistory.fromJson(data))
             .toList();
-        return history;
-      } else if (response.statusCode == 400) {
-        CustomSnackBar.showError(context, response.body.toString());
-        throw Exception(response.body.toString());
       } else {
-        throw Exception("Error in getting event history.");
+        throw Exception(response.body.toString());
       }
     } catch (error) {
       CustomSnackBar.showError(context, "Error in getting event history.");
       throw Exception("Error in getting event history.");
     }
   }
-
-
 }

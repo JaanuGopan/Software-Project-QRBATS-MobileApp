@@ -1,56 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/api_services/EventService.dart';
-import 'package:qrbats_sp/api_services/LectureService.dart';
+import 'package:qrbats_sp/api_services/LectureAttendedHistoryService.dart';
 import 'package:qrbats_sp/api_services/ModuleService.dart';
 import 'package:qrbats_sp/components/attendance_history/attendance_history_component.dart';
 import 'package:qrbats_sp/components/attendance_history/enrolled_module_attendance.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/EventAttendanceHistoryData.dart';
-import 'package:qrbats_sp/models/StudentAttendanceHistory.dart';
-
-import '../../../api_services/LectureAttendedHistoryService.dart';
-import '../../../models/AttendanceHistoryData.dart';
+import 'package:qrbats_sp/models/StudentAttendanceResultDto.dart';
 
 class AttendanceHistoryPage extends StatefulWidget {
-  final String token;
-
-  const AttendanceHistoryPage({Key? key, this.token = ""}) : super(key: key);
+  const AttendanceHistoryPage({super.key});
 
   @override
   State<AttendanceHistoryPage> createState() => _AttendanceHistoryPageState();
 }
 
 class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
-  List<AttendanceData> _attendanceList = [];
   List<EventAttendanceHistory> _eventAttendanceData = [];
-  bool isLoading = true;
+  List<Module> _allEnrolledModuleList = [];
+  StudentAttendanceResultDto? studentAttendanceResultDto;
+  Module? selectedModule;
+  bool isLoading = false;
   bool isEventAttendanceHistoryLoading = true;
+  bool isAllEnrolledModuleLoading = true;
+  bool showLectureHistory = true;
   String errorMessage = '';
   String eventHistoryErrorMessage = '';
-  bool showLectureHistory = true;
-  List<Module> _allEnrolledModuleList = [];
-  bool isAllEnrolledModuleLoading = true;
-  String? selectedModuleCode;
-  late StudentAttendanceHistoryDto _selectedModuleStudentAttendanceHistory;
-
-  late int studentId;
 
   @override
   void initState() {
     super.initState();
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["userId"];
-    _fetchAttendanceData(studentId);
-    _fetchEventAttendanceData(studentId);
-    _fetchAllEnrolledModuleData(context, studentId);
+    _fetchAllEnrolledModuleData();
   }
 
-  Future<void> _fetchAllEnrolledModuleData(
-      BuildContext context, int studentId) async {
+  Future<void> _fetchAllEnrolledModuleData() async {
     try {
-      final List<Module> modulesList =
-          await ModuleService.getAllEnrolledModule(context, studentId);
+      final modulesList = await ModuleService.getAllEnrolledModule(context);
       setState(() {
         _allEnrolledModuleList = modulesList;
         isAllEnrolledModuleLoading = false;
@@ -63,13 +48,14 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     }
   }
 
-  Future<void> _fetchAttendanceData(int studentId) async {
+  Future<void> _fetchAttendanceData(int moduleId) async {
+    setState(() => isLoading = true);
     try {
-      final List<AttendanceData> attendanceList =
-          await LectureAttendedHistoryService.fetchAttendanceList(studentId);
-      attendanceList.sort((a, b) => b.attendedDate.compareTo(a.attendedDate));
+      final resultDto =
+          await LectureAttendedHistoryService.fetchModuleAttendanceForStudent(
+              moduleId, context);
       setState(() {
-        _attendanceList = attendanceList;
+        studentAttendanceResultDto = resultDto;
         isLoading = false;
       });
     } catch (e) {
@@ -80,10 +66,10 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     }
   }
 
-  Future<void> _fetchEventAttendanceData(int studentId) async {
+  Future<void> _fetchEventAttendanceData() async {
     try {
-      final List<EventAttendanceHistory> eventAttendanceList =
-          await EventService.getEventAttendanceHistory(context, studentId);
+      final eventAttendanceList =
+          await EventService.getEventAttendanceHistory(context);
       eventAttendanceList
           .sort((a, b) => b.attendedDate.compareTo(a.attendedDate));
       setState(() {
@@ -98,27 +84,17 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     }
   }
 
-  Future<StudentAttendanceHistoryDto> _getStudentAttendanceByModuleId(
-      int moduleId, int studentId) async {
-    final StudentAttendanceHistoryDto studentAttendanceHistoryDto =
-        await LectureService.getStudentAttendanceByModuleId(
-            context, moduleId, studentId);
-    return studentAttendanceHistoryDto;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: isLoading || isEventAttendanceHistoryLoading
-            ? Center(child: CircularProgressIndicator())
+        child: isAllEnrolledModuleLoading
+            ? const Center(child: CircularProgressIndicator())
             : errorMessage.isNotEmpty
                 ? Center(child: Text(errorMessage))
-                : eventHistoryErrorMessage.isNotEmpty
-                    ? Center(child: Text(eventHistoryErrorMessage))
-                    : _buildAttendanceContent(),
+                : _buildAttendanceContent(),
       ),
     );
   }
@@ -127,54 +103,32 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(height: 10),
-        if (selectedModuleCode != null)
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () => setState(() => selectedModuleCode = null),
-              ),
-              Text(
-                'Module: $selectedModuleCode',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        if (selectedModuleCode == null)
+        if (selectedModule == null)
           Center(
             child: ToggleButtons(
-              children: <Widget>[
+              children: const [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('Lecture History'),
-                ),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('Lecture History')),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text('Event History'),
-                ),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('Event History')),
               ],
               isSelected: [showLectureHistory, !showLectureHistory],
-              onPressed: (int index) {
-                setState(() {
-                  showLectureHistory = index == 0;
-                });
-              },
+              onPressed: (index) =>
+                  setState(() => showLectureHistory = index == 0),
               color: Colors.black,
               selectedColor: Colors.white,
-              fillColor:
-                  showLectureHistory ? Color(0xFF086494) : Color(0xFF086494),
-              selectedBorderColor:
-                  showLectureHistory ? Color(0xFF086494) : Color(0xFF086494),
+              fillColor: Color(0xFF086494),
+              selectedBorderColor: Color(0xFF086494),
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-        SizedBox(height: 20),
+        if (selectedModule == null) SizedBox(height: 20),
         Expanded(
           child: showLectureHistory
-              ? (selectedModuleCode != null
-                  ? _buildLectureHistory(selectedModuleCode!,
-                      _selectedModuleStudentAttendanceHistory!)
+              ? (selectedModule != null
+                  ? _buildLectureHistory(selectedModule!)
                   : _buildEnrolledModuleAttendance())
               : _buildEventHistory(),
         ),
@@ -187,62 +141,135 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
       itemCount: _allEnrolledModuleList.length,
       itemBuilder: (context, index) {
         final module = _allEnrolledModuleList[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 5),
-          child: FutureBuilder<StudentAttendanceHistoryDto>(
-            future: _getStudentAttendanceByModuleId(module.moduleId, studentId),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error loading attendance data');
-              } else if (!snapshot.hasData) {
-                return Text('No attendance data available');
-              }
-              double attendancePercentage = snapshot.data!.attendancePercentage;
-              return EnrolledModuleAttendance(
-                enrolledModule: module,
-                number: index + 1,
-                attendancePercentage: attendancePercentage,
-                onTap: (moduleCode, moduleId) {
-                  setState(() {
-                    selectedModuleCode = moduleCode;
-                    _selectedModuleStudentAttendanceHistory = snapshot.data!;
-                  });
-                },
-              );
-            },
-          ),
+        return EnrolledModuleAttendance(
+          enrolledModule: module,
+          number: index + 1,
+          attendancePercentage: 80.0, // Placeholder
+          onTap: (module) {
+            _fetchAttendanceData(module.id);
+            setState(() => selectedModule = module);
+          },
         );
       },
     );
   }
 
-  Widget _buildLectureHistory(String moduleCode,
-      StudentAttendanceHistoryDto studentAttendanceHistoryDto) {
-    List<AttendanceData> attendanceDataList = List.empty(growable: true);
-    studentAttendanceHistoryDto.studentAttendancesLectureList
-        .forEach((element) {
-      AttendanceData attendanceData = AttendanceData(
-          lectureName: element.lectureName,
-          lectureModuleCode: moduleCode,
-          lectureModuleName: moduleCode,
-          attendedDate: element.attendedDate.toIso8601String().split('T')[0],
-          attendedTime:
-              StudentAttendanceLectureDto.formatTime(element.attendedTime),
-          attendanceStatus:
-              element.attendanceStatus == AttendanceStatus.PRESENT);
-      attendanceDataList.add(attendanceData);
-    });
-    return ListView.builder(
-      itemCount: attendanceDataList.length,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10),
-        child: LectureAttendanceHistoryItem(
-          attendanceData: attendanceDataList[index],
-          number: index + 1,
+  Widget _buildLectureHistory(Module module) {
+    final totalLectureCount =
+        (studentAttendanceResultDto?.attendanceCount ?? 0) +
+            (studentAttendanceResultDto?.notAttendanceCount ?? 0);
+    final attendedLectureCount =
+        studentAttendanceResultDto?.attendanceCount ?? 0;
+    final attendancePercentage =
+        studentAttendanceResultDto?.attendancePercentage ?? 0;
+    final missedLectureCount =
+        studentAttendanceResultDto?.notAttendanceCount ?? 0;
+    final completedLectureHours =
+        studentAttendanceResultDto?.finishedLectureHours.inHours ?? 0;
+    final attendedLectureHours =
+        studentAttendanceResultDto?.attendanceHours.inHours ?? 0;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => setState(() => selectedModule = null),
+            ),
+            Expanded(
+              child: Text(
+                '${module.moduleName} (${module.moduleCode})',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                maxLines: 1, // Ensures text remains on a single line
+                softWrap: false, // Prevents text from wrapping to a new line
+              ),
+            ),
+          ],
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12, // Soft shadow
+                  blurRadius: 6.0,
+                  spreadRadius: 2.0,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Attendance Summary',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                SizedBox(height: 12),
+                Text('Total Finished Lectures: $totalLectureCount'),
+                Text('Attended Lectures: $attendedLectureCount'),
+                Text('Missed Lectures: $missedLectureCount'),
+                Text('Total Finished Lectures Hours: $completedLectureHours'),
+                Text('Attended Lecture Hours: $attendedLectureHours'),
+                Text(
+                  'Attendance Percentage: ${attendancePercentage.toStringAsFixed(2)}%',
+                  style: TextStyle(
+                    color:
+                        attendancePercentage > 80 ? Colors.green : Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+              child: Text(
+                'Lecture History',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.left,
+              ),
+            ),
+          ],
+        ),
+        isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Expanded(
+                child: ListView.builder(
+                  itemCount: studentAttendanceResultDto
+                          ?.studentAttendancesLectureList.length ??
+                      0,
+                  itemBuilder: (context, index) {
+                    final attendanceData = studentAttendanceResultDto!
+                        .studentAttendancesLectureList[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 8.0),
+                      child: LectureAttendanceHistoryItem(
+                        studentAttendanceLectureDto: attendanceData,
+                        number: index + 1,
+                      ),
+                    );
+                  },
+                ),
+              ),
+      ],
     );
   }
 
@@ -250,12 +277,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     return ListView.builder(
       itemCount: _eventAttendanceData.length,
       itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 8.0, left: 10, right: 10),
-          child: EventAttendanceHistoryItem(
-            eventAttendanceHistory: _eventAttendanceData[index],
-            number: index + 1,
-          ),
+        return EventAttendanceHistoryItem(
+          eventAttendanceHistory: _eventAttendanceData[index],
+          number: index + 1,
         );
       },
     );

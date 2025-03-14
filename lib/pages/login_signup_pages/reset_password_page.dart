@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
+import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
+
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -16,15 +18,30 @@ class ResetPasswordPage extends StatefulWidget {
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+
+  bool isLoading = false;
+  bool isUsernameToggleEnabled = false;
 
   Future<void> resetPassword() async {
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmPasswordController.text;
+    String username = _usernameController.text;
 
-    // Perform input validation
-    if (newPassword.isEmpty || confirmPassword.isEmpty) {
-      CustomSnackBar.showSnackBar(context, 'Please fill in all fields.');
+    if (isUsernameToggleEnabled) {
+      if (username.isEmpty) {
+        CustomSnackBar.showSnackBar(context, 'Please enter username.');
+        return;
+      }
+    }
+    if (newPassword.isEmpty) {
+      CustomSnackBar.showSnackBar(context, 'Please enter new password.');
+      return;
+    }
+    if (confirmPassword.isEmpty) {
+      CustomSnackBar.showSnackBar(context, 'Please confirm new password.');
       return;
     }
 
@@ -33,156 +50,138 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     }
 
-    await ForgotPasswordService.resetPassword(context, widget.email, newPassword);
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await ForgotPasswordService.resetPassword(context, widget.email,
+          newPassword, isUsernameToggleEnabled, username);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void navigateToLoginPage() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return Login();
+        return const Login();
       }),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                color: Colors.white,
-                child: Center(
-                  child: TextBlue(
-                    text: "Reset Password",
-                    fontSize: 25,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 8,
-              child: Container(
-                color: Colors.white,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      height: screenHeight * 0.5,
-                      width: screenWidth * 0.9,
-                      decoration: _buildContainerDecoration(),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            SizedBox(height: 30),
-                            TextBlue(
-                              text: "New Password",
-                              fontSize: 20,
-                            ),
-                            SizedBox(height: 10),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            left: 20,
+            child:
+                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Center(
+                        child: TextBlue(text: "Reset Password", fontSize: 30)),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const TextBlue(
+                                  text: "Change Username", fontSize: 15),
+                              const SizedBox(width: 10),
+                              Switch(
+                                value: isUsernameToggleEnabled,
+                                focusColor: const Color(0xFF086494),
+                                activeColor: const Color(0xFF086494),
+                                inactiveThumbColor: Colors.white,
+                                inactiveTrackColor: Colors.grey,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isUsernameToggleEnabled = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          if (isUsernameToggleEnabled) ...[
+                            const Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    TextBlue(text: "Username", fontSize: 15)),
                             MyTextField(
-                              controller: _newPasswordController,
-                              hintText: "Enter new password",
-                              width: screenWidth * 0.8,
-                              obscureText: true,
-                              icon: Icon(Icons.lock),
+                              controller: _usernameController,
+                              hintText: "Enter new username",
+                              width: double.infinity,
+                              obscureText: false,
+                              icon: const Icon(Icons.person),
                             ),
-                            SizedBox(height: 20),
-                            TextBlue(
-                              text: "Confirm Password",
-                              fontSize: 20,
-                            ),
-                            SizedBox(height: 10),
-                            MyTextField(
-                              controller: _confirmPasswordController,
-                              hintText: "Confirm new password",
-                              width: screenWidth * 0.8,
-                              obscureText: true,
-                              icon: Icon(Icons.lock),
-                            ),
-                            SizedBox(height: 40),
+                            const SizedBox(height: 10),
                           ],
-                        ),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  TextBlue(text: "New Password", fontSize: 15)),
+                          MyTextField(
+                            controller: _newPasswordController,
+                            hintText: "Enter new password",
+                            width: double.infinity,
+                            obscureText: true,
+                            icon: const Icon(Icons.lock),
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Confirm Password", fontSize: 15)),
+                          MyTextField(
+                            controller: _confirmPasswordController,
+                            hintText: "Confirm new password",
+                            width: double.infinity,
+                            obscureText: true,
+                            icon: const Icon(Icons.lock),
+                          ),
+                          const SizedBox(height: 40),
+                          Center(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF086494),
+                                      ),
+                                    )
+                                  : MyButtonDS(
+                                      onTap: resetPassword,
+                                      text: "Reset Password",
+                                      width: double.infinity,
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Container(
-                color: Colors.white,
-                child: Center(
-                  child: Column(
-                    children: [
-                      Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 0,right: 0 ,top: 0,bottom: 15),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 20),
-                            RoundButton(
-                              onTap: () => navigateToLoginPage(),
-                              icon: Icons.arrow_back,
-                            ),
-                            Spacer(),
-                            OutlinedButton(
-                                onPressed: () {
-                                  resetPassword();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: Color(0xFF086494)),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Reset Password",
-                                  style: TextStyle(color: Color(0xFF086494)),
-                                )),
-                            SizedBox(width: 20),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border(
-        top: BorderSide(
-          color: Color(0xFF086494),
-          width: 6.0,
-        ),
-        bottom: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        left: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        right: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
+          ),
+        ],
       ),
     );
   }

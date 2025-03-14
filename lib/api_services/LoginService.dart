@@ -1,27 +1,27 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../api_config/api_constants.dart';
 import '../../pages/main_pages/main_page.dart';
 import '../widgets/snackbar/custom_snackbar.dart'; // Import CustomSnackBar class
 
 class LoginService {
-  static Future<void> login(BuildContext context, String userName, String password) async {
+  static Future<void> login(
+      BuildContext context, String userName, String password) async {
     late SharedPreferences preferences;
     preferences = await SharedPreferences.getInstance();
 
-    final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentlogin}?userName=$userName&password=$password');
+    final String endpoint =
+        '${ApiConstants.studentlogin}?userName=$userName&password=$password';
 
     try {
-      final http.Response response = await http.get(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        }
-      );
+      // Use ApiService to make the GET request
+      final response = await ApiService.get(endpoint, context);
 
-      if (response.statusCode == 200) {
+      if (response != null && response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         var authToken = jsonResponse['token'];
         preferences.setString("token", authToken);
@@ -33,13 +33,11 @@ class LoginService {
           }),
         );
       } else {
-        if(response.statusCode == 400) {
-          CustomSnackBar.showError(context, response.body.toString());
-        } 
+        // Handle error response
         CustomSnackBar.showError(context, 'Error In Login Service');
       }
     } catch (error) {
-      print('Error registering user: $error');
+      print('Error logging in: $error');
       CustomSnackBar.showError(context, "Error In Login Service, Try Again.");
     }
   }

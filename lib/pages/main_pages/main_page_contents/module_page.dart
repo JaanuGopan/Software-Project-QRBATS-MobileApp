@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/components/modulecomponents/module_enrollement_item.dart';
 import 'package:qrbats_sp/components/modulecomponents/module_unenrollment_item.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
@@ -7,16 +6,13 @@ import 'package:qrbats_sp/models/EnrolledModule.dart';
 import '../../../api_services/ModuleService.dart';
 
 class ModulePage extends StatefulWidget {
-  final String token;
-
-  const ModulePage({super.key, required this.token});
+  const ModulePage({super.key});
 
   @override
   State<ModulePage> createState() => _ModulePageState();
 }
 
 class _ModulePageState extends State<ModulePage> {
-  late int studentId;
   List<Module> allModuleList = [];
   List<Module> allEnrolledModuleList = [];
   List<Module> notEnrolledModuleList = [];
@@ -28,19 +24,17 @@ class _ModulePageState extends State<ModulePage> {
   @override
   void initState() {
     super.initState();
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["userId"];
-    _fetchAllModuleData(context, studentId);
-    _fetchAllEnrolledModuleData(context, studentId);
+    _fetchAllModuleData(context);
+    _fetchAllEnrolledModuleData(context);
   }
 
-  Future<void> _fetchAllModuleData(BuildContext context, int studentId) async {
+  Future<void> _fetchAllModuleData(BuildContext context) async {
     try {
       final List<Module> modulesList =
-          await ModuleService.getAllModule(context, studentId);
+          await ModuleService.getAllModule(context);
       setState(() {
         allModuleList = modulesList;
-        _calculateNotEnrolledModules();
+        notEnrolledModuleList = modulesList;
         isAllModuleLoading = false;
       });
     } catch (e) {
@@ -51,14 +45,13 @@ class _ModulePageState extends State<ModulePage> {
     }
   }
 
-  Future<void> _fetchAllEnrolledModuleData(
-      BuildContext context, int studentId) async {
+  Future<void> _fetchAllEnrolledModuleData(BuildContext context) async {
     try {
       final List<Module> modulesList =
-          await ModuleService.getAllEnrolledModule(context, studentId);
+          await ModuleService.getAllEnrolledModule(context);
       setState(() {
         allEnrolledModuleList = modulesList;
-        _calculateNotEnrolledModules();
+        notEnrolledModuleList = modulesList;
         isAllEnrolledModuleLoading = false;
       });
     } catch (e) {
@@ -69,30 +62,18 @@ class _ModulePageState extends State<ModulePage> {
     }
   }
 
-  void _calculateNotEnrolledModules() {
-    if (true) {
-      final enrolledModuleIds =
-          allEnrolledModuleList.map((module) => module.moduleId).toSet();
-      notEnrolledModuleList = allModuleList
-          .where((module) => !enrolledModuleIds.contains(module.moduleId))
-          .toList();
-    }
-  }
-
   void _enrollModule(int moduleId, String enrollmentKey) async {
     if (enrollmentKey.isNotEmpty) {
-      await ModuleService.moduleEnrollment(
-          context, moduleId, studentId, enrollmentKey);
-      _fetchAllEnrolledModuleData(
-          context, studentId); // Refresh enrolled modules
-      _fetchAllModuleData(context, studentId); // Refresh all modules
+      await ModuleService.moduleEnrollment(context, moduleId, enrollmentKey);
+      _fetchAllEnrolledModuleData(context); // Refresh enrolled modules
+      _fetchAllModuleData(context); // Refresh all modules
     }
   }
 
   void _unEnrollModule(int moduleId) async {
-    await ModuleService.moduleUnEnrollment(context, moduleId, studentId);
-    _fetchAllEnrolledModuleData(context, studentId); // Refresh enrolled modules
-    _fetchAllModuleData(context, studentId); // Refresh all modules
+    await ModuleService.moduleUnEnrollment(context, moduleId);
+    _fetchAllEnrolledModuleData(context); // Refresh enrolled modules
+    _fetchAllModuleData(context); // Refresh all modules
   }
 
   @override
@@ -154,7 +135,8 @@ class _ModulePageState extends State<ModulePage> {
                                 if (allEnrolledModuleList.isNotEmpty &&
                                     showEnrolledModule)
                                   _buildEnrolledModuleList(),
-                                if (allEnrolledModuleList.isEmpty)
+                                if (showEnrolledModule &&
+                                    allEnrolledModuleList.isEmpty)
                                   const Center(
                                     child: Text("No Enrolled Modules."),
                                   ),
@@ -162,7 +144,8 @@ class _ModulePageState extends State<ModulePage> {
                                 if (notEnrolledModuleList.isNotEmpty &&
                                     !showEnrolledModule)
                                   _buildNotEnrolledModuleList(),
-                                if (notEnrolledModuleList.isEmpty)
+                                if (!showEnrolledModule &&
+                                    notEnrolledModuleList.isEmpty)
                                   const Center(
                                     child: Text("No Modules For Enrollment."),
                                   ),

@@ -1,23 +1,23 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_config/api_constants.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-class MarkAttendanceService{
+class MarkAttendanceService {
   static Future<bool> markAttendance(
       int eventID,
       int attendeeID,
       double locationGPSLatitude,
       double locationGPSLongitude,
-      BuildContext context
-      ) async {
+      BuildContext context) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? authToken = preferences.getString("token");
-    final Uri apiUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.markAttendanceEndpoint}');
+    final Uri apiUrl = Uri.parse(
+        '${ApiConstants.baseUrl}${ApiConstants.markAttendanceEndpoint}');
     Map<String, dynamic> attendanceData = {
       "eventId": eventID,
       "attendeeId": attendeeID,
@@ -26,7 +26,6 @@ class MarkAttendanceService{
       "locationGPSLatitude": locationGPSLatitude,
       "locationGPSLongitude": locationGPSLongitude
     };
-    print(attendanceData);
 
     try {
       final http.Response response = await http.post(
@@ -39,17 +38,9 @@ class MarkAttendanceService{
       );
 
       if (response.statusCode == 200) {
-        // Registration successful
         CustomSnackBar.showSuccess(context, "Attendance marked successfully.");
         return true;
-
-      } else if(response.statusCode == 400) {
-        // Registration failed
-        CustomSnackBar.showError(context, response.body);
-        print('Failed to mark attendance: ${response.statusCode}');
-        // Handle error
-        return false;
-      }else{
+      } else {
         CustomSnackBar.showSnackBar(context, "Error In Mark Event Attendance.");
         return false;
       }

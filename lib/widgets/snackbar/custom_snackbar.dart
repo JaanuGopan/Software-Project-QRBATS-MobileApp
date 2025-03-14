@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class CustomSnackBar {
@@ -11,6 +9,7 @@ class CustomSnackBar {
       ),
     );
   }
+
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -19,6 +18,7 @@ class CustomSnackBar {
       ),
     );
   }
+
   static void showSuccess(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -27,6 +27,7 @@ class CustomSnackBar {
       ),
     );
   }
+
   static void showWarning(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

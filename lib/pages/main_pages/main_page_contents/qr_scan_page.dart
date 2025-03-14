@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qrbats_sp/api_services/EventService.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
@@ -16,9 +15,7 @@ import 'package:qrbats_sp/models/QRCodeDetails.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class QRCodeScan extends StatefulWidget {
-  final String token;
-
-  const QRCodeScan({Key? key, this.token = ""}) : super(key: key);
+  const QRCodeScan({super.key});
 
   @override
   State<QRCodeScan> createState() => _QRCodeScanState();
@@ -30,8 +27,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
   @override
   void initState() {
     super.initState();
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["userId"];
   }
 
   String? result;
@@ -99,13 +94,13 @@ class _QRCodeScanState extends State<QRCodeScan> {
           if (details.containsKey('eventId') && details['eventId'] != null) {
             String scannedEventId = details['eventId'].toString();
             if (scannedEventId.isNotEmpty) {
-              print("The Event Id Is : "+scannedEventId);
               getEvent(int.parse(scannedEventId));
               setState(() {
                 showScannedDetails = true;
               });
             }
-          } else if (details.containsKey('moduleCode') && details['moduleCode'] != null) {
+          } else if (details.containsKey('moduleCode') &&
+              details['moduleCode'] != null) {
             String scannedModuleCode = details['moduleCode'];
             if (scannedModuleCode.isNotEmpty) {
               getModule(scannedModuleCode);
@@ -131,7 +126,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
     if (!mounted) return;
     debugPrint("THE RESULT IS $result");
   }
-
 
   Future<void> getModule(String moduleCode) async {
     Module module =
@@ -177,8 +171,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
     } on Exception catch (e) {
       // TODO
     }
-
-
   }
 
   /*Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {
@@ -202,19 +194,19 @@ class _QRCodeScanState extends State<QRCodeScan> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 "Scan QR Code to Mark Attendance",
                 style: TextStyle(fontSize: 15),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: screenWidth * 0.8,
                 margin: EdgeInsets.only(
                     left: screenWidth * 0.07, right: screenWidth * 0.07),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  border: Border(
+                  border: const Border(
                     top: BorderSide(
                       color: Color(0xFF086494),
                       width: 1.0,
@@ -235,10 +227,10 @@ class _QRCodeScanState extends State<QRCodeScan> {
                 ),
                 child: Row(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Image(
                           image: AssetImage(
                               "lib/assets/qrcode/barcode-scanner.png"),
@@ -246,31 +238,31 @@ class _QRCodeScanState extends State<QRCodeScan> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     OutlinedButton(
                         onPressed: () {
                           checkLocationPermission();
                           scanQRCode();
                         },
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Color(0xFF086494)),
+                          side: const BorderSide(color: Color(0xFF086494)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           "Scan QR Code",
                           style: TextStyle(color: Color(0xFF086494)),
                         )),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (showQRCodeDetails && qrCodeDetails != null)
                 Column(
                   children: [
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Column(
                       children: [
                         showScannedModule
@@ -285,20 +277,25 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     ),
                   ],
                 ),
-              showEventQrCodeDetails && scannedEventQRCodeDetails !=null ?
-                Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Column(
+              showEventQrCodeDetails && scannedEventQRCodeDetails != null
+                  ? Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ScannedEvent(event: scannedEventQRCodeDetails!, studentId: studentId),
-                        ),
+                        const SizedBox(height: 10),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: ScannedEvent(
+                                  event: scannedEventQRCodeDetails!,
+                                  studentId: studentId),
+                            ),
+                          ],
+                        )
                       ],
                     )
-                  ],
-                ): showScannedDetails ? const Center(child: CircularProgressIndicator()) : Container(),
+                  : showScannedDetails
+                      ? const Center(child: CircularProgressIndicator())
+                      : Container(),
             ],
           ),
         ),

@@ -32,7 +32,11 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
   @override
   void initState() {
     super.initState();
-    _selectedValue = widget.initialValue;
+
+    if (widget.initialValue != null) {
+      print("Initial value " + widget.initialValue.toString());
+      _selectedValue = widget.initialValue;
+    }
   }
 
   @override
@@ -42,7 +46,19 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
-        border: Border(
+        border: const Border(
+          top: BorderSide(
+            color: Color(0xFF086494), // Set top border color
+            width: 0.5, // Set top border thickness
+          ),
+          right: BorderSide(
+            color: Color(0xFF086494), // Set right border color
+            width: 0.25, // Set right border thickness
+          ),
+          left: BorderSide(
+            color: Color(0xFF086494), // Set left border color
+            width: 0.25, // Set left border thickness
+          ),
           bottom: BorderSide(
             color: Color(0xFF086494),
             width: 3,
@@ -56,29 +72,30 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
             _selectedValue = newValue;
           });
           if (widget.onChanged != null) {
-            widget.onChanged!(newValue);
+            int index = int.parse(newValue!) - 1;
+            widget.onChanged!(widget.options[index]);
           }
         },
-        items: widget.options.map((String value) {
+        items: List.generate(widget.options.length, (index) {
           return DropdownMenuItem<String>(
-            value: value,
+            value: (index + 1).toString(),
             child: Text(
-              value,
-              style: TextStyle(color: Color(0xFF086494)),
+              widget.options[index],
+              style: const TextStyle(color: Color(0xFF086494)),
             ),
           );
-        }).toList(),
+        }),
         decoration: InputDecoration(
           border: InputBorder.none,
           fillColor: Colors.transparent,
           prefixIcon: Icon(
             widget.icon.icon,
-            color: Color(0xFF086494),
+            color: const Color(0xFF086494),
           ),
-          prefixIconColor: Color(0xFF086494),
+          prefixIconColor: const Color(0xFF086494),
           filled: true,
           hintText: widget.hintText,
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             color: Color(0xFF086494),
           ),
         ),

@@ -1,18 +1,24 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
+import 'package:qrbats_sp/models/student_dto.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../api_config/api_constants.dart';
 
 class StudentUpdateSettingService {
+  static Future<StudentDto> getStudent(BuildContext context) async {
+    const String endpoint = ApiConstants.getStudentUrl;
+    final response = await ApiService.get(endpoint, context);
+    final responseData = jsonDecode(response!.body);
+    StudentDto studentDto = StudentDto.fromJson(responseData);
+    return studentDto;
+  }
 
   static Future<void> updateStudent(
     BuildContext context,
-    int studentId,
     String username,
     String password,
     String confirmPassword,
@@ -23,59 +29,48 @@ class StudentUpdateSettingService {
     int departmentId,
     int currentSemester,
   ) async {
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-
     if (password != confirmPassword) {
       // Use CustomSnackBar to show the snackbar
       CustomSnackBar.showWarning(context, 'Passwords do not match.');
       return; // Exit function if passwords don't match
     }
+
     Map<String, dynamic> userData = {
-      'userId':studentId,
-      'userName': username=="" ? null : username,
-      'password': password=="" ? null : password,
+      'userName': username == "" ? null : username,
+      'password': password == "" ? null : password,
       'firstName': studentName,
       'indexNumber': indexNumber,
       'email': email,
-      'role': studentRole=="" ? null:studentRole,
+      'role': studentRole == "" ? null : studentRole,
       'departmentId': departmentId,
       'semester': currentSemester,
-
     };
-    final Uri studentUpdateUrl = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.updateStudentUrl}');
+
+    const String endpoint = ApiConstants.updateStudentUrl;
 
     try {
-      final http.Response registerResponse = await http.put(
-        studentUpdateUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $authToken',
-        },
-        body: jsonEncode(userData),
-      );
+      final response = await ApiService.put(endpoint, userData, context);
 
-      if (registerResponse.statusCode == 200) {
-        CustomSnackBar.showSuccess(context,"Student Account successfully Updated." );
+      if (response != null && response.statusCode == 200) {
+        CustomSnackBar.showSuccess(
+            context, "Student Account successfully Updated.");
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove("token");
+
         // Navigate to the starting page (login page)
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Login()),
         );
-      } else if(registerResponse.statusCode == 400){
-        CustomSnackBar.showError(context, registerResponse.body);
+      } else if (response != null && response.statusCode == 400) {
+        CustomSnackBar.showError(context, response.body);
+      } else {
+        // Handle error response here
+        print('Failed to update student: ${response?.statusCode}');
       }
-      else {
-        // Registration failed
-        print('Failed to register user: ${registerResponse.statusCode}');
-        // Handle error
-      }
-    } on Exception catch (e) {
-      // TODO
+    } catch (e) {
+      // Error handling
       CustomSnackBar.showError(context, "Error In Update Your Profile.");
     }
   }

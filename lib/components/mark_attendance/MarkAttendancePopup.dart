@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
 
-void markAttendancePopup(BuildContext context, Function markAttendance,Lecture lecture) {
+void markAttendancePopup(
+    BuildContext context, Function markAttendance, Lecture lecture) {
   final timeFormat = DateFormat('HH:mm a');
   showDialog(
     context: context,
@@ -15,22 +16,29 @@ void markAttendancePopup(BuildContext context, Function markAttendance,Lecture l
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Center(child: const Text("Mark Attendance",style: TextStyle(fontWeight: FontWeight.bold),)),
+                title: Center(
+                    child: const Text(
+                  "Mark Attendance",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )),
               ),
-               Padding(
+              Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lecture.lectureName,
-                        style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                        lecture.name,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "Day : ${lecture!.lectureDay}",
+                        "Date : ${lecture!.lectureDate}",
                         style: TextStyle(fontSize: 12, color: Colors.black),
                       ),
                       SizedBox(height: 4),
@@ -45,10 +53,9 @@ void markAttendancePopup(BuildContext context, Function markAttendance,Lecture l
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "Venue : ${lecture!.lectureVenue}",
+                        "Venue : ${lecture!.locationName}",
                         style: TextStyle(fontSize: 12, color: Colors.black),
                       ),
-
                     ],
                   ),
                 ),
@@ -64,20 +71,20 @@ void markAttendancePopup(BuildContext context, Function markAttendance,Lecture l
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
                       markAttendance();
                       Navigator.of(context).pop();
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Attend",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],

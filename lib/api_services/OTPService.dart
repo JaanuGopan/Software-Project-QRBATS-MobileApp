@@ -1,70 +1,62 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
+
 import '../api_config/api_constants.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
-class OTPServices{
-
-  static Future<void> generateOTP(BuildContext context, String studentEmail) async {
-    final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentGenerateOTP}');
-
+class OTPServices {
+  // 🔹 Generate OTP
+  static Future<bool> generateOTP(
+    BuildContext context,
+    String studentEmail,
+  ) async {
     final Map<String, dynamic> userData = {
       'otpSendEmail': studentEmail,
     };
 
-    try{
-      final http.Response response = await http.post(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(userData),
-      );
-      if (response.statusCode == 200) {
+    // Use ApiService to send the POST request
+    final response = await ApiService.post(
+      ApiConstants.studentGenerateOTP,
+      userData,
+      context,
+    );
 
-        CustomSnackBar.showSuccess(context, 'Please check your email.');
-      } else {
-        CustomSnackBar.showError(context, 'Invalid Request.'); // Use CustomSnackBar
-      }
-
-
-    }catch(e){
+    if (response != null && response.statusCode == 200) {
+      CustomSnackBar.showSuccess(context, 'Please check your email.');
+      return true;
+    } else {
       CustomSnackBar.showError(context, 'Invalid Request.');
+      return false;
     }
   }
 
-  static Future<void> verifyOTP(BuildContext context, String studentEmail,String otp,Function function) async {
-    final Uri apiUrl = Uri.parse('${ApiConstants.mobileBaseUrl}${ApiConstants.studentVerifyOtp}');
-
+  // 🔹 Verify OTP
+  static Future<void> verifyOTP(BuildContext context, String studentEmail,
+      String otp, Function function) async {
     final Map<String, dynamic> userData = {
       'studentEmail': studentEmail,
-      'otp':otp.toString()
+      'otp': otp.toString(),
     };
 
-    try{
-      final http.Response otpVerificationResponse = await http.post(
-        apiUrl,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(userData),
-      );
-      if (otpVerificationResponse.statusCode == 200) {
-        final bool isOTPVerified = jsonDecode(otpVerificationResponse.body);
-        if(isOTPVerified){
-          CustomSnackBar.showSuccess(context, 'OTP verified.'); // Use CustomSnackBar
-          function();
-        }else{
-          CustomSnackBar.showError(context, 'You entered Wrong OTP.'); // Use CustomSnackBar
-        }
-      } else if(otpVerificationResponse.statusCode == 400){
-        CustomSnackBar.showError(context, otpVerificationResponse.body.toString()); // Use CustomSnackBar
-      }
+    // Use ApiService to send the POST request
+    final response = await ApiService.post(
+      ApiConstants.studentVerifyOtp,
+      userData,
+      context,
+    );
 
-    }catch(e){
-      CustomSnackBar.showError(context, 'Error In OTP Verification.');
+    if (response != null && response.statusCode == 200) {
+      final bool isOTPVerified = jsonDecode(response.body);
+      if (isOTPVerified) {
+        CustomSnackBar.showSuccess(context, 'OTP verified.');
+        function(); // Execute the passed function if OTP is verified
+      } else {
+        CustomSnackBar.showError(context, 'You entered Wrong OTP.');
+      }
+    } else if (response != null && response.statusCode == 400) {
+      CustomSnackBar.showError(context, response.body.toString());
     }
   }
-
 }

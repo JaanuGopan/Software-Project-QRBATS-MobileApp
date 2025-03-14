@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/OTPService.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/signup_page2.dart';
-import 'dart:async';
+import 'package:qrbats_sp/components/buttons/round_button.dart';
+import 'package:qrbats_sp/pages/login_signup_pages/signup_page3.dart';
+
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 
@@ -9,12 +12,20 @@ class OtpVerificationPage extends StatefulWidget {
   final String email;
   final String indexNumber;
   final String studentName;
+  final String studentRole;
+  final int departmentId;
+  final int currentSemester;
+  final int studentBatch;
 
   const OtpVerificationPage({
     Key? key,
     required this.email,
     required this.indexNumber,
     required this.studentName,
+    required this.studentRole,
+    required this.departmentId,
+    required this.currentSemester,
+    required this.studentBatch,
   }) : super(key: key);
 
   @override
@@ -34,7 +45,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingTime > 0) {
         setState(() {
           _remainingTime--;
@@ -56,11 +67,24 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   void nextPage() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SignUp2(
+      return SignUp3(
         studentName: widget.studentName,
         email: widget.email,
         indexNumber: widget.indexNumber,
+        studentRole: widget.studentRole,
+        departmentId: widget.departmentId,
+        currentSemester: widget.currentSemester,
+        studentBatch: widget.studentBatch,
       );
+      /* return SignUp3(
+        studentName: "John Doe",
+        email: "john.doe@example.com",
+        indexNumber: "123456",
+        studentRole: "Student",
+        departmentId: 1,
+        currentSemester: 3,
+        studentBatch: 2021,
+      ); */
     }));
   }
 
@@ -106,167 +130,86 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Container(
-                  color: Colors.white,
-                  child: Center(
-                      child: TextBlue(text: "OTP Verification", fontSize: 25)),
-                ),
-              ),
-              Expanded(
-                flex: 8,
-                child: Container(
-                  color: Colors.white,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                        height: screenHeight * 0.65,
-                        width: screenWidth * 0.9,
-                        decoration: _buildContainerDecoration(),
-                        child: Center(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                SizedBox(height: 30),
-                                TextBlue(
-                                    text: "Enter the OTP sent to",
-                                    fontSize: 20),
-                                TextBlue(text: "${widget.email}", fontSize: 20),
-                                SizedBox(height: 40),
-                                MyTextField(
-                                  controller: _otpController,
-                                  hintText: "Enter OTP",
-                                  width: screenWidth * 0.8,
-                                  obscureText: false,
-                                  icon: Icon(Icons.lock_outline),
-                                ),
-                                SizedBox(height: 40),
-                                _isVerifyOTPLoading ? Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    : OutlinedButton(
-                                        onPressed: () => {handleVerifyOTP()},
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(
-                                              color: Colors.green),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          "Verify OTP",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.green),
-                                        ),
-                                      ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                showResendOTPButton
-                                    ? _isLoadingResendOTP
-                                        ? Center(
-                                            child: CircularProgressIndicator(),
-                                          )
-                                        : OutlinedButton(
-                                            onPressed: () =>
-                                                {handleResendOTP()},
-                                            style: OutlinedButton.styleFrom(
-                                              side: const BorderSide(
-                                                  color: Colors.orange),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                            ),
-                                            child: const Text(
-                                              "Resend OTP",
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.orange),
-                                            ),
-                                          )
-                                    : Center(
-                                        child: Text(
-                                            "The OTP Is Expired In $_formattedTime"),
-                                      ) // timer
-                              ],
-                            ),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(
+                onTap: () => Navigator.pop(context), icon: Icons.arrow_back),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Center(
+                        child:
+                            TextBlue(text: "OTP Verification", fontSize: 30)),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const TextBlue(
+                                  text: "Enter the OTP sent to ", fontSize: 15),
+                              Text(
+                                widget.email,
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          MyTextField(
+                            controller: _otpController,
+                            hintText: "Enter OTP",
+                            width: double.infinity,
+                            obscureText: false,
+                            icon: const Icon(Icons.lock_outline),
+                          ),
+                          const SizedBox(height: 20),
+                          _isVerifyOTPLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFF086494),
+                                  ),
+                                )
+                              : RoundButton(
+                                  onTap: handleVerifyOTP,
+                                  icon: Icons.check,
+                                ),
+                          const SizedBox(height: 20),
+                          showResendOTPButton
+                              ? _isLoadingResendOTP
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF086494),
+                                      ),
+                                    )
+                                  : RoundButton(
+                                      onTap: handleResendOTP,
+                                      icon: Icons.refresh,
+                                    )
+                              : Center(
+                                  child: Text(
+                                      "The OTP will expire in $_formattedTime"),
+                                ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  color: Colors.white,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Spacer(),
-                            SizedBox(
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: screenHeight * 0.007,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border(
-        top: BorderSide(
-          color: Color(0xFF086494),
-          width: 6.0,
-        ),
-        bottom: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        left: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        right: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
+        ],
       ),
     );
   }

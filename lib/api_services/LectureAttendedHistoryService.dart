@@ -1,29 +1,28 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:flutter/cupertino.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
+import 'package:qrbats_sp/models/StudentAttendanceResultDto.dart';
+
 import '../api_config/api_constants.dart';
-import '../models/AttendanceHistoryData.dart';
+import '../widgets/snackbar/custom_snackbar.dart';
 
 class LectureAttendedHistoryService {
-  static Future<List<AttendanceData>> fetchAttendanceList(int studentId) async {
+  static Future<StudentAttendanceResultDto> fetchModuleAttendanceForStudent(
+      int moduleId, BuildContext context) async {
+    final String apiUrl =
+        '${ApiConstants.getModuleAttendanceForStudent}?moduleId=$moduleId';
 
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
+    final response = await ApiService.get(apiUrl, context);
 
-    final String apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getAllAttendanceHistoryByStudentIdUrl}/$studentId';
-
-    final response = await http.get(Uri.parse(apiUrl),
-        headers: {
-      'Content-Type': 'application/json',
-          'Authorization': 'Bearer $authToken',
-    });
-
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> responseData = jsonDecode(response.body);
-      return responseData.map((data) => AttendanceData.fromJson(data)).toList();
+    if (response != null && response.statusCode == 200) {
+      print("Before parsing :" + response.body.toString());
+      StudentAttendanceResultDto studentAttendanceResultDto =
+          StudentAttendanceResultDto.fromJson(jsonDecode(response.body));
+      print("After parsing :" + studentAttendanceResultDto.toString());
+      return studentAttendanceResultDto;
     } else {
+      CustomSnackBar.showError(context, "Failed to load attendance data");
       throw Exception('Failed to load attendance data');
     }
   }

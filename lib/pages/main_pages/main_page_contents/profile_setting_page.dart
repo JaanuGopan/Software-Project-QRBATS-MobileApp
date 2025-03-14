@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:logger/logger.dart';
 import 'package:qrbats_sp/api_services/StudentUpdateSettingService.dart';
+import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
 import 'package:qrbats_sp/components/profile_update/profile_update_popup.dart';
+import 'package:qrbats_sp/components/text_field/list_input_field.dart';
+import 'package:qrbats_sp/components/text_field/text_field.dart';
+import 'package:qrbats_sp/components/texts/TextBlue.dart';
+import 'package:qrbats_sp/models/student_dto.dart';
 
 class ProfileSettingPage extends StatefulWidget {
-  final String token;
-
-  const ProfileSettingPage({Key? key, required this.token}) : super(key: key);
+  const ProfileSettingPage({super.key});
 
   @override
   State<ProfileSettingPage> createState() => _ProfileSettingPageState();
@@ -18,111 +21,188 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
   late TextEditingController roleController;
   late TextEditingController nameController;
   late TextEditingController indexController;
-  String userName = "";
 
   String? selectedDepartment; // Track selected department
   String? selectedSemester; // Track selected semester
+  bool _isLoading = true;
 
-  int? studentId;
+  String studentName = "";
+
   @override
-  void initState() {
-    super.initState();
-    // Mock userDetails for demonstration (replace with actual logic to decode JWT)
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["userId"];
-    emailController = TextEditingController(text: jwtDecodedToken["email"]);
-    semesterController = TextEditingController(text: jwtDecodedToken["semester"].toString());
-    roleController = TextEditingController(text: jwtDecodedToken["role"].toString());
-    nameController = TextEditingController(text: jwtDecodedToken["firstName"]);
-    indexController = TextEditingController(text: jwtDecodedToken["indexNumber"]);
-    selectedDepartment = jwtDecodedToken["departmentId"].toString(); // Mocked department ID
-    selectedSemester = jwtDecodedToken["semester"].toString(); // Mocked semester ID
+  initState() {
+    emailController = TextEditingController();
+    semesterController = TextEditingController();
+    roleController = TextEditingController();
+    nameController = TextEditingController();
+    indexController = TextEditingController();
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      Future<StudentDto> studentDto =
+          StudentUpdateSettingService.getStudent(context);
+      studentDto.then((value) => {
+            setState(() {
+              emailController.text = value.email!;
+              semesterController.text = value.semester.toString();
+              roleController.text = value.role!;
+              nameController.text = value.firstName!;
+              indexController.text = value.indexNumber!;
+              selectedDepartment = value.departmentId.toString();
+              selectedSemester = value.semester.toString();
+              studentName = value.firstName!;
+            })
+          });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 10),
-            Text("Profile Setting",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-            SizedBox(height: 20),
-            _buildTextField("Name", nameController),
-            _buildTextField("Email", emailController),
-            _buildDropdownField("Semester", _getSemesterList(), selectedSemester, (newValue) {
-              setState(() {
-                selectedSemester = newValue;
-              });
-            }),
-            _buildDropdownField("Department", _getDepartmentList(), selectedDepartment, (newValue) {
-              setState(() {
-                selectedDepartment = newValue;
-              });
-            }),
-            _buildTextField("Index Number", indexController),
-            SizedBox(height: 20),
-            OutlinedButton(
-                onPressed: () {
-                  showUpdateProfile(context, ()=>_updateDetails());
-                },
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Color(0xFF086494)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+        padding: const EdgeInsets.all(10.0),
+        child: _isLoading
+            ? const CircularProgressIndicator(
+                color: Color(0xFF086494),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 10),
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.account_circle,
+                      color: Color(0xFF086494),
+                      size: 80,
+                    ),
                   ),
-                ),
-                child: Text(
-                  "Update Profile",
-                  style: TextStyle(color: Color(0xFF086494)),
-                )),
-          ],
-        ),
+                  Text(
+                    studentName,
+                    style: const TextStyle(
+                      color: Color(0xFF086494),
+                      fontSize: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Name", fontSize: 15)),
+                  ),
+                  _buildTextField("Name", nameController),
+                  const SizedBox(height: 10),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Email", fontSize: 15)),
+                  ),
+                  _buildTextField("Email", emailController),
+                  const SizedBox(height: 10),
+                  if (selectedSemester != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Semester", fontSize: 15)),
+                        ),
+                        _buildDropdownField(
+                            "Semester", _getSemesterList(), selectedSemester,
+                            (newValue) {
+                          setState(() {
+                            selectedSemester = newValue;
+                          });
+                        }),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  if (selectedDepartment != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  TextBlue(text: "Department", fontSize: 15)),
+                        ),
+                        _buildDropdownField("Department", _getDepartmentList(),
+                            selectedDepartment, (newValue) {
+                          setState(() {
+                            selectedDepartment = newValue;
+                          });
+                        }),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Index Number", fontSize: 15)),
+                  ),
+                  _buildTextField("Index Number", indexController),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: MyButtonDS(
+                      onTap: () {
+                        showUpdateProfile(context, () => _updateDetails());
+                      },
+                      text: "Update Profile",
+                      width: double.infinity,
+                    ),
+                  )
+                ],
+              ),
       ),
     );
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: TextField(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: MyTextField(
         controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-        ),
+        hintText: label,
+        width: double.infinity,
+        obscureText: false,
+        icon: const Icon(Icons.text_fields),
       ),
     );
   }
 
   Widget _buildDropdownField(
-      String label,
-      List<Map<String, dynamic>> items,
-      String? value,
-      ValueChanged<String?> onChanged,
-      ) {
+    String label,
+    List<Map<String, dynamic>> items,
+    String? value,
+    ValueChanged<String?> onChanged,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: DropdownButtonFormField<String>(
-        value: value,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ListInputFieldWidget(
+        hintText: label,
+        width: double.infinity,
+        icon: const Icon(Icons.list),
+        options: items.map((item) => item['name'].toString()).toList(),
+        initialValue: value,
         onChanged: onChanged,
-        items: items.map((item) {
-          return DropdownMenuItem<String>(
-            value: item['id'].toString(),
-            child: Text(item['name']),
-          );
-        }).toList(),
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-        ),
       ),
     );
   }
-  List departmentList = ["DEIE","DCOM","DMME","DCEE","DMENA"];
+
   List<Map<String, dynamic>> _getDepartmentList() {
     return [
       {"name": "DEIE", "id": "1"},
@@ -132,7 +212,6 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
       {"name": "DMENA", "id": "5"},
     ];
   }
-
 
   List<Map<String, dynamic>> _getSemesterList() {
     return [
@@ -147,9 +226,6 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     ];
   }
 
-
-
-
   void _updateDetails() async {
     String updatedName = nameController.text;
     String updatedEmail = emailController.text;
@@ -157,12 +233,23 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     String updatedSemester = selectedSemester!;
     String updatedDepartment = selectedDepartment!;
 
-    await StudentUpdateSettingService.updateStudent(context,studentId! ,"", "", "", updatedName, updatedIndex, updatedEmail, "", int.parse(updatedDepartment),int.parse(updatedSemester));
+    var logger = Logger();
+    logger.i('Updating details...');
+    logger.i(
+        'Name: $updatedName, Email: $updatedEmail, Index: $updatedIndex, Semester: $updatedSemester, Department: $updatedDepartment');
+
+    /* await StudentUpdateSettingService.updateStudent(
+        context,
+        "",
+        "",
+        "",
+        "",
+        int.parse(updatedDepartment),
+        int.parse(updatedSemester)); */
     // Replace with actual update logic using API service
     print('Updating details...');
-    print('Name: $updatedName, Email: $updatedEmail, Index: $updatedIndex, Semester: $updatedSemester, Department: $updatedDepartment');
+    print(
+        'Name: $updatedName, Email: $updatedEmail, Index: $updatedIndex, Semester: $updatedSemester, Department: $updatedDepartment');
     // Call your update service here with the updated values
   }
 }
-
-

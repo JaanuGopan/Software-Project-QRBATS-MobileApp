@@ -4,6 +4,7 @@ import 'package:qrbats_sp/pages/login_signup_pages/forgot_password_page.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/signup_page1.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../api_services/LoginService.dart';
 import '../../components/buttons/button_dark_large.dart';
 import '../../components/buttons/round_button.dart';
@@ -39,7 +40,7 @@ class _LoginState extends State<Login> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return OpeningPage();
+        return const OpeningPage();
       }),
     );
   }
@@ -48,14 +49,14 @@ class _LoginState extends State<Login> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return ForgotPasswordPage();
+        return const ForgotPasswordPage();
       }),
     );
   }
 
   void signUpPage() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Signup1();
+      return const Signup1();
     }));
   }
 
@@ -63,11 +64,11 @@ class _LoginState extends State<Login> {
 
   Future<void> _handelLogin(
       BuildContext context, String userName, String password) async {
-    if(userName == ""){
+    if (userName == "") {
       CustomSnackBar.showWarning(context, "Please Enter UserName.");
       return;
     }
-    if(password == ""){
+    if (password == "") {
       CustomSnackBar.showWarning(context, "Please Enter Password.");
     }
     try {
@@ -76,7 +77,6 @@ class _LoginState extends State<Login> {
       });
       await LoginService.login(context, userName, password);
     } on Exception catch (e) {
-      // TODO
       CustomSnackBar.showError(context, "Error in Login.");
     } finally {
       setState(() {
@@ -85,69 +85,61 @@ class _LoginState extends State<Login> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
+      body: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 20.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 20),
-                    Center(child: TextBlue(text: "LogIn", fontSize: 30)),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 20),
+                    const Center(child: TextBlue(text: "LogIn", fontSize: 30)),
+                    const SizedBox(height: 30),
                     Container(
-                      padding: EdgeInsets.only(
-                          left: 10, right: 10, top: 20, bottom: 30),
-                      width: screenWidth * 0.9,
-                      decoration: _buildContainerDecoration(),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
-                          Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 20),
-                              child: Text(
-                                "This is very easy to use and You can mark your attendance very Quickly and Easily",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          TextBlue(text: "User Name", fontSize: 20),
-                          SizedBox(height: screenHeight * 0.02),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "User Name", fontSize: 15)),
                           MyTextField(
                             controller: _userNameTextController,
                             hintText: "user name",
-                            width: screenWidth * 0.8,
+                            width: double.infinity,
                             obscureText: false,
-                            icon: Icon(Icons.person),
+                            icon: const Icon(Icons.person),
                           ),
-                          SizedBox(height: screenHeight * 0.05),
-                          TextBlue(text: "Password", fontSize: 20),
-                          SizedBox(height: 20),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Password", fontSize: 15)),
                           MyTextField(
                             controller: _password,
                             hintText: "password",
-                            width: screenWidth * 0.8,
+                            width: double.infinity,
                             obscureText: true,
-                            icon: Icon(Icons.lock),
+                            icon: const Icon(Icons.lock),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               TextButton(
                                 onPressed: forgotPasswordPage,
-                                child: Text(
+                                child: const Text(
                                   "Forgot Password?",
                                   style: TextStyle(
                                     fontSize: 15,
@@ -158,26 +150,45 @@ class _LoginState extends State<Login> {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 10),
                             ],
+                          ),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: _isLoginLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF086494),
+                                      ),
+                                    )
+                                  : MyButtonDS(
+                                      onTap: () => _handelLogin(
+                                          context,
+                                          _userNameTextController.text,
+                                          _password.text),
+                                      text: "LogIn",
+                                      width: double.infinity,
+                                    ),
+                            ),
                           ),
                           Row(
                             children: [
-                              Spacer(),
-                              Text(
+                              const Spacer(),
+                              const Text(
                                 "If you don't have an account? ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 12, color: Colors.black),
+                                    fontSize: 15, color: Colors.black),
                               ),
                               TextButton(
                                 onPressed: signUpPage,
-                                child: Text(
+                                child: const Text(
                                   "SignUp",
                                   style: TextStyle(color: Color(0xFF086494)),
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                         ],
@@ -187,44 +198,8 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Row(
-                  children: [
-                    SizedBox(width: 15),
-                    RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-                    Spacer(),
-                    _isLoginLoading
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : MyButtonDS(
-                            onTap: () => _handelLogin(context,_userNameTextController.text,_password.text),
-                            text: "LogIn",
-                            width: screenWidth * 0.35,
-                          ),
-                    SizedBox(width: 15),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border.all(
-        color: Color(0xFF086494),
-        width: 1.0,
+          ),
+        ],
       ),
     );
   }

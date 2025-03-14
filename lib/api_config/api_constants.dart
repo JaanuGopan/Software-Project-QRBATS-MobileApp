@@ -27,26 +27,28 @@ class ApiConstants {
   static const String lectureAttendanceMarking =
       '/api/v1/lecture-attendance/mark-attendance';
   static const String lectureAttendanceMarkingByLectureId =
-      '/api/v1/lecture-attendance/mark-attendance-by-lectureId';
+      '/api/v1/attendance/mark-attendance-for-lecture';
   static const String getAllModuleByStudentId =
-      '/api/v1/module/get-all-modules-by-studentId';
+      '/api/v1/module/get-all-un-enrolled-module-for-student';
   static const String getModuleByModuleCode =
       '/api/v1/module/get-module-by-module-code';
   static const String getAllEnrolledModuleByStudentId =
-      '/api/v1/module/get-all-enrolled-modules';
+      '/api/v1/module/get-all-enrolled-modules-for-student';
   static const String moduleEnrollmentUrl = '/api/v1/module/module-enrollment';
   static const String moduleUnEnrollmentUrl =
       '/api/v1/module/module-un-enrollment';
   static const String getAllLecturesByModuleCode =
-      '/api/v1/lecture/get-all-lecture-by-module-code';
-  static const String getAllAttendanceHistoryByStudentIdUrl =
-      '/api/v1/lecture-attendance/get-all-attendance-history-by-studentId';
+      '/api/v1/lecture/get-all-lecture-by-moduleId-for-student';
+  static const String getModuleAttendanceForStudent =
+      '/api/v1/attendance/get-module-attendance-for-student';
   static const String getEventByEventId = '/api/v1/event/get-event-by-eventId';
   static const String getEventAttendanceHistoryUrl =
       '/api/v1/attendance/get-all-attendance-by-studentId';
   static const String sendOTPForForgotPassword =
-      '/api/v1/mobile/forgot-password-send-otp';
+      '/api/v1/auth/forgot-password-send-otp-for-student';
   static const String verifyOTPForForgotPassword =
-      '/api/v1/mobile/forgot-password-verify-otp';
-  static const String resetPasswordUrl = '/api/v1/auth/reset-password';
+      '/api/v1/auth/forgot-password-verify-otp-for-student';
+  static const String resetPasswordUrl =
+      '/api/v1/auth/forgot-password-reset-password-for-student';
+  static const String getStudentUrl = '/api/v1/auth/user';
 }

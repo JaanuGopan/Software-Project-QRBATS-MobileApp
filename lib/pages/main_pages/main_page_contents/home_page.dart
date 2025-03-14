@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:qrbats_sp/api_services/ModuleService.dart';
 import 'package:qrbats_sp/components/modulecomponents/module_enrolled_item.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
-import 'package:qrbats_sp/api_services/ModuleService.dart';
 
 class Home extends StatefulWidget {
-  final String token;
-
-  const Home({Key? key, this.token = ""}) : super(key: key);
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  late int studentId;
   List<Module> moduleList = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -22,16 +18,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
-    studentId = jwtDecodedToken["userId"];
-    _fetchEnrolledModuleData(context, studentId);
+    _fetchEnrolledModuleData(context);
   }
 
-  Future<void> _fetchEnrolledModuleData(
-      BuildContext context, int studentId) async {
+  Future<void> _fetchEnrolledModuleData(BuildContext context) async {
     try {
       final List<Module> enrolledModuleList =
-      await ModuleService.getAllEnrolledModule(context, studentId);
+          await ModuleService.getAllEnrolledModule(context);
       setState(() {
         moduleList = enrolledModuleList;
         isLoading = false;
@@ -46,9 +39,9 @@ class _HomeState extends State<Home> {
 
   void _unEnrollModule(int moduleId) async {
     if (moduleId.isFinite) {
-      await ModuleService.moduleUnEnrollment(context, moduleId, studentId);
+      await ModuleService.moduleUnEnrollment(context, moduleId);
       _fetchEnrolledModuleData(
-          context, studentId); // Refresh module list after unenrollment
+          context); // Refresh module list after unenrollment
     }
   }
 
@@ -68,26 +61,26 @@ class _HomeState extends State<Home> {
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(9.0),
-                  decoration: _buildContainerDecoration(),
+                  //decoration: _buildContainerDecoration(),
                   child: isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : errorMessage.isNotEmpty
-                      ? Center(child: Text(errorMessage))
-                      : moduleList.isEmpty
-                      ? const Center(child: Text("No Enrolled Modules"))
-                      : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Center(
-                        child: Text(
-                          "Enrolled Modules",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildEnrolledModuleList(),
-                    ],
-                  ),
+                          ? Center(child: Text(errorMessage))
+                          : moduleList.isEmpty
+                              ? const Center(child: Text("No Enrolled Modules"))
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                      child: Text(
+                                        "Enrolled Modules",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    _buildEnrolledModuleList(),
+                                  ],
+                                ),
                 ),
               ],
             ),
@@ -108,7 +101,6 @@ class _HomeState extends State<Home> {
             ModuleEnrolledContent(
               module: moduleList[index],
               number: index + 1,
-              studentId: studentId,
             ),
             const SizedBox(height: 10),
           ],
