@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/pages/getStart_page.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,12 +28,7 @@ class ApiService {
     BuildContext? context, {
     Map<String, dynamic>? body,
   }) async {
-    Map<String, String> headers = {};
-    if (!endpoint.contains("/auth/")) {
-      headers = await _getHeaders();
-    } else {
-      headers = {'Content-Type': 'application/json; charset=UTF-8'};
-    }
+    Map<String, String> headers = await _getHeaders();
     final Uri url = Uri.parse('$baseUrl$endpoint');
 
     try {
@@ -82,6 +78,19 @@ class ApiService {
       } else {
         CustomSnackBar.showError(
             context, "Request failed with status ${response.statusCode}");
+      }
+
+      void logout() async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove("token");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const OpeningPage()),
+        );
+      }
+
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        logout();
       }
     }
 

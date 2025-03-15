@@ -276,7 +276,11 @@ class _QRCodeScanState extends State<QRCodeScan> {
                                 child: ScannedModule(
                                   module: scannedModule!,
                                 ))
-                            : const Center(child: CircularProgressIndicator()),
+                            : const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF086494),
+                                ),
+                              ),
                       ],
                     ),
                   ],
@@ -297,7 +301,11 @@ class _QRCodeScanState extends State<QRCodeScan> {
                       ],
                     )
                   : showScannedDetails
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF086494),
+                          ),
+                        )
                       : Container(),
             ],
           ),

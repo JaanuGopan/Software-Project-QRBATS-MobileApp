@@ -94,7 +94,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(
+        timeLimit: const Duration(
             seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
@@ -155,8 +155,8 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     return GestureDetector(
       onTap: handleShowLecture,
       child: Container(
-        padding: EdgeInsets.all(8.0),
-        margin: EdgeInsets.symmetric(vertical: 4.0),
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.symmetric(vertical: 4.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -165,7 +165,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -173,10 +173,10 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
           children: [
             Row(
               children: [
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Text(widget.number.toString(),
                     style: TextStyle(fontSize: _getFontSize(screenWidth))),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +220,11 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
   Widget _buildLectureList() {
     return isLecturesLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF086494),
+            ),
+          )
         : errorMessage.isNotEmpty
             ? Center(child: Text(errorMessage))
             : Column(
@@ -246,14 +250,14 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         padding: const EdgeInsets.all(10),
         child: Row(
           children: [
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             Column(
               children: [
                 Text(
@@ -264,7 +268,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             Flexible(
@@ -279,7 +283,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "Date: ${lecture.lectureDate}",
                     style: TextStyle(
@@ -287,7 +291,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "Start Time: ${timeFormat.format(lecture.lectureStartTime)}",
                     style: TextStyle(
@@ -295,7 +299,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "End Time: ${timeFormat.format(lecture.lectureEndTime)}",
                     style: TextStyle(
@@ -303,7 +307,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "Venue: ${lecture.locationName}",
                     style: TextStyle(
@@ -314,13 +318,13 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 ],
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 isProcessing && processingLectureId == lecture.id
-                    ? CircularProgressIndicator() // Show progress indicator when processing
+                    ? const CircularProgressIndicator() // Show progress indicator when processing
                     : ElevatedButton(
                         onPressed: () => markAttendancePopup(context,
                             () => _handleMarkAttendance(lecture.id), lecture),

@@ -90,7 +90,11 @@ class _ModulePageState extends State<ModulePage> {
                 child: Container(
                   padding: const EdgeInsets.all(9.0),
                   child: isAllModuleLoading || isAllEnrolledModuleLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF086494),
+                          ),
+                        )
                       : errorMessage.isNotEmpty
                           ? Center(child: Text(errorMessage))
                           : Column(

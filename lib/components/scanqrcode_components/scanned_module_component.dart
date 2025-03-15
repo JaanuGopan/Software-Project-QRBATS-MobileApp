@@ -224,7 +224,11 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   Widget _buildLectureList() {
     return isLecturesLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF086494),
+            ),
+          )
         : errorMessage.isNotEmpty
             ? Center(child: Text(errorMessage))
             : Column(
@@ -299,7 +303,9 @@ class _ScannedModuleState extends State<ScannedModule> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 isProcessing && processingLectureId == lecture.id
-                    ? const CircularProgressIndicator() // Show CircularProgressIndicator if processing
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ) // Show CircularProgressIndicator if processing
                     : OutlinedButton(
                         onPressed: () => markAttendancePopup(context,
                             () => _handleMarkAttendance(lecture.id), lecture),

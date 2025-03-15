@@ -53,7 +53,7 @@ class _ScannedEventState extends State<ScannedEvent> {
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(
+        timeLimit: const Duration(
             seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
@@ -109,8 +109,8 @@ class _ScannedEventState extends State<ScannedEvent> {
   Widget build(BuildContext context) {
     final timeFormat = DateFormat('HH:mm a');
     return Container(
-      padding: EdgeInsets.all(8.0),
-      margin: EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -119,7 +119,7 @@ class _ScannedEventState extends State<ScannedEvent> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -130,7 +130,7 @@ class _ScannedEventState extends State<ScannedEvent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Column(
@@ -149,23 +149,23 @@ class _ScannedEventState extends State<ScannedEvent> {
                                   fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               "Date : ${widget.event.eventDate}",
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.black),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               "Time : ${widget.event.eventTime}",
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.black),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               "Venue : ${widget.event.eventVenue}",
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.black),
                             ),
                           ],
                         ),
@@ -173,9 +173,11 @@ class _ScannedEventState extends State<ScannedEvent> {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 isProcessing
-                    ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ) // Show CircularProgressIndicator if processing
                     : OutlinedButton(
                         onPressed: () => markEventAttendancePopup(context,
                             () => _handleMarkAttendance(), widget.event),

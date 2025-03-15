@@ -35,166 +35,167 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     roleController = TextEditingController();
     nameController = TextEditingController();
     indexController = TextEditingController();
-
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      Future<StudentDto> studentDto =
-          StudentUpdateSettingService.getStudent(context);
-      studentDto.then((value) => {
-            setState(() {
-              emailController.text = value.email!;
-              semesterController.text = value.semester.toString();
-              roleController.text = value.role!;
-              nameController.text = value.firstName!;
-              indexController.text = value.indexNumber!;
-              selectedDepartment = value.departmentId.toString();
-              selectedSemester = value.semester.toString();
-              studentName = value.firstName!;
-              selectedStudentBatch = value.studentBatch.toString();
+    setState(() {
+      _isLoading = true;
+    });
+    Future<StudentDto> studentDto =
+        StudentUpdateSettingService.getStudent(context);
+    studentDto
+        .then((value) => {
+              setState(() {
+                emailController.text = value.email!;
+                semesterController.text = value.semester.toString();
+                roleController.text = value.role!;
+                nameController.text = value.firstName!;
+                indexController.text = value.indexNumber!;
+                selectedDepartment = value.departmentId.toString();
+                selectedSemester = value.semester.toString();
+                studentName = value.firstName!;
+                selectedStudentBatch = value.studentBatch.toString();
+              }),
+              setState(() {
+                _isLoading = false;
+              })
             })
-          });
-    } finally {
+        .catchError((onError) {
       setState(() {
         _isLoading = false;
       });
-    }
+      return null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10.0),
-        child: _isLoading
-            ? const CircularProgressIndicator(
-                color: Color(0xFF086494),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 10),
-                  const CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.account_circle,
-                      color: Color(0xFF086494),
-                      size: 80,
-                    ),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(10.0),
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF086494),
                   ),
-                  Text(
-                    studentName,
-                    style: const TextStyle(
-                      color: Color(0xFF086494),
-                      fontSize: 24,
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Update Profile",
+                      style: TextStyle(
+                          color: Color(0xFF086494),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextBlue(text: "Name", fontSize: 15)),
-                  ),
-                  _buildTextField("Name", nameController),
-                  const SizedBox(height: 10),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextBlue(text: "Email", fontSize: 15)),
-                  ),
-                  _buildTextField("Email", emailController),
-                  const SizedBox(height: 10),
-                  if (selectedSemester != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Semester", fontSize: 15)),
-                        ),
-                        _buildDropdownField(
-                            "Semester", _semesterList, selectedSemester,
-                            (newValue) {
-                          setState(() {
-                            selectedSemester = newValue;
-                          });
-                        }),
-                        const SizedBox(height: 10),
-                      ],
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextBlue(text: "Name", fontSize: 15)),
                     ),
-                  if (selectedDepartment != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child:
-                                  TextBlue(text: "Department", fontSize: 15)),
-                        ),
-                        _buildDropdownField(
-                            "Department", _departmentList, selectedDepartment,
-                            (newValue) {
-                          setState(() {
-                            selectedDepartment =
-                                (_departmentList.indexOf(newValue!) + 1)
-                                    .toString();
-                          });
-                        }),
-                        const SizedBox(height: 10),
-                      ],
+                    _buildTextField("Name", nameController),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextBlue(text: "Email", fontSize: 15)),
                     ),
-                  if (selectedStudentBatch != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Student Batch", fontSize: 15)),
-                        ),
-                        _buildDropdownField(
-                            "Student Batch",
-                            _studentBatchList,
-                            (_studentBatchList.indexOf(selectedStudentBatch!) +
-                                    1)
-                                .toString(), (newValue) {
-                          setState(() {
-                            selectedStudentBatch = newValue;
-                          });
-                        }),
-                        const SizedBox(height: 10),
-                      ],
+                    _buildTextField("Email", emailController),
+                    const SizedBox(height: 10),
+                    if (selectedSemester != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    TextBlue(text: "Semester", fontSize: 15)),
+                          ),
+                          _buildDropdownField(
+                              "Semester", _semesterList, selectedSemester,
+                              (newValue) {
+                            setState(() {
+                              selectedSemester = newValue;
+                            });
+                          }),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    if (selectedDepartment != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    TextBlue(text: "Department", fontSize: 15)),
+                          ),
+                          _buildDropdownField(
+                              "Department", _departmentList, selectedDepartment,
+                              (newValue) {
+                            setState(() {
+                              selectedDepartment =
+                                  (_departmentList.indexOf(newValue!) + 1)
+                                      .toString();
+                            });
+                          }),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    if (selectedStudentBatch != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextBlue(
+                                    text: "Student Batch", fontSize: 15)),
+                          ),
+                          _buildDropdownField(
+                              "Student Batch",
+                              _studentBatchList,
+                              (_studentBatchList
+                                          .indexOf(selectedStudentBatch!) +
+                                      1)
+                                  .toString(), (newValue) {
+                            setState(() {
+                              selectedStudentBatch = newValue;
+                            });
+                          }),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextBlue(text: "Index Number", fontSize: 15)),
                     ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextBlue(text: "Index Number", fontSize: 15)),
-                  ),
-                  _buildTextField("Index Number", indexController),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: MyButtonDS(
-                      onTap: () {
-                        showUpdateProfile(context, () => _updateDetails());
-                      },
-                      text: "Update Profile",
-                      width: double.infinity,
-                    ),
-                  )
-                ],
-              ),
+                    _buildTextField("Index Number", indexController),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: MyButtonDS(
+                        onTap: () {
+                          showUpdateProfile(context, () => _updateDetails());
+                        },
+                        text: "Update Profile",
+                        width: double.infinity,
+                      ),
+                    )
+                  ],
+                ),
+        ),
       ),
     );
   }

@@ -47,9 +47,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -63,7 +60,11 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.all(9.0),
                   //decoration: _buildContainerDecoration(),
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF086494),
+                          ),
+                        )
                       : errorMessage.isNotEmpty
                           ? Center(child: Text(errorMessage))
                           : moduleList.isEmpty

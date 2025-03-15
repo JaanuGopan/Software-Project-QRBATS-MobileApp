@@ -91,7 +91,11 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: isAllEnrolledModuleLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF086494),
+                ),
+              )
             : errorMessage.isNotEmpty
                 ? Center(child: Text(errorMessage))
                 : _buildAttendanceContent(),
@@ -119,12 +123,12 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                   setState(() => showLectureHistory = index == 0),
               color: Colors.black,
               selectedColor: Colors.white,
-              fillColor: Color(0xFF086494),
-              selectedBorderColor: Color(0xFF086494),
+              fillColor: const Color(0xFF086494),
+              selectedBorderColor: const Color(0xFF086494),
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-        if (selectedModule == null) SizedBox(height: 20),
+        if (selectedModule == null) const SizedBox(height: 20),
         Expanded(
           child: showLectureHistory
               ? (selectedModule != null
@@ -198,7 +202,7 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.0),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black12, // Soft shadow
                   blurRadius: 6.0,
@@ -211,14 +215,14 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Attendance Summary',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Text('Total Finished Lectures: $totalLectureCount'),
                 Text('Attended Lectures: $attendedLectureCount'),
                 Text('Missed Lectures: $missedLectureCount'),
@@ -249,7 +253,11 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
           ],
         ),
         isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF086494),
+                ),
+              )
             : Expanded(
                 child: ListView.builder(
                   itemCount: studentAttendanceResultDto
