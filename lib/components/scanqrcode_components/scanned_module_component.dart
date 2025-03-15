@@ -11,12 +11,10 @@ import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this im
 
 class ScannedModule extends StatefulWidget {
   final Module module;
-  final int studentId;
 
   const ScannedModule({
     Key? key,
     required this.module,
-    required this.studentId,
   }) : super(key: key);
 
   @override
@@ -100,7 +98,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(
+        timeLimit: const Duration(
             seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
@@ -157,8 +155,8 @@ class _ScannedModuleState extends State<ScannedModule> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.0),
-      margin: EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +165,7 @@ class _ScannedModuleState extends State<ScannedModule> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -176,26 +174,37 @@ class _ScannedModuleState extends State<ScannedModule> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.module.moduleCode,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          0.6, // Adjust the width as needed
+                      child: Text(
+                        widget.module.moduleCode,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    Text(
-                      widget.module.moduleName,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          0.6, // Adjust the width as needed
+                      child: Text(
+                        widget.module.moduleName,
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               IconButton(
                 onPressed: handleShowLecture,
                 icon: Icon(
@@ -215,7 +224,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   Widget _buildLectureList() {
     return isLecturesLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator())
         : errorMessage.isNotEmpty
             ? Center(child: Text(errorMessage))
             : Column(
@@ -240,7 +249,7 @@ class _ScannedModuleState extends State<ScannedModule> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -250,7 +259,7 @@ class _ScannedModuleState extends State<ScannedModule> {
             const SizedBox(width: 25),
             Text(
               "${lectures.indexOf(lecture) + 1}.",
-              style: TextStyle(fontSize: 12, color: Colors.black),
+              style: const TextStyle(fontSize: 12, color: Colors.black),
             ),
             const SizedBox(width: 20),
             Flexible(
@@ -266,20 +275,20 @@ class _ScannedModuleState extends State<ScannedModule> {
                           fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       "Date : ${lecture.lectureDate}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
+                      style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       "Time : ${timeFormat.format(lecture.lectureStartTime)}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
+                      style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       "Venue : ${lecture.locationName}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
+                      style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ],
                 ),
@@ -290,7 +299,7 @@ class _ScannedModuleState extends State<ScannedModule> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 isProcessing && processingLectureId == lecture.id
-                    ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
+                    ? const CircularProgressIndicator() // Show CircularProgressIndicator if processing
                     : OutlinedButton(
                         onPressed: () => markAttendancePopup(context,
                             () => _handleMarkAttendance(lecture.id), lecture),
@@ -307,7 +316,7 @@ class _ScannedModuleState extends State<ScannedModule> {
                       ),
               ],
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
           ],
         ),
       ),

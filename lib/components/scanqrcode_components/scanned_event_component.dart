@@ -1,20 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:intl/intl.dart';
+import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkEventAttendancePopup.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class ScannedEvent extends StatefulWidget {
   final EventQRCodeDetails event;
-  final int studentId;
 
   const ScannedEvent({
     super.key,
     required this.event,
-    required this.studentId,
   });
 
   @override
@@ -83,7 +80,7 @@ class _ScannedEventState extends State<ScannedEvent> {
     try {
       await checkLocationPermission();
       await markEventAttendance(
-          widget.event.eventId, widget.studentId, latitude, longitude, context);
+          widget.event.eventId, latitude, longitude, context);
     } catch (e) {
       CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
@@ -93,11 +90,11 @@ class _ScannedEventState extends State<ScannedEvent> {
     }
   }
 
-  Future<void> markEventAttendance(int eventId, int studentId, double latitude,
+  Future<void> markEventAttendance(int eventId, double latitude,
       double longitude, BuildContext context) async {
     try {
       bool isCloseDetails = await MarkAttendanceService.markAttendance(
-          eventId, studentId, latitude, longitude, context);
+          eventId, latitude, longitude, context);
       if (isCloseDetails) {
         setState(() {
           // Refresh the state if necessary

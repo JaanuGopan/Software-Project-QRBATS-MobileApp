@@ -33,18 +33,14 @@ class EventQRCodeDetails {
   }
 }
 
-
 class LectureQRCodeDetails {
   String moduleCode;
+  int moduleId;
 
-  LectureQRCodeDetails({
-    required this.moduleCode
-  });
+  LectureQRCodeDetails({required this.moduleCode, required this.moduleId});
 
   factory LectureQRCodeDetails.fromJson(Map<String, dynamic> json) {
     return LectureQRCodeDetails(
-      moduleCode: json['moduleCode'],
-    );
+        moduleCode: json['moduleCode'], moduleId: json['moduleId']);
   }
 }
-

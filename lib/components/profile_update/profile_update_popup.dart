@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 void showUpdateProfile(BuildContext context, Function onUpdate) {
-  TextEditingController enrollmentKeyController = TextEditingController();
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -12,15 +11,15 @@ void showUpdateProfile(BuildContext context, Function onUpdate) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
+              const ListTile(
                 title: Center(
-                  child: const Text(
+                  child: Text(
                     "Profile Update",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -78,7 +77,7 @@ final BoxDecoration _alertBoxDecoration = BoxDecoration(
       color: Colors.black.withOpacity(0.5),
       spreadRadius: 1,
       blurRadius: 10,
-      offset: Offset(0, 3),
+      offset: const Offset(0, 3),
     ),
   ],
 );

@@ -19,31 +19,20 @@ class StudentUpdateSettingService {
 
   static Future<void> updateStudent(
     BuildContext context,
-    String username,
-    String password,
-    String confirmPassword,
     String studentName,
     String indexNumber,
     String email,
-    String studentRole,
     int departmentId,
-    int currentSemester,
+    int semester,
+    int studentBatch,
   ) async {
-    if (password != confirmPassword) {
-      // Use CustomSnackBar to show the snackbar
-      CustomSnackBar.showWarning(context, 'Passwords do not match.');
-      return; // Exit function if passwords don't match
-    }
-
     Map<String, dynamic> userData = {
-      'userName': username == "" ? null : username,
-      'password': password == "" ? null : password,
       'firstName': studentName,
       'indexNumber': indexNumber,
       'email': email,
-      'role': studentRole == "" ? null : studentRole,
       'departmentId': departmentId,
-      'semester': currentSemester,
+      'semester': semester,
+      'studentBatch': studentBatch,
     };
 
     const String endpoint = ApiConstants.updateStudentUrl;

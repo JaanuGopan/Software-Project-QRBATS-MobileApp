@@ -9,9 +9,8 @@ import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 class ModuleService {
   // 🔹 Get Module by Module Code
   static Future<Module> getModuleByModuleCode(
-      BuildContext context, String moduleCode) async {
-    final endpoint =
-        '${ApiConstants.getModuleByModuleCode}?moduleCode=$moduleCode';
+      BuildContext context, int moduleId) async {
+    final endpoint = '${ApiConstants.getModuleByModuleCode}?moduleId=$moduleId';
 
     try {
       final response = await ApiService.get(endpoint, context);

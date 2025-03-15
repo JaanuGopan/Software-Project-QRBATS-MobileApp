@@ -188,21 +188,61 @@ class _MainPageState extends State<MainPage> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('About Us'),
-                    content: const Text(
-                      'Skyticker is a smart QR-based attendance tracking app designed to simplify and automate attendance management '
-                      'with fast QR scanning and real-time tracking, ensuring accuracy and efficiency. Developed by 22nd Computer Engineering '
-                      'batch students—Janugopan S, Harintharan N, Sivakkanth K, and Dilexan H.A.L.—this app aims to digitalize the attendance '
-                      'marking system at the University of Ruhuna, Faculty of Engineering, making the process seamless and modern.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Close'),
+                    contentPadding: EdgeInsets.zero,
+                    content: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const ListTile(
+                            title: Center(
+                              child: Text(
+                                "About Us",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Skyticker is a smart QR-based attendance tracking app designed to simplify and automate attendance management '
+                                  'with fast QR scanning and real-time tracking, ensuring accuracy and efficiency. Developed by 22nd Computer Engineering '
+                                  'batch students—Janugopan S, Harintharan N, Sivakkanth K, and Dilexan H.A.L.—this app aims to digitalize the attendance '
+                                  'marking system at the University of Ruhuna, Faculty of Engineering, making the process seamless and modern.',
+                                ),
+                              ],
+                            ),
+                          ),
+                          ButtonBar(
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text(
+                                  "Close",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               );

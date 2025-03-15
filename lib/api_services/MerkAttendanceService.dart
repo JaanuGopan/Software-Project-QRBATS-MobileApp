@@ -8,19 +8,14 @@ import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MarkAttendanceService {
-  static Future<bool> markAttendance(
-      int eventID,
-      int attendeeID,
-      double locationGPSLatitude,
-      double locationGPSLongitude,
-      BuildContext context) async {
+  static Future<bool> markAttendance(int eventID, double locationGPSLatitude,
+      double locationGPSLongitude, BuildContext context) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? authToken = preferences.getString("token");
     final Uri apiUrl = Uri.parse(
         '${ApiConstants.baseUrl}${ApiConstants.markAttendanceEndpoint}');
     Map<String, dynamic> attendanceData = {
       "eventId": eventID,
-      "attendeeId": attendeeID,
       "attendanceDate": DateFormat('yyyy-MM-dd').format(DateTime.now()),
       "attendanceTime": DateFormat('HH:mm:ss').format(DateTime.now()),
       "locationGPSLatitude": locationGPSLatitude,

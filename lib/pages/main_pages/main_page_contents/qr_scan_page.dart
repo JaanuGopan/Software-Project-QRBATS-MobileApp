@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:qrbats_sp/api_services/EventService.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
@@ -13,6 +12,8 @@ import 'package:qrbats_sp/components/scanqrcode_components/scanned_module_compon
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:simple_barcode_scanner/enum.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 class QRCodeScan extends StatefulWidget {
   const QRCodeScan({super.key});
@@ -22,8 +23,6 @@ class QRCodeScan extends StatefulWidget {
 }
 
 class _QRCodeScanState extends State<QRCodeScan> {
-  late int studentId;
-
   @override
   void initState() {
     super.initState();
@@ -78,18 +77,37 @@ class _QRCodeScanState extends State<QRCodeScan> {
         scannedEventQRCodeDetails = null;
       });
 
-      result = await FlutterBarcodeScanner.scanBarcode(
+      /* result = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666",
         "Cancel",
         true,
         ScanMode.QR,
-      );
+      ); */
+
+      result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SimpleBarcodeScannerPage(
+              scanType: ScanType.qr,
+              lineColor: "#086494",
+              isShowFlashIcon: true,
+              appBarTitle: "Scan QR Code",
+              centerTitle: true,
+              cancelButtonText: "Close",
+            ),
+          ));
+      setState(() {
+        if (result is String) {
+          result = result;
+        }
+      });
 
       debugPrint("Scanned QR Code: $result");
 
       if (result != null && result != "-1") {
         try {
-          Map<String, dynamic> details = json.decode(result!);
+          String decodedString = utf8.decode(base64Decode(result!));
+          Map<String, dynamic> details = json.decode(decodedString);
 
           if (details.containsKey('eventId') && details['eventId'] != null) {
             String scannedEventId = details['eventId'].toString();
@@ -99,16 +117,15 @@ class _QRCodeScanState extends State<QRCodeScan> {
                 showScannedDetails = true;
               });
             }
-          } else if (details.containsKey('moduleCode') &&
-              details['moduleCode'] != null) {
-            String scannedModuleCode = details['moduleCode'];
-            if (scannedModuleCode.isNotEmpty) {
-              getModule(scannedModuleCode);
-              setState(() {
-                qrCodeDetails = LectureQRCodeDetails.fromJson(details);
-                showQRCodeDetails = true;
-              });
-            }
+          } else if (details.containsKey('moduleId') &&
+              details['moduleId'] != null) {
+            int scannedModuleId = details['moduleId'];
+            debugPrint("Module ID: $scannedModuleId");
+            getModule(scannedModuleId);
+            setState(() {
+              qrCodeDetails = LectureQRCodeDetails.fromJson(details);
+              showQRCodeDetails = true;
+            });
           } else {
             CustomSnackBar.showError(context, "Scanned QR Code is not valid.");
           }
@@ -127,9 +144,9 @@ class _QRCodeScanState extends State<QRCodeScan> {
     debugPrint("THE RESULT IS $result");
   }
 
-  Future<void> getModule(String moduleCode) async {
+  Future<void> getModule(int moduleId) async {
     Module module =
-        await ModuleService.getModuleByModuleCode(context, moduleCode);
+        await ModuleService.getModuleByModuleCode(context, moduleId);
     setState(() {
       scannedModule = module;
       showScannedModule = true;
@@ -140,7 +157,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
   Future<void> markAttendance(int eventID, int attendeeID, double latitude,
       double longitude, BuildContext context) async {
     bool isCloseDetails = await MarkAttendanceService.markAttendance(
-        eventID, attendeeID, latitude, longitude, context);
+        eventID, latitude, longitude, context);
     if (isCloseDetails) {
       setState(() {
         showQRCodeDetails = false;
@@ -173,19 +190,8 @@ class _QRCodeScanState extends State<QRCodeScan> {
     }
   }
 
-  /*Future<void> getLocationDistance(String locationName, double latitude,double longitude) async {
-    await checkLocationPermission();
-    double calcdistance = await LocationService.findLocationDistance(locationName, latitude, longitude);
-    print("distance"+ calcdistance.toString());
-    setState(() {
-      print(calcdistance);
-      distance = calcdistance;
-    });
-  }*/
-
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -228,32 +234,31 @@ class _QRCodeScanState extends State<QRCodeScan> {
                 child: Row(
                   children: [
                     const Spacer(),
-                    Container(
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Image(
-                          image: AssetImage(
-                              "lib/assets/qrcode/barcode-scanner.png"),
-                          height: 70,
-                        ),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Image(
+                        image:
+                            AssetImage("lib/assets/qrcode/barcode-scanner.png"),
+                        height: 70,
                       ),
                     ),
                     const SizedBox(width: 10),
-                    OutlinedButton(
-                        onPressed: () {
-                          checkLocationPermission();
-                          scanQRCode();
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF086494)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
+                    ElevatedButton(
+                      onPressed: () {
+                        checkLocationPermission();
+                        scanQRCode();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF086494),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: const Text(
-                          "Scan QR Code",
-                          style: TextStyle(color: Color(0xFF086494)),
-                        )),
+                      ),
+                      child: const Text(
+                        "Scan QR Code",
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                    ),
                     const Spacer(),
                   ],
                 ),
@@ -270,7 +275,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
                                 width: screenWidth * 0.9,
                                 child: ScannedModule(
                                   module: scannedModule!,
-                                  studentId: studentId,
                                 ))
                             : const Center(child: CircularProgressIndicator()),
                       ],
@@ -286,8 +290,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
                             Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: ScannedEvent(
-                                  event: scannedEventQRCodeDetails!,
-                                  studentId: studentId),
+                                  event: scannedEventQRCodeDetails!),
                             ),
                           ],
                         )

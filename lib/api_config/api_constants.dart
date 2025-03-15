@@ -4,8 +4,9 @@ class ApiConstants {
   static const String facultyLocalIp =
       'http://10.50.227.44:8080'; // For Android App this IP is not working so use ngrok IP
   static const String awsIpAddress = '13.51.170.30';
-  static const String devIp = 'http://localhost:8080';
-  static const String baseUrl = devIp;
+  static const String devIp = 'http://192.168.1.10:8080';
+  static const String baseUrl =
+      'https://1682-2402-d000-a500-54c7-d971-7f13-d230-14a7.ngrok-free.app';
   static const String mobileBaseUrl = devIp;
   static const String baseUrlEmulater = 'http://10.0.2.2:8082';
   static const String checkStudentEmailEndpoint =
@@ -15,7 +16,7 @@ class ApiConstants {
   static const String checkStudentUserNameEndpoint =
       '/api/v1/auth/check-student-username';
   static const String studentRegister = '/api/v1/auth/signup';
-  static const String updateStudentUrl = '/api/v1/auth/update-user';
+  static const String updateStudentUrl = '/api/v1/auth/update-student';
   static const String studentlogin = '/api/v1/auth/student-login';
   static const String studentGenerateOTP = '/api/v1/otp/generate-otp';
   static const String studentVerifyOtp = '/api/v1/otp/otp-verification';
@@ -31,7 +32,7 @@ class ApiConstants {
   static const String getAllModuleByStudentId =
       '/api/v1/module/get-all-un-enrolled-module-for-student';
   static const String getModuleByModuleCode =
-      '/api/v1/module/get-module-by-module-code';
+      '/api/v1/module/get-module-by-moduleId-for-student';
   static const String getAllEnrolledModuleByStudentId =
       '/api/v1/module/get-all-enrolled-modules-for-student';
   static const String moduleEnrollmentUrl = '/api/v1/module/module-enrollment';

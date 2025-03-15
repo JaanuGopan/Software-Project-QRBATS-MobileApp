@@ -8,6 +8,7 @@ class StudentDto {
   final int? semester;
   final String? indexNumber;
   final String? role;
+  final int? studentBatch;
 
   StudentDto({
     this.userId,
@@ -19,6 +20,7 @@ class StudentDto {
     this.semester,
     this.indexNumber,
     this.role,
+    this.studentBatch,
   });
 
   factory StudentDto.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class StudentDto {
       semester: json['semester'],
       indexNumber: json['indexNumber'],
       role: json['role'],
+      studentBatch: json['studentBatch'],
     );
   }
 
@@ -46,6 +49,7 @@ class StudentDto {
       'semester': semester,
       'indexNumber': indexNumber,
       'role': role,
+      'studentBatch': studentBatch,
     };
   }
 }

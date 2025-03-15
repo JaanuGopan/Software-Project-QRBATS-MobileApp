@@ -34,7 +34,6 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
     super.initState();
 
     if (widget.initialValue != null) {
-      print("Initial value " + widget.initialValue.toString());
       _selectedValue = widget.initialValue;
     }
   }

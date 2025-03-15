@@ -27,7 +27,12 @@ class ApiService {
     BuildContext? context, {
     Map<String, dynamic>? body,
   }) async {
-    final headers = await _getHeaders();
+    Map<String, String> headers = {};
+    if (!endpoint.contains("/auth/")) {
+      headers = await _getHeaders();
+    } else {
+      headers = {'Content-Type': 'application/json; charset=UTF-8'};
+    }
     final Uri url = Uri.parse('$baseUrl$endpoint');
 
     try {

@@ -74,6 +74,11 @@ class _SignUp3State extends State<SignUp3> {
             context, "Password And Confirm Password Are Not Match.");
         return;
       }
+      if (!isValidPassword(_password.text)) {
+        CustomSnackBar.showWarning(context,
+            "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+        return;
+      }
 
       await RegistrationHelper.register(
         context,
@@ -93,6 +98,13 @@ class _SignUp3State extends State<SignUp3> {
         _isSignUpLoading = false;
       });
     }
+  }
+
+  bool isValidPassword(String password) {
+    // Add your password validation logic here
+    // Example: At least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character
+    final regex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    return regex.hasMatch(password);
   }
 
   @override

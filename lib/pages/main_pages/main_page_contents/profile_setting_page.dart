@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:qrbats_sp/api_services/StudentUpdateSettingService.dart';
 import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
 import 'package:qrbats_sp/components/profile_update/profile_update_popup.dart';
@@ -22,8 +21,9 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
   late TextEditingController nameController;
   late TextEditingController indexController;
 
-  String? selectedDepartment; // Track selected department
-  String? selectedSemester; // Track selected semester
+  String? selectedDepartment;
+  String? selectedSemester;
+  String? selectedStudentBatch;
   bool _isLoading = true;
 
   String studentName = "";
@@ -52,6 +52,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
               selectedDepartment = value.departmentId.toString();
               selectedSemester = value.semester.toString();
               studentName = value.firstName!;
+              selectedStudentBatch = value.studentBatch.toString();
             })
           });
     } finally {
@@ -118,7 +119,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                               child: TextBlue(text: "Semester", fontSize: 15)),
                         ),
                         _buildDropdownField(
-                            "Semester", _getSemesterList(), selectedSemester,
+                            "Semester", _semesterList, selectedSemester,
                             (newValue) {
                           setState(() {
                             selectedSemester = newValue;
@@ -138,10 +139,37 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                               child:
                                   TextBlue(text: "Department", fontSize: 15)),
                         ),
-                        _buildDropdownField("Department", _getDepartmentList(),
-                            selectedDepartment, (newValue) {
+                        _buildDropdownField(
+                            "Department", _departmentList, selectedDepartment,
+                            (newValue) {
                           setState(() {
-                            selectedDepartment = newValue;
+                            selectedDepartment =
+                                (_departmentList.indexOf(newValue!) + 1)
+                                    .toString();
+                          });
+                        }),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  if (selectedStudentBatch != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Student Batch", fontSize: 15)),
+                        ),
+                        _buildDropdownField(
+                            "Student Batch",
+                            _studentBatchList,
+                            (_studentBatchList.indexOf(selectedStudentBatch!) +
+                                    1)
+                                .toString(), (newValue) {
+                          setState(() {
+                            selectedStudentBatch = newValue;
                           });
                         }),
                         const SizedBox(height: 10),
@@ -186,7 +214,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
 
   Widget _buildDropdownField(
     String label,
-    List<Map<String, dynamic>> items,
+    List<String> items,
     String? value,
     ValueChanged<String?> onChanged,
   ) {
@@ -196,35 +224,42 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
         hintText: label,
         width: double.infinity,
         icon: const Icon(Icons.list),
-        options: items.map((item) => item['name'].toString()).toList(),
+        options: items,
         initialValue: value,
         onChanged: onChanged,
       ),
     );
   }
 
-  List<Map<String, dynamic>> _getDepartmentList() {
-    return [
-      {"name": "DEIE", "id": "1"},
-      {"name": "DCOM", "id": "2"},
-      {"name": "DMME", "id": "3"},
-      {"name": "DCEE", "id": "4"},
-      {"name": "DMENA", "id": "5"},
-    ];
-  }
+  final List<String> _departmentList = [
+    'DEIE',
+    'DCOM',
+    'DMME',
+    'DCEE',
+    'DMENA',
+  ];
 
-  List<Map<String, dynamic>> _getSemesterList() {
-    return [
-      {"name": "1", "id": "1"},
-      {"name": "2", "id": "2"},
-      {"name": "3", "id": "3"},
-      {"name": "4", "id": "4"},
-      {"name": "5", "id": "5"},
-      {"name": "6", "id": "6"},
-      {"name": "7", "id": "7"},
-      {"name": "8", "id": "8"},
-    ];
-  }
+  final List<String> _studentBatchList = [
+    '20',
+    '21',
+    '22',
+    '23',
+    '24',
+    '25',
+    '26',
+    '27',
+  ];
+
+  final List<String> _semesterList = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+  ];
 
   void _updateDetails() async {
     String updatedName = nameController.text;
@@ -232,24 +267,15 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     String updatedIndex = indexController.text;
     String updatedSemester = selectedSemester!;
     String updatedDepartment = selectedDepartment!;
+    int updatedStudentBatch = int.parse(selectedStudentBatch!);
 
-    var logger = Logger();
-    logger.i('Updating details...');
-    logger.i(
-        'Name: $updatedName, Email: $updatedEmail, Index: $updatedIndex, Semester: $updatedSemester, Department: $updatedDepartment');
-
-    /* await StudentUpdateSettingService.updateStudent(
+    await StudentUpdateSettingService.updateStudent(
         context,
-        "",
-        "",
-        "",
-        "",
+        updatedName,
+        updatedIndex,
+        updatedEmail,
         int.parse(updatedDepartment),
-        int.parse(updatedSemester)); */
-    // Replace with actual update logic using API service
-    print('Updating details...');
-    print(
-        'Name: $updatedName, Email: $updatedEmail, Index: $updatedIndex, Semester: $updatedSemester, Department: $updatedDepartment');
-    // Call your update service here with the updated values
+        int.parse(updatedSemester),
+        updatedStudentBatch);
   }
 }
