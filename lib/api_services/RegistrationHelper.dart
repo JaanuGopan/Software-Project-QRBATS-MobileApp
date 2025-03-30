@@ -1,12 +1,13 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:qrbats_sp/api_services/config/api_service.dart';
+
 import '../api_config/api_constants.dart';
 import '../pages/login_signup_pages/login_page.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
 class RegistrationHelper {
-  static const String mobileBaseUrl = ApiConstants.mobileBaseUrl;
   static const String studentRegisterEndpoint = ApiConstants.studentRegister;
   static const String checkStudentUserNameEndpoint =
       ApiConstants.checkStudentUserNameEndpoint;
@@ -20,18 +21,15 @@ class RegistrationHelper {
     String indexNumber,
     String email,
     String studentRole,
-    int departmentId,
+    int? departmentId,
     int currentSemester,
+    int studentBatch,
   ) async {
     if (password != confirmPassword) {
       // Use CustomSnackBar to show the snackbar
       CustomSnackBar.showWarning(context, 'Passwords do not match.');
       return; // Exit function if passwords don't match
     }
-    final Uri apiUrlSignup =
-        Uri.parse('$mobileBaseUrl$studentRegisterEndpoint');
-    final Uri apiUrlCheckUserName =
-        Uri.parse('$mobileBaseUrl$checkStudentUserNameEndpoint?userName=$username');
 
     Map<String, dynamic> userData = {
       'userName': username,
@@ -42,29 +40,29 @@ class RegistrationHelper {
       'role': studentRole,
       'departmentId': departmentId,
       'semester': currentSemester,
+      'batch': studentBatch,
     };
 
     try {
-      final http.Response checkUserNameResponse = await http.post(
-        apiUrlCheckUserName,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        }
+      // Use ApiService for checking username
+      final checkUserNameResponse = await ApiService.post(
+        '$checkStudentUserNameEndpoint?userName=$username',
+        {},
+        context,
       );
-      print(checkUserNameResponse.body);
 
-      if (checkUserNameResponse.statusCode == 200) {
+      if (checkUserNameResponse != null &&
+          checkUserNameResponse.statusCode == 200) {
         final bool usernameExists = jsonDecode(checkUserNameResponse.body);
         if (!usernameExists) {
-          final http.Response registerResponse = await http.post(
-            apiUrlSignup,
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(userData),
+          // Use ApiService for registration
+          final registerResponse = await ApiService.post(
+            studentRegisterEndpoint,
+            userData,
+            context,
           );
 
-          if (registerResponse.statusCode == 200) {
+          if (registerResponse != null && registerResponse.statusCode == 200) {
             CustomSnackBar.showSuccess(context,
                 "Account Successfully Created, Please Login Your Account.");
             Navigator.push(
@@ -73,8 +71,7 @@ class RegistrationHelper {
             );
           } else {
             // Registration failed
-            print('Failed to register user: ${registerResponse.statusCode}');
-            // Handle error
+            CustomSnackBar.showError(context, 'Registration failed.');
           }
         } else {
           // Username already exists, show snackbar
@@ -82,14 +79,14 @@ class RegistrationHelper {
         }
       } else {
         // Handle error if failed to check username
-        print(
-            'Failed to check username existence: ${checkUserNameResponse.statusCode}');
-        // Handle error
+        CustomSnackBar.showError(
+            context, 'Failed to check username availability.');
       }
     } catch (error) {
       // Catch any errors that occur during the HTTP request
       print('Error registering user: $error');
-      // Handle error
+      CustomSnackBar.showError(
+          context, 'An error occurred during registration.');
     }
   }
 }

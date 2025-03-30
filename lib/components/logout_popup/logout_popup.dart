@@ -43,20 +43,20 @@ void showLogoutPopup(BuildContext context, Function logout) {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
                       logout();
                       Navigator.of(context).pop();
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Logout",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],

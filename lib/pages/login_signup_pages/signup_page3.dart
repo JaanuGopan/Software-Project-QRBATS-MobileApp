@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/RegistrationHelper.dart'; // Adjust import path as needed
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+
 import '../../components/buttons/button_dark_large.dart';
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
@@ -13,8 +13,9 @@ class SignUp3 extends StatefulWidget {
   final String indexNumber;
   final String email;
   final String studentRole;
-  final int departmentId;
+  final int? departmentId;
   final int currentSemester;
+  final int studentBatch;
 
   const SignUp3({
     Key? key,
@@ -24,6 +25,7 @@ class SignUp3 extends StatefulWidget {
     required this.studentRole,
     required this.departmentId,
     required this.currentSemester,
+    required this.studentBatch,
   }) : super(key: key);
 
   @override
@@ -43,7 +45,7 @@ class _SignUp3State extends State<SignUp3> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        return MainPage();
+        return const MainPage();
       }),
     );
   }
@@ -55,23 +57,38 @@ class _SignUp3State extends State<SignUp3> {
       setState(() {
         _isSignUpLoading = true;
       });
-      if(_userNameTextController.text == ""){
+      if (_userNameTextController.text == "") {
         CustomSnackBar.showWarning(context, "Please Enter UserName.");
         return;
       }
-      if(_password.text == ""){
+      if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
+        CustomSnackBar.showWarning(
+            context, "User name should not include special characters.");
+        return;
+      }
+      if (_userNameTextController.text.length < 6) {
+        CustomSnackBar.showWarning(
+            context, "User name should be at least 6 characters long.");
+        return;
+      }
+      if (_password.text == "") {
         CustomSnackBar.showWarning(context, "Please Enter Password.");
         return;
       }
-      if(_confirmPassword.text == ""){
+      if (_confirmPassword.text == "") {
         CustomSnackBar.showWarning(context, "Please Enter Confirm Password.");
         return;
       }
-      if(_confirmPassword.text != _password.text){
-        CustomSnackBar.showWarning(context, "Password And Confirm Password Are Not Match.");
+      if (_confirmPassword.text != _password.text) {
+        CustomSnackBar.showWarning(
+            context, "Password And Confirm Password Are Not Match.");
         return;
       }
-
+      if (!isValidPassword(_password.text)) {
+        CustomSnackBar.showWarning(context,
+            "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+        return;
+      }
 
       await RegistrationHelper.register(
         context,
@@ -84,6 +101,7 @@ class _SignUp3State extends State<SignUp3> {
         widget.studentRole,
         widget.departmentId,
         widget.currentSemester,
+        widget.studentBatch,
       );
     } finally {
       setState(() {
@@ -92,124 +110,98 @@ class _SignUp3State extends State<SignUp3> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                      child:
-                          Center(child: TextBlue(text: "SignUp", fontSize: 30)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                        width: screenWidth * 0.9,
-                        decoration: _buildContainerDecoration(),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 30),
-                            const TextBlue(text: "User Name", fontSize: 20),
-                            const SizedBox(height: 10),
-                            MyTextField(
-                              controller: _userNameTextController,
-                              hintText: "user name",
-                              width: screenWidth * 0.8,
-                              obscureText: false,
-                              icon: const Icon(Icons.person),
-                            ),
-                            const SizedBox(height: 40),
-                            const TextBlue(text: "Password", fontSize: 20),
-                            const SizedBox(height: 10),
-                            MyTextField(
-                              controller: _password,
-                              hintText: "password",
-                              width: screenWidth * 0.8,
-                              obscureText: true,
-                              icon: Icon(Icons.lock),
-                            ),
-                            SizedBox(height: 40),
-                            TextBlue(text: "Confirm Password", fontSize: 20),
-                            SizedBox(height: 10),
-                            MyTextField(
-                              controller: _confirmPassword,
-                              hintText: "confirm password",
-                              width: screenWidth * 0.8,
-                              obscureText: true,
-                              icon: Icon(Icons.lock),
-                            ),
-                            SizedBox(height: 40),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Row(
-                  children: [
-                    SizedBox(width: 20),
-                    RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-                    Spacer(),
-                    _isSignUpLoading
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : MyButtonDS(
-                            onTap: () {
-                              handleSignUp();
-                            },
-                            text: "SignUp",
-                            width: 100,
-                          ),
-                    SizedBox(width: 20),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  bool isValidPassword(String password) {
+    // Password must contain at least 8 characters, one uppercase letter,
+    // one lowercase letter, and one number
+    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    return regex.hasMatch(password);
   }
 
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border(
-        top: BorderSide(
-          color: Color(0xFF086494),
-          width: 6.0,
-        ),
-        bottom: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        left: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
-        right: BorderSide(
-          color: Color(0xFF086494),
-          width: 1.0,
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Center(child: TextBlue(text: "SignUp", fontSize: 30)),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "User Name", fontSize: 15)),
+                          MyTextField(
+                            controller: _userNameTextController,
+                            hintText: "user name",
+                            width: double.infinity,
+                            obscureText: false,
+                            icon: const Icon(Icons.person),
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Password", fontSize: 15)),
+                          MyTextField(
+                            controller: _password,
+                            hintText: "password",
+                            width: double.infinity,
+                            obscureText: true,
+                            icon: const Icon(Icons.lock),
+                          ),
+                          const SizedBox(height: 10),
+                          const Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Confirm Password", fontSize: 15)),
+                          MyTextField(
+                            controller: _confirmPassword,
+                            hintText: "confirm password",
+                            width: double.infinity,
+                            obscureText: true,
+                            icon: const Icon(Icons.lock),
+                          ),
+                          const SizedBox(height: 10),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: _isSignUpLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF086494),
+                                      ),
+                                    )
+                                  : MyButtonDS(
+                                      onTap: handleSignUp,
+                                      text: "SignUp",
+                                      width: double.infinity,
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

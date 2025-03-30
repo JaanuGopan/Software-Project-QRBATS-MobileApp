@@ -1,34 +1,34 @@
 class Lecture {
-  final int lectureId;
-  final String lectureName;
-  final String lectureDay;
-  final String lectureVenue;
+  final int id;
+  final String name;
+  final DateTime lectureDate;
+  final String locationName;
   final DateTime lectureStartTime;
   final DateTime lectureEndTime;
-  final int lectureAssignedUserId;
-  final String lectureModuleCode;
+  final String? moduleCode;
+  final int? createdBy;
 
   Lecture({
-    required this.lectureId,
-    required this.lectureName,
-    required this.lectureDay,
-    required this.lectureVenue,
+    required this.id,
+    required this.name,
+    required this.lectureDate,
+    required this.locationName,
     required this.lectureStartTime,
     required this.lectureEndTime,
-    required this.lectureAssignedUserId,
-    required this.lectureModuleCode,
+    this.moduleCode,
+    this.createdBy,
   });
 
   factory Lecture.fromJson(Map<String, dynamic> json) {
     return Lecture(
-      lectureId: json['lectureId'],
-      lectureName: json['lectureName'],
-      lectureDay: json['lectureDay'],
-      lectureVenue: json['lectureVenue'],
+      id: json['id'],
+      name: json['name'],
+      lectureDate: DateTime.parse(json['lectureDate']), // Parsing Date
+      locationName: json['locationName'],
       lectureStartTime: _parseTime(json['lectureStartTime']),
       lectureEndTime: _parseTime(json['lectureEndTime']),
-      lectureAssignedUserId: json['lectureAssignedUserId'],
-      lectureModuleCode: json['lectureModuleCode'],
+      moduleCode: json['moduleCode'], // Nullable field
+      createdBy: json['createdBy'], // Nullable field
     );
   }
 

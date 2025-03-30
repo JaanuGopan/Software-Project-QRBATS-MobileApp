@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
 
 void showUpdateProfile(BuildContext context, Function onUpdate) {
-  TextEditingController enrollmentKeyController = TextEditingController();
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -13,15 +11,15 @@ void showUpdateProfile(BuildContext context, Function onUpdate) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
+              const ListTile(
                 title: Center(
-                  child: const Text(
+                  child: Text(
                     "Profile Update",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -44,20 +42,20 @@ void showUpdateProfile(BuildContext context, Function onUpdate) {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
                       onUpdate();
                       Navigator.of(context).pop();
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Update",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],
@@ -79,7 +77,7 @@ final BoxDecoration _alertBoxDecoration = BoxDecoration(
       color: Colors.black.withOpacity(0.5),
       spreadRadius: 1,
       blurRadius: 10,
-      offset: Offset(0, 3),
+      offset: const Offset(0, 3),
     ),
   ],
 );

@@ -7,27 +7,25 @@ class ListInputFieldWidget extends StatefulWidget {
   final List<String> options;
   final String? initialValue;
   final double height;
-  final double borderWidth;
   final void Function(String?)? onChanged;
 
   const ListInputFieldWidget({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.icon,
     required this.width,
     required this.options,
     this.initialValue,
     this.height = 55.0,
-    this.borderWidth = 1.0,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   _ListInputFieldWidgetState createState() => _ListInputFieldWidgetState();
 }
 
 class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
-  String? _selectedValue;
+  late String? _selectedValue;
 
   @override
   void initState() {
@@ -42,10 +40,22 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
-        border: Border(
+        border: const Border(
+          top: BorderSide(
+            color: Color(0xFF086494), // Set top border color
+            width: 0.5, // Set top border thickness
+          ),
+          right: BorderSide(
+            color: Color(0xFF086494), // Set right border color
+            width: 0.25, // Set right border thickness
+          ),
+          left: BorderSide(
+            color: Color(0xFF086494), // Set left border color
+            width: 0.25, // Set left border thickness
+          ),
           bottom: BorderSide(
-            color: Color(0xFF086494),
-            width: 3,
+            color: Color(0xFF086494), // Set bottom border color
+            width: 3, // Set bottom border thickness
           ),
         ),
       ),
@@ -55,16 +65,14 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
           setState(() {
             _selectedValue = newValue;
           });
-          if (widget.onChanged != null) {
-            widget.onChanged!(newValue);
-          }
+          widget.onChanged?.call(newValue);
         },
-        items: widget.options.map((String value) {
+        items: widget.options.map((option) {
           return DropdownMenuItem<String>(
-            value: value,
+            value: option,
             child: Text(
-              value,
-              style: TextStyle(color: Color(0xFF086494)),
+              option,
+              style: const TextStyle(color: Color(0xFF086494)),
             ),
           );
         }).toList(),
@@ -73,13 +81,12 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
           fillColor: Colors.transparent,
           prefixIcon: Icon(
             widget.icon.icon,
-            color: Color(0xFF086494),
+            color: const Color(0xFF086494),
           ),
-          prefixIconColor: Color(0xFF086494),
           filled: true,
           hintText: widget.hintText,
-          hintStyle: TextStyle(
-            color: Color(0xFF086494),
+          hintStyle: const TextStyle(
+            color: Colors.grey,
           ),
         ),
       ),

@@ -12,13 +12,11 @@ import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 class ModuleEnrolledContent extends StatefulWidget {
   final Module module;
   final int number;
-  final int studentId;
 
   const ModuleEnrolledContent({
     super.key,
     required this.module,
     required this.number,
-    required this.studentId,
   });
 
   @override
@@ -34,7 +32,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   int processingLectureId = -1;
 
   Future<void> _fetchLecturesByModuleCode(
-      BuildContext context, String moduleCode) async {
+      BuildContext context, int moduleId) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
@@ -42,7 +40,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
     try {
       final List<Lecture> lecturesList =
-          await LectureService.getAllLectureByModuleCode(context, moduleCode);
+          await LectureService.getAllLectureByModuleCode(context, moduleId);
       setState(() {
         lectures = lecturesList;
         isLecturesLoading = false;
@@ -57,7 +55,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
   void handleShowLecture() async {
     if (!showLecturesList && lectures.isEmpty) {
-      await _fetchLecturesByModuleCode(context, widget.module.moduleCode);
+      await _fetchLecturesByModuleCode(context, widget.module.id);
     }
     if (lectures.isNotEmpty) {
       setState(() {
@@ -96,7 +94,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(
+        timeLimit: const Duration(
             seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
@@ -123,10 +121,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     });
     try {
       await checkLocationPermission();
-      await markLectureAttendance(
-          widget.studentId, lectureId, latitude, longitude, context);
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+      await markLectureAttendance(lectureId, latitude, longitude, context);
     } finally {
       setState(() {
         isProcessing = false; // Set isProcessing to false when done
@@ -135,19 +130,15 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     }
   }
 
-  Future<void> markLectureAttendance(int studentId, int lectureId,
-      double latitude, double longitude, BuildContext context) async {
-    try {
-      bool isCloseDetails =
-          await LectureAttendanceService.markLectureAttendanceByLectureId(
-              studentId, lectureId, latitude, longitude, context);
-      if (isCloseDetails) {
-        setState(() {
-          // Refresh the state if necessary
-        });
-      }
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+  Future<void> markLectureAttendance(int lectureId, double latitude,
+      double longitude, BuildContext context) async {
+    bool isCloseDetails =
+        await LectureAttendanceService.markLectureAttendanceByLectureId(
+            lectureId, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+        // Refresh the state if necessary
+      });
     }
   }
 
@@ -155,70 +146,79 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      padding: EdgeInsets.all(8.0),
-      margin: EdgeInsets.symmetric(vertical: 4.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(width: 10),
-              Text(widget.number.toString(),
-                  style: TextStyle(fontSize: _getFontSize(screenWidth))),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.module.moduleCode,
-                      style: TextStyle(
-                          fontSize: _getFontSize(screenWidth),
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      widget.module.moduleName,
-                      style: TextStyle(
-                          fontSize: _getFontSize(screenWidth, isSubtext: true),
-                          color: Colors.grey),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+    return GestureDetector(
+      onTap: handleShowLecture,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.symmetric(vertical: 4.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 10),
+                Text(widget.number.toString(),
+                    style: TextStyle(fontSize: _getFontSize(screenWidth))),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.module.moduleCode,
+                        style: TextStyle(
+                            fontSize: _getFontSize(screenWidth),
+                            fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        widget.module.moduleName,
+                        style: TextStyle(
+                            fontSize:
+                                _getFontSize(screenWidth, isSubtext: true),
+                            color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                onPressed: handleShowLecture,
-                icon: Icon(
-                  showLecturesList
-                      ? CupertinoIcons.multiply_square
-                      : Icons.menu_open,
-                  color: showLecturesList ? Colors.red : Colors.green,
+                IconButton(
+                  onPressed: handleShowLecture,
+                  icon: Icon(
+                    showLecturesList
+                        ? CupertinoIcons.chevron_down_circle
+                        : CupertinoIcons.chevron_left_circle,
+                    color: showLecturesList ? Colors.red : Colors.green,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          if (showLecturesList) _buildLectureList(),
-        ],
+              ],
+            ),
+            if (showLecturesList)
+              GestureDetector(onTap: () {}, child: _buildLectureList()),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildLectureList() {
     return isLecturesLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF086494),
+            ),
+          )
         : errorMessage.isNotEmpty
             ? Center(child: Text(errorMessage))
             : Column(
@@ -244,14 +244,14 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         padding: const EdgeInsets.all(10),
         child: Row(
           children: [
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             Column(
               children: [
                 Text(
@@ -262,7 +262,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             Flexible(
@@ -270,22 +270,22 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    lecture.lectureName,
+                    lecture.name,
                     style: TextStyle(
                         fontSize: _getFontSize(screenWidth),
                         color: Colors.black,
                         fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    "Day: ${lecture.lectureDay}",
+                    "Date: ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
                     style: TextStyle(
                         fontSize: _getFontSize(screenWidth, isSubtext: true),
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "Start Time: ${timeFormat.format(lecture.lectureStartTime)}",
                     style: TextStyle(
@@ -293,7 +293,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     "End Time: ${timeFormat.format(lecture.lectureEndTime)}",
                     style: TextStyle(
@@ -301,9 +301,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    "Venue: ${lecture.lectureVenue}",
+                    "Venue: ${lecture.locationName}",
                     style: TextStyle(
                         fontSize: _getFontSize(screenWidth, isSubtext: true),
                         color: Colors.black),
@@ -312,20 +312,20 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 ],
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                isProcessing && processingLectureId == lecture.lectureId
-                    ? CircularProgressIndicator() // Show progress indicator when processing
-                    : OutlinedButton(
-                        onPressed: () => markAttendancePopup(
-                            context,
-                            () => _handleMarkAttendance(lecture.lectureId),
-                            lecture),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.green),
+                isProcessing && processingLectureId == lecture.id
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ) // Show progress indicator when processing
+                    : ElevatedButton(
+                        onPressed: () => markAttendancePopup(context,
+                            () => _handleMarkAttendance(lecture.id), lecture),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -334,7 +334,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                           "Attend",
                           style: TextStyle(
                               fontSize: _getFontSize(screenWidth),
-                              color: Colors.green),
+                              color: Colors.white),
                         ),
                       ),
               ],

@@ -1,13 +1,16 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
 
-void showOTPVerificationPopup(BuildContext context,String email) {
+void showOTPVerificationPopup(BuildContext context, String email) {
   TextEditingController OTPTextEditingController = TextEditingController();
 
-  Future<void> handleVerifyOTP(BuildContext context,String email,String otp) async{
+  Future<void> handleVerifyOTP(
+      BuildContext context, String email, String otp) async {
     try {
-      await ForgotPasswordService.verifyOTPForForgotPassword(context, email, otp);
+      await ForgotPasswordService.verifyOTPForForgotPassword(
+          context, email, otp);
     } on Exception catch (e) {
       // TODO
     }
@@ -23,33 +26,39 @@ void showOTPVerificationPopup(BuildContext context,String email) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
+              const ListTile(
                 title: Center(
-                  child: const Text(
+                  child: Text(
                     "OTP Verification",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "The OTP is send to the email",
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       email,
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     TextField(
                       controller: OTPTextEditingController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: "Enter OTP",
                       ),
                     ),
@@ -67,19 +76,20 @@ void showOTPVerificationPopup(BuildContext context,String email) {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
-                      handleVerifyOTP(context,email,OTPTextEditingController.text);
+                      handleVerifyOTP(
+                          context, email, OTPTextEditingController.text);
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Verify",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],
@@ -101,7 +111,7 @@ final BoxDecoration _alertBoxDecoration = BoxDecoration(
       color: Colors.black.withOpacity(0.5),
       spreadRadius: 1,
       blurRadius: 10,
-      offset: Offset(0, 3),
+      offset: const Offset(0, 3),
     ),
   ],
 );

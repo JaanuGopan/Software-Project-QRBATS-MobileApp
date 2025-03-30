@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/components/modulecomponents/ModuleEnrolmentPopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
@@ -82,10 +81,7 @@ class ModuleEnrollContent extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => showEnrollmentDialog(
-              context,
-                  (key) => onClick(module.moduleId, key),
-              module
-            ),
+                context, (key) => onClick(module.id, key), module),
             icon: Icon(
               Icons.add_circle_outline_outlined,
               color: Colors.green,

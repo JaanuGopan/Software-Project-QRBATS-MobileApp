@@ -34,7 +34,19 @@ class _MyTextFieldState extends State<MyTextField> {
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0), // Add border corner radius
-        border: Border(
+        border: const Border(
+          top: BorderSide(
+            color: Color(0xFF086494), // Set top border color
+            width: 0.5, // Set top border thickness
+          ),
+          right: BorderSide(
+            color: Color(0xFF086494), // Set right border color
+            width: 0.25, // Set right border thickness
+          ),
+          left: BorderSide(
+            color: Color(0xFF086494), // Set left border color
+            width: 0.25, // Set left border thickness
+          ),
           bottom: BorderSide(
             color: Color(0xFF086494), // Set bottom border color
             width: 3, // Set bottom border thickness
@@ -44,7 +56,7 @@ class _MyTextFieldState extends State<MyTextField> {
       child: TextField(
         controller: widget.controller,
         obscureText: widget.obscureText && _obscureText,
-        style: TextStyle(
+        style: const TextStyle(
           color: Color(0xFF086494), // Changed text color
         ),
         decoration: InputDecoration(
@@ -52,25 +64,25 @@ class _MyTextFieldState extends State<MyTextField> {
           fillColor: Colors.transparent,
           prefixIcon: Icon(
             widget.icon.icon,
-            color: Color(0xFF086494), // Changed prefix icon color
+            color: const Color(0xFF086494), // Changed prefix icon color
           ),
-          prefixIconColor: Color(0xFF086494), // Changed prefix icon color
+          prefixIconColor: const Color(0xFF086494), // Changed prefix icon color
           suffixIcon: widget.obscureText
               ? IconButton(
-            icon: Icon(
-              _obscureText ? Icons.visibility : Icons.visibility_off,
-              color: Color(0xFF086494), // Changed suffix icon color
-            ),
-            onPressed: () {
-              setState(() {
-                _obscureText = !_obscureText;
-              });
-            },
-          )
+                  icon: Icon(
+                    _obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: const Color(0xFF086494), // Changed suffix icon color
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                )
               : null,
           filled: true,
           hintText: widget.hintText,
-          hintStyle: TextStyle(
+          hintStyle: const TextStyle(
             color: Color(0xFF888888), // Changed hint text color
           ),
         ),

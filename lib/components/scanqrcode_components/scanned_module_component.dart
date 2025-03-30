@@ -1,23 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LectureService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:intl/intl.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
 
 class ScannedModule extends StatefulWidget {
   final Module module;
-  final int studentId;
 
   const ScannedModule({
-    Key? key,
+    super.key,
     required this.module,
-    required this.studentId,
-  }) : super(key: key);
+  });
 
   @override
   State<ScannedModule> createState() => _ScannedModuleState();
@@ -35,7 +33,7 @@ class _ScannedModuleState extends State<ScannedModule> {
   double longitude = 0.0;
 
   Future<void> _fetchLecturesByModuleCode(
-      BuildContext context, String moduleCode) async {
+      BuildContext context, int moduleId) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
@@ -43,7 +41,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
     try {
       final List<Lecture> lecturesList =
-          await LectureService.getAllLectureByModuleCode(context, moduleCode);
+          await LectureService.getAllLectureByModuleCode(context, moduleId);
       setState(() {
         lectures = lecturesList;
         isLecturesLoading = false;
@@ -64,7 +62,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   void handleShowLecture() async {
     if (!showLecturesList && lectures.isEmpty) {
-      await _fetchLecturesByModuleCode(context, widget.module.moduleCode);
+      await _fetchLecturesByModuleCode(context, widget.module.id);
     }
     if (lectures.isNotEmpty) {
       setState(() {
@@ -72,7 +70,7 @@ class _ScannedModuleState extends State<ScannedModule> {
       });
     } else {
       CustomSnackBar.showError(context,
-          "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+          "There Are No Any upcoming Lectures For This Module ${widget.module.moduleCode}");
     }
   }
 
@@ -100,7 +98,7 @@ class _ScannedModuleState extends State<ScannedModule> {
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: Duration(
+        timeLimit: const Duration(
             seconds: 10), // Add a timeout to avoid waiting indefinitely
       );
 
@@ -127,10 +125,7 @@ class _ScannedModuleState extends State<ScannedModule> {
     });
     try {
       await checkLocationPermission();
-      await markLectureAttendance(
-          widget.studentId, lectureId, latitude, longitude, context);
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+      await markLectureAttendance(lectureId, latitude, longitude, context);
     } finally {
       setState(() {
         isProcessing = false; // Set isProcessing to false when done
@@ -139,27 +134,23 @@ class _ScannedModuleState extends State<ScannedModule> {
     }
   }
 
-  Future<void> markLectureAttendance(int studentId, int lectureId,
-      double latitude, double longitude, BuildContext context) async {
-    try {
-      bool isCloseDetails =
-          await LectureAttendanceService.markLectureAttendanceByLectureId(
-              studentId, lectureId, latitude, longitude, context);
-      if (isCloseDetails) {
-        setState(() {
-          // Refresh the state if necessary
-        });
-      }
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+  Future<void> markLectureAttendance(int lectureId, double latitude,
+      double longitude, BuildContext context) async {
+    bool isCloseDetails =
+        await LectureAttendanceService.markLectureAttendanceByLectureId(
+            lectureId, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+        // Refresh the state if necessary
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8.0),
-      margin: EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -168,7 +159,7 @@ class _ScannedModuleState extends State<ScannedModule> {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -177,26 +168,37 @@ class _ScannedModuleState extends State<ScannedModule> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.module.moduleCode,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          0.6, // Adjust the width as needed
+                      child: Text(
+                        widget.module.moduleCode,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    Text(
-                      widget.module.moduleName,
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          0.6, // Adjust the width as needed
+                      child: Text(
+                        widget.module.moduleName,
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               IconButton(
                 onPressed: handleShowLecture,
                 icon: Icon(
@@ -216,7 +218,11 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   Widget _buildLectureList() {
     return isLecturesLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF086494),
+            ),
+          )
         : errorMessage.isNotEmpty
             ? Center(child: Text(errorMessage))
             : Column(
@@ -241,7 +247,7 @@ class _ScannedModuleState extends State<ScannedModule> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -251,66 +257,64 @@ class _ScannedModuleState extends State<ScannedModule> {
             const SizedBox(width: 25),
             Text(
               "${lectures.indexOf(lecture) + 1}.",
-              style: TextStyle(fontSize: 12, color: Colors.black),
+              style: const TextStyle(fontSize: 12, color: Colors.black),
             ),
             const SizedBox(width: 20),
             Flexible(
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lecture.lectureName,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Day : ${lecture.lectureDay}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Time : ${timeFormat.format(lecture.lectureStartTime)}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Venue : ${lecture.lectureVenue}",
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lecture.name,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Date : ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Time : ${timeFormat.format(lecture.lectureStartTime)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Venue : ${lecture.locationName}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 10),
+            const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                isProcessing && processingLectureId == lecture.lectureId
-                    ? CircularProgressIndicator() // Show CircularProgressIndicator if processing
-                    : OutlinedButton(
-                        onPressed: () => markAttendancePopup(
-                            context,
-                            () => _handleMarkAttendance(lecture.lectureId),
-                            lecture),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.green),
+                isProcessing && processingLectureId == lecture.id
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ) // Show CircularProgressIndicator if processing
+                    : ElevatedButton(
+                        onPressed: () => markAttendancePopup(context,
+                            () => _handleMarkAttendance(lecture.id), lecture),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
                         child: const Text(
                           "Attend",
-                          style: TextStyle(fontSize: 12, color: Colors.green),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ),
               ],
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 15),
           ],
         ),
       ),

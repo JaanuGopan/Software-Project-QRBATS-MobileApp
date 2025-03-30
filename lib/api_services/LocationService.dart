@@ -1,26 +1,29 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/api_services/config/api_service.dart';
 
-import '../api_config/api_constants.dart';
-import 'package:http/http.dart' as http;
+class LocationService {
+  static Future<double> findLocationDistance(String locationName,
+      double latitude, double longitude, BuildContext context) async {
+    final requestBody = {
+      'locationName': locationName,
+      'latitude': latitude,
+      'longitude': longitude,
+    };
 
-class LocationService{
-  static Future<double> findLocationDistance(String locationName, double latitude,double longitude) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? authToken = preferences.getString("token");
-    final apiUrl = '${ApiConstants.baseUrl}${ApiConstants.getAttendanceDistance}';
-    final requestBody = jsonEncode({'locationName': locationName,'latitude':latitude,'longitude':longitude});
+    try {
+      final response = await ApiService.post(
+          ApiConstants.getAttendanceDistance, // Endpoint
+          requestBody,
+          context);
 
-    final response = await http.post(Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $authToken',
-        }, body: requestBody);
-
-    if (response.statusCode == 200) {
-      return double.parse(response.body);
-    } else {
-      throw Exception('Failed to load attendance data');
+      if (response != null && response.statusCode == 200) {
+        return double.parse(response.body);
+      } else {
+        throw Exception('Failed to load attendance data');
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 }
