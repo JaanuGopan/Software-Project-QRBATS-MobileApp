@@ -81,7 +81,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool isValidPassword(String password) {
     // Password must contain at least 8 characters, one uppercase letter,
     // one lowercase letter, and one number
-    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    final regex = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$');
     return regex.hasMatch(password);
   }
 

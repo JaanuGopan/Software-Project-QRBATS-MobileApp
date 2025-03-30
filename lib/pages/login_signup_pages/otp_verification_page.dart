@@ -19,7 +19,7 @@ class OtpVerificationPage extends StatefulWidget {
   final int studentBatch;
 
   const OtpVerificationPage({
-    Key? key,
+    super.key,
     required this.email,
     required this.indexNumber,
     required this.studentName,
@@ -27,7 +27,7 @@ class OtpVerificationPage extends StatefulWidget {
     required this.departmentId,
     required this.currentSemester,
     required this.studentBatch,
-  }) : super(key: key);
+  });
 
   @override
   _OtpVerificationPageState createState() => _OtpVerificationPageState();
@@ -77,15 +77,6 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         currentSemester: widget.currentSemester,
         studentBatch: widget.studentBatch,
       );
-      /* return SignUp3(
-        studentName: "John Doe",
-        email: "john.doe@example.com",
-        indexNumber: "123456",
-        studentRole: "Student",
-        departmentId: 1,
-        currentSemester: 3,
-        studentBatch: 2021,
-      ); */
     }));
   }
 
@@ -117,11 +108,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   Future<void> handleVerifyOTP() async {
     if (_otpController.text.isEmpty) {
-      CustomSnackBar.showError(context, "Please enter OTP");
+      CustomSnackBar.showWarning(context, "Please enter OTP");
       return;
     }
     if (_otpController.text.length != 4) {
-      CustomSnackBar.showError(context, "Please enter a valid OTP");
+      CustomSnackBar.showWarning(context, "Please enter a valid OTP");
       return;
     }
     try {
@@ -167,46 +158,61 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                         children: [
                           Row(
                             children: [
-                              const TextBlue(
-                                  text: "Enter the OTP sent to ", fontSize: 15),
-                              Text(
-                                widget.email,
-                                style: const TextStyle(fontSize: 15),
+                              Flexible(
+                                child: Center(
+                                  child: Text(
+                                    'The OTP has been sent to ${widget.email}',
+                                    style: const TextStyle(
+                                        fontSize: 15, color: Colors.black),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
-                          OTPTextField(
-                            controller: _otpController,
-                            length: 4,
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: OTPTextField(
+                              controller: _otpController,
+                              length: 4,
+                            ),
                           ),
                           const SizedBox(height: 20),
-                          _isVerifyOTPLoading
+                          _isVerifyOTPLoading || _isLoadingResendOTP
                               ? const Center(
                                   child: CircularProgressIndicator(
                                     color: Color(0xFF086494),
                                   ),
                                 )
-                              : RoundButton(
-                                  onTap: handleVerifyOTP,
-                                  icon: Icons.check,
-                                ),
+                              : showResendOTPButton
+                                  ? Column(
+                                      children: [
+                                        const Center(
+                                          child: Text(
+                                              "Click the button below to resend OTP"),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        RoundButton(
+                                          onTap: handleResendOTP,
+                                          icon: Icons.refresh,
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      children: [
+                                        RoundButton(
+                                          onTap: handleVerifyOTP,
+                                          icon: Icons.check,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Center(
+                                          child: Text(
+                                              "The OTP will expire in $_formattedTime"),
+                                        ),
+                                      ],
+                                    ),
                           const SizedBox(height: 20),
-                          showResendOTPButton
-                              ? _isLoadingResendOTP
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFF086494),
-                                      ),
-                                    )
-                                  : RoundButton(
-                                      onTap: handleResendOTP,
-                                      icon: Icons.refresh,
-                                    )
-                              : Center(
-                                  child: Text(
-                                      "The OTP will expire in $_formattedTime"),
-                                ),
                         ],
                       ),
                     ),

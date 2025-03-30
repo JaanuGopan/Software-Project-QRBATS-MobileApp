@@ -18,7 +18,7 @@ class SignUp3 extends StatefulWidget {
   final int studentBatch;
 
   const SignUp3({
-    Key? key,
+    super.key,
     required this.studentName,
     required this.indexNumber,
     required this.email,
@@ -26,7 +26,7 @@ class SignUp3 extends StatefulWidget {
     required this.departmentId,
     required this.currentSemester,
     required this.studentBatch,
-  }) : super(key: key);
+  });
 
   @override
   State<SignUp3> createState() => _SignUp3State();
@@ -111,9 +111,8 @@ class _SignUp3State extends State<SignUp3> {
   }
 
   bool isValidPassword(String password) {
-    // Password must contain at least 8 characters, one uppercase letter,
-    // one lowercase letter, and one number
-    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    // Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number
+    final regex = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$');
     return regex.hasMatch(password);
   }
 

@@ -1,11 +1,11 @@
 class ApiConstants {
   static const String facultyHostedNgrokIp =
-      'https://lionfish-wondrous-catfish.ngrok-free.app'; // This is hosted on faculty server backend IP
+      'https://redfish-real-directly.ngrok-free.app'; // This is hosted on faculty server backend IP
   static const String facultyLocalIp =
       'http://10.50.227.44:8080'; // For Android App this IP is not working so use ngrok IP
   static const String awsIpAddress = '13.51.170.30';
   static const String devIp = 'http://192.168.1.10:8080';
-  static const String baseUrl = 'http://10.50.60.114:8080';
+  static const String baseUrl = facultyHostedNgrokIp;
   static const String checkStudentEmailEndpoint =
       '/api/v1/auth/check-student-email';
   static const String checkStudentIndexNoEndpoint =
