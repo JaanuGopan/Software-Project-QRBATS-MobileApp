@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/OTPService.dart';
 import 'package:qrbats_sp/components/buttons/round_button.dart';
+import 'package:qrbats_sp/components/text_field/otp_text_field.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/signup_page3.dart';
+import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
-import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 
 class OtpVerificationPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class OtpVerificationPage extends StatefulWidget {
   final String indexNumber;
   final String studentName;
   final String studentRole;
-  final int departmentId;
+  final int? departmentId;
   final int currentSemester;
   final int studentBatch;
 
@@ -115,6 +116,14 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   bool _isVerifyOTPLoading = false;
 
   Future<void> handleVerifyOTP() async {
+    if (_otpController.text.isEmpty) {
+      CustomSnackBar.showError(context, "Please enter OTP");
+      return;
+    }
+    if (_otpController.text.length != 4) {
+      CustomSnackBar.showError(context, "Please enter a valid OTP");
+      return;
+    }
     try {
       setState(() {
         _isVerifyOTPLoading = true;
@@ -167,12 +176,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          MyTextField(
+                          OTPTextField(
                             controller: _otpController,
-                            hintText: "Enter OTP",
-                            width: double.infinity,
-                            obscureText: false,
-                            icon: const Icon(Icons.lock_outline),
+                            length: 4,
                           ),
                           const SizedBox(height: 20),
                           _isVerifyOTPLoading

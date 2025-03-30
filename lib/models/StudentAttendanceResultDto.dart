@@ -5,9 +5,9 @@ class StudentAttendanceResultDto {
   int attendanceCount;
   int notAttendanceCount;
   int finishedLectureCount;
-  Duration attendanceHours;
-  Duration notAttendanceHours;
-  Duration finishedLectureHours;
+  String attendanceHours;
+  String notAttendanceHours;
+  String finishedLectureHours;
   double attendancePercentage;
 
   StudentAttendanceResultDto({
@@ -31,9 +31,9 @@ class StudentAttendanceResultDto {
       attendanceCount: json['attendanceCount'] ?? 0,
       notAttendanceCount: json['notAttendanceCount'] ?? 0,
       finishedLectureCount: json['finishedLectureCount'] ?? 0,
-      attendanceHours: parseISO8601Duration(json['attendanceHours']),
-      notAttendanceHours: parseISO8601Duration(json['notAttendanceHours']),
-      finishedLectureHours: parseISO8601Duration(json['finishedLectureHours']),
+      attendanceHours: json['attendanceHours'],
+      notAttendanceHours: json['notAttendanceHours'],
+      finishedLectureHours: json['finishedLectureHours'],
       attendancePercentage:
           (json['attendancePercentage'] as num?)?.toDouble() ?? 0.0,
     );
@@ -47,9 +47,9 @@ class StudentAttendanceResultDto {
       'attendanceCount': attendanceCount,
       'notAttendanceCount': notAttendanceCount,
       'finishedLectureCount': finishedLectureCount,
-      'attendanceHours': formatDurationToISO8601(attendanceHours),
-      'notAttendanceHours': formatDurationToISO8601(notAttendanceHours),
-      'finishedLectureHours': formatDurationToISO8601(finishedLectureHours),
+      'attendanceHours': attendanceHours,
+      'notAttendanceHours': notAttendanceHours,
+      'finishedLectureHours': finishedLectureHours,
       'attendancePercentage': attendancePercentage,
     };
   }
@@ -62,9 +62,9 @@ StudentAttendanceResultDto(
   attendanceCount: $attendanceCount,
   notAttendanceCount: $notAttendanceCount,
   finishedLectureCount: $finishedLectureCount,
-  attendanceHours: ${formatDurationToISO8601(attendanceHours)},
-  notAttendanceHours: ${formatDurationToISO8601(notAttendanceHours)},
-  finishedLectureHours: ${formatDurationToISO8601(finishedLectureHours)},
+  attendanceHours: ${(attendanceHours)},
+  notAttendanceHours: ${(notAttendanceHours)},
+  finishedLectureHours: ${(finishedLectureHours)},
   attendancePercentage: $attendancePercentage,
   studentAttendancesLectureList: $studentAttendancesLectureList
 )''';
@@ -77,7 +77,7 @@ class StudentAttendanceLectureDto {
   String lectureStartTime;
   String lectureEndTime;
   String locationName;
-  DateTime? attendedTime;
+  String? attendedTime;
   DateTime? attendedDate;
   AttendanceStatus attendanceStatus;
 
@@ -100,10 +100,7 @@ class StudentAttendanceLectureDto {
       lectureStartTime: json['lectureStartTime'],
       lectureEndTime: json['lectureEndTime'],
       locationName: json['locationName'],
-      attendedTime: json['attendedTime'] != null
-          ? DateFormat('HH:mm:ss')
-              .parse(json['attendedTime'].toString().substring(0, 7))
-          : null,
+      attendedTime: json['attendedTime'],
       attendedDate: json['attendedDate'] != null
           ? DateTime.tryParse(json['attendedDate'])
           : null,
@@ -122,9 +119,7 @@ class StudentAttendanceLectureDto {
       'lectureStartTime': lectureStartTime,
       'lectureEndTime': lectureEndTime,
       'locationName': locationName,
-      'attendedTime': attendedTime != null
-          ? DateFormat('HH:mm:ss').format(attendedTime!)
-          : null,
+      'attendedTime': attendedTime,
       'attendedDate': attendedDate != null
           ? DateFormat('yyyy-MM-dd').format(attendedDate!)
           : null,
@@ -142,7 +137,7 @@ StudentAttendanceLectureDto(
   lectureStartTime: $lectureStartTime,
   lectureEndTime: $lectureEndTime,
   locationName: $locationName,
-  attendedTime: ${attendedTime != null ? DateFormat('HH:mm:ss').format(attendedTime!) : 'null'},
+  attendedTime: ${attendedTime},
   attendedDate: ${attendedDate != null ? DateFormat('yyyy-MM-dd').format(attendedDate!) : 'null'},
   attendanceStatus: $attendanceStatus
 )''';

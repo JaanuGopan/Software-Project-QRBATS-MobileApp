@@ -18,7 +18,6 @@ class _ModulePageState extends State<ModulePage> {
   List<Module> notEnrolledModuleList = [];
   bool isAllModuleLoading = true;
   bool isAllEnrolledModuleLoading = true;
-  String errorMessage = '';
   bool showEnrolledModule = true;
 
   @override
@@ -29,6 +28,9 @@ class _ModulePageState extends State<ModulePage> {
   }
 
   Future<void> _fetchAllModuleData(BuildContext context) async {
+    setState(() {
+      isAllModuleLoading = true;
+    });
     try {
       final List<Module> modulesList =
           await ModuleService.getAllModule(context);
@@ -39,13 +41,15 @@ class _ModulePageState extends State<ModulePage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = 'Failed to load modules';
         isAllModuleLoading = false;
       });
     }
   }
 
   Future<void> _fetchAllEnrolledModuleData(BuildContext context) async {
+    setState(() {
+      isAllEnrolledModuleLoading = true;
+    });
     try {
       final List<Module> modulesList =
           await ModuleService.getAllEnrolledModule(context);
@@ -56,7 +60,6 @@ class _ModulePageState extends State<ModulePage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = 'Failed to load enrolled modules';
         isAllEnrolledModuleLoading = false;
       });
     }
@@ -89,72 +92,74 @@ class _ModulePageState extends State<ModulePage> {
                 padding: const EdgeInsets.all(10.0),
                 child: Container(
                   padding: const EdgeInsets.all(9.0),
-                  child: isAllModuleLoading || isAllEnrolledModuleLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFF086494),
-                          ),
-                        )
-                      : errorMessage.isNotEmpty
-                          ? Center(child: Text(errorMessage))
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: ToggleButtons(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        child: Text('Enrolled Module'),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        child: Text('Not Entrolled Module'),
-                                      ),
-                                    ],
-                                    isSelected: [
-                                      showEnrolledModule,
-                                      !showEnrolledModule
-                                    ],
-                                    onPressed: (int index) {
-                                      setState(() {
-                                        showEnrolledModule = index == 0;
-                                      });
-                                    },
-                                    color: Colors.black,
-                                    selectedColor: Colors.white,
-                                    fillColor: showEnrolledModule
-                                        ? Color(0xFF086494)
-                                        : Color(0xFF086494),
-                                    selectedBorderColor: showEnrolledModule
-                                        ? Color(0xFF086494)
-                                        : Color(0xFF086494),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                                const SizedBox(height: 10),
-                                if (allEnrolledModuleList.isNotEmpty &&
-                                    showEnrolledModule)
-                                  _buildEnrolledModuleList(),
-                                if (showEnrolledModule &&
-                                    allEnrolledModuleList.isEmpty)
-                                  const Center(
-                                    child: Text("No Enrolled Modules."),
-                                  ),
-                                const SizedBox(height: 10),
-                                if (notEnrolledModuleList.isNotEmpty &&
-                                    !showEnrolledModule)
-                                  _buildNotEnrolledModuleList(),
-                                if (!showEnrolledModule &&
-                                    notEnrolledModuleList.isEmpty)
-                                  const Center(
-                                    child: Text("No Modules For Enrollment."),
-                                  ),
-                              ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: ToggleButtons(
+                          isSelected: [showEnrolledModule, !showEnrolledModule],
+                          onPressed: (int index) {
+                            if (index == 1) {
+                              _fetchAllModuleData(context);
+                            }
+                            if (index == 0) {
+                              _fetchAllEnrolledModuleData(context);
+                            }
+                            setState(() {
+                              showEnrolledModule = index == 0;
+                            });
+                          },
+                          color: Colors.black,
+                          selectedColor: Colors.white,
+                          fillColor: showEnrolledModule
+                              ? const Color(0xFF086494)
+                              : const Color(0xFF086494),
+                          selectedBorderColor: showEnrolledModule
+                              ? const Color(0xFF086494)
+                              : const Color(0xFF086494),
+                          borderRadius: BorderRadius.circular(8.0),
+                          children: const <Widget>[
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text('Enrolled Module'),
                             ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text('Not Entrolled Module'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ...(isAllModuleLoading || isAllEnrolledModuleLoading)
+                          ? [
+                              const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF086494),
+                                ),
+                              )
+                            ]
+                          : [
+                              if (allEnrolledModuleList.isNotEmpty &&
+                                  showEnrolledModule)
+                                _buildEnrolledModuleList(),
+                              if (showEnrolledModule &&
+                                  allEnrolledModuleList.isEmpty)
+                                const Center(
+                                  child: Text("No Enrolled Modules."),
+                                ),
+                              const SizedBox(height: 10),
+                              if (notEnrolledModuleList.isNotEmpty &&
+                                  !showEnrolledModule)
+                                _buildNotEnrolledModuleList(),
+                              if (!showEnrolledModule &&
+                                  notEnrolledModuleList.isEmpty)
+                                const Center(
+                                  child: Text("No Modules For Enrollment."),
+                                ),
+                            ]
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -167,7 +172,7 @@ class _ModulePageState extends State<ModulePage> {
   Widget _buildEnrolledModuleList() {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: allEnrolledModuleList.length,
       itemBuilder: (context, index) {
         return ModuleUnEnrollContent(
@@ -182,7 +187,7 @@ class _ModulePageState extends State<ModulePage> {
   Widget _buildNotEnrolledModuleList() {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: notEnrolledModuleList.length,
       itemBuilder: (context, index) {
         return ModuleEnrollContent(

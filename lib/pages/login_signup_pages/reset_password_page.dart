@@ -32,21 +32,36 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     if (isUsernameToggleEnabled) {
       if (username.isEmpty) {
-        CustomSnackBar.showSnackBar(context, 'Please enter username.');
+        CustomSnackBar.showWarning(context, 'Please enter username.');
+        return;
+      }
+      if (username.length < 6) {
+        CustomSnackBar.showWarning(
+            context, "User name should be at least 6 characters long.");
+        return;
+      }
+      if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(username)) {
+        CustomSnackBar.showWarning(
+            context, "User name should not include special characters.");
         return;
       }
     }
     if (newPassword.isEmpty) {
-      CustomSnackBar.showSnackBar(context, 'Please enter new password.');
+      CustomSnackBar.showWarning(context, 'Please enter new password.');
       return;
     }
     if (confirmPassword.isEmpty) {
-      CustomSnackBar.showSnackBar(context, 'Please confirm new password.');
+      CustomSnackBar.showWarning(context, 'Please confirm new password.');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      CustomSnackBar.showSnackBar(context, 'Passwords do not match.');
+      CustomSnackBar.showWarning(context, 'Passwords do not match.');
+      return;
+    }
+    if (!isValidPassword(newPassword)) {
+      CustomSnackBar.showWarning(context,
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
       return;
     }
 
@@ -61,6 +76,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         isLoading = false;
       });
     }
+  }
+
+  bool isValidPassword(String password) {
+    // Password must contain at least 8 characters, one uppercase letter,
+    // one lowercase letter, and one number
+    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    return regex.hasMatch(password);
   }
 
   void navigateToLoginPage() {

@@ -105,7 +105,7 @@ class LectureAttendanceHistoryItem extends StatelessWidget {
                   if (studentAttendanceLectureDto.attendanceStatus !=
                       AttendanceStatus.ABSENT)
                     Text(
-                      'Attended Time: ${studentAttendanceLectureDto.attendedTime}',
+                      'Attended Time: ${studentAttendanceLectureDto.attendedTime?.substring(0, 8)}',
                       style: TextStyle(
                           fontSize: contentFontSize, color: Colors.grey),
                       overflow: TextOverflow.ellipsis,
@@ -217,12 +217,14 @@ class EventAttendanceHistoryItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'Status: ${eventAttendanceHistory.attendanceStatus ? "Present" : "Absent"}',
+                  'Status: ${eventAttendanceHistory.attendanceStatus == "PRESENT" ? "Present" : eventAttendanceHistory.attendanceStatus == "LATE" ? "Late" : "Absent"}',
                   style: TextStyle(
                     fontSize: contentFontSize,
-                    color: eventAttendanceHistory.attendanceStatus
+                    color: eventAttendanceHistory.attendanceStatus == "PRESENT"
                         ? Colors.green
-                        : Colors.red,
+                        : eventAttendanceHistory.attendanceStatus == "ABSENT"
+                            ? Colors.orange
+                            : Colors.red,
                   ),
                 ),
               ],

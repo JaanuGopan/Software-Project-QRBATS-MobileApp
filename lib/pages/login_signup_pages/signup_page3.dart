@@ -13,7 +13,7 @@ class SignUp3 extends StatefulWidget {
   final String indexNumber;
   final String email;
   final String studentRole;
-  final int departmentId;
+  final int? departmentId;
   final int currentSemester;
   final int studentBatch;
 
@@ -61,6 +61,16 @@ class _SignUp3State extends State<SignUp3> {
         CustomSnackBar.showWarning(context, "Please Enter UserName.");
         return;
       }
+      if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
+        CustomSnackBar.showWarning(
+            context, "User name should not include special characters.");
+        return;
+      }
+      if (_userNameTextController.text.length < 6) {
+        CustomSnackBar.showWarning(
+            context, "User name should be at least 6 characters long.");
+        return;
+      }
       if (_password.text == "") {
         CustomSnackBar.showWarning(context, "Please Enter Password.");
         return;
@@ -101,9 +111,9 @@ class _SignUp3State extends State<SignUp3> {
   }
 
   bool isValidPassword(String password) {
-    // Add your password validation logic here
-    // Example: At least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character
-    final regex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    // Password must contain at least 8 characters, one uppercase letter,
+    // one lowercase letter, and one number
+    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
     return regex.hasMatch(password);
   }
 

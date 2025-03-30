@@ -22,7 +22,7 @@ class StudentUpdateSettingService {
     String studentName,
     String indexNumber,
     String email,
-    int departmentId,
+    int? departmentId,
     int semester,
     int studentBatch,
   ) async {

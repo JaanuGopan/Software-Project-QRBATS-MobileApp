@@ -15,15 +15,15 @@ void markAttendancePopup(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
+              const ListTile(
                 title: Center(
-                    child: const Text(
+                    child: Text(
                   "Mark Attendance",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 )),
               ),
               Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,25 +36,29 @@ void markAttendancePopup(
                             fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Date : ${lecture!.lectureDate}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Date : ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Start Time : ${timeFormat.format(lecture!.lectureStartTime)}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Start Time : ${timeFormat.format(lecture.lectureStartTime)}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "End Time : ${timeFormat.format(lecture!.lectureEndTime)}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "End Time : ${timeFormat.format(lecture.lectureEndTime)}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Venue : ${lecture!.locationName}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Venue : ${lecture.locationName}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
                     ],
                   ),
@@ -106,7 +110,7 @@ final BoxDecoration _alertBoxDecoration = BoxDecoration(
       color: Colors.black.withOpacity(0.5), // Shadow color
       spreadRadius: 1, // Spread radius
       blurRadius: 10, // Blur radius
-      offset: Offset(0, 3), // Shadow position
+      offset: const Offset(0, 3), // Shadow position
     ),
   ],
 );

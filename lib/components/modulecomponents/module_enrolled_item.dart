@@ -122,8 +122,6 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     try {
       await checkLocationPermission();
       await markLectureAttendance(lectureId, latitude, longitude, context);
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
       setState(() {
         isProcessing = false; // Set isProcessing to false when done
@@ -134,17 +132,13 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
 
   Future<void> markLectureAttendance(int lectureId, double latitude,
       double longitude, BuildContext context) async {
-    try {
-      bool isCloseDetails =
-          await LectureAttendanceService.markLectureAttendanceByLectureId(
-              lectureId, latitude, longitude, context);
-      if (isCloseDetails) {
-        setState(() {
-          // Refresh the state if necessary
-        });
-      }
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+    bool isCloseDetails =
+        await LectureAttendanceService.markLectureAttendanceByLectureId(
+            lectureId, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+        // Refresh the state if necessary
+      });
     }
   }
 
@@ -285,7 +279,7 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Date: ${lecture.lectureDate}",
+                    "Date: ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
                     style: TextStyle(
                         fontSize: _getFontSize(screenWidth, isSubtext: true),
                         color: Colors.black),
@@ -324,7 +318,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 isProcessing && processingLectureId == lecture.id
-                    ? const CircularProgressIndicator() // Show progress indicator when processing
+                    ? const CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ) // Show progress indicator when processing
                     : ElevatedButton(
                         onPressed: () => markAttendancePopup(context,
                             () => _handleMarkAttendance(lecture.id), lecture),

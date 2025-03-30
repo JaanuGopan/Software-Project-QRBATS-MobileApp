@@ -5,7 +5,9 @@ import 'package:qrbats_sp/components/profile_update/profile_update_popup.dart';
 import 'package:qrbats_sp/components/text_field/list_input_field.dart';
 import 'package:qrbats_sp/components/text_field/text_field.dart';
 import 'package:qrbats_sp/components/texts/TextBlue.dart';
+import 'package:qrbats_sp/config/Utils.dart';
 import 'package:qrbats_sp/models/student_dto.dart';
+import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class ProfileSettingPage extends StatefulWidget {
   const ProfileSettingPage({super.key});
@@ -23,46 +25,55 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
 
   String? selectedDepartment;
   String? selectedSemester;
+  String? selectedSemesterForFirstYear;
   String? selectedStudentBatch;
   bool _isLoading = true;
-
-  String studentName = "";
+  bool isDepartmentToggleEnabled = false;
 
   @override
-  initState() {
+  void initState() {
+    super.initState();
+
     emailController = TextEditingController();
     semesterController = TextEditingController();
     roleController = TextEditingController();
     nameController = TextEditingController();
     indexController = TextEditingController();
+
+    _loadStudentData();
+  }
+
+  Future<void> _loadStudentData() async {
     setState(() {
       _isLoading = true;
     });
-    Future<StudentDto> studentDto =
-        StudentUpdateSettingService.getStudent(context);
-    studentDto
-        .then((value) => {
-              setState(() {
-                emailController.text = value.email!;
-                semesterController.text = value.semester.toString();
-                roleController.text = value.role!;
-                nameController.text = value.firstName!;
-                indexController.text = value.indexNumber!;
-                selectedDepartment = value.departmentId.toString();
-                selectedSemester = value.semester.toString();
-                studentName = value.firstName!;
-                selectedStudentBatch = value.studentBatch.toString();
-              }),
-              setState(() {
-                _isLoading = false;
-              })
-            })
-        .catchError((onError) {
+
+    try {
+      StudentDto student =
+          await StudentUpdateSettingService.getStudent(context);
+
+      setState(() {
+        emailController.text = student.email ?? '';
+        nameController.text = student.firstName ?? '';
+        indexController.text = student.indexNumber ?? '';
+        roleController.text = student.role ?? '';
+        semesterController.text = student.semester?.toString() ?? '';
+
+        selectedSemester = student.semester?.toString();
+        selectedDepartment = student.departmentId != null
+            ? departmentList[student.departmentId! - 1]
+            : null;
+        selectedStudentBatch = student.studentBatch?.toString();
+
+        isDepartmentToggleEnabled = student.departmentId != null;
+        _isLoading = false;
+      });
+    } catch (error) {
       setState(() {
         _isLoading = false;
       });
-      return null;
-    });
+      debugPrint("Error fetching student data: $error");
+    }
   }
 
   @override
@@ -106,6 +117,53 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                     ),
                     _buildTextField("Email", emailController),
                     const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                  text: "Select Department", fontSize: 15)),
+                        ),
+                        const SizedBox(width: 10),
+                        Switch(
+                          value: isDepartmentToggleEnabled,
+                          focusColor: const Color(0xFF086494),
+                          activeColor: const Color(0xFF086494),
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.grey,
+                          onChanged: (value) {
+                            setState(() {
+                              isDepartmentToggleEnabled = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    if (isDepartmentToggleEnabled) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    TextBlue(text: "Department", fontSize: 15)),
+                          ),
+                          _buildDropdownField(
+                              "Department", departmentList, selectedDepartment,
+                              (newValue) {
+                            setState(() {
+                              selectedDepartment = newValue;
+                            });
+                          }),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 1),
                     if (selectedSemester != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,35 +176,15 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                                     TextBlue(text: "Semester", fontSize: 15)),
                           ),
                           _buildDropdownField(
-                              "Semester", _semesterList, selectedSemester,
-                              (newValue) {
-                            setState(() {
-                              selectedSemester = newValue;
-                            });
-                          }),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
-                    if (selectedDepartment != null)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    TextBlue(text: "Department", fontSize: 15)),
+                            "Select Semester",
+                            semesterList,
+                            selectedSemester,
+                            (selectedValue) {
+                              setState(() {
+                                selectedSemester = selectedValue;
+                              });
+                            },
                           ),
-                          _buildDropdownField(
-                              "Department", _departmentList, selectedDepartment,
-                              (newValue) {
-                            setState(() {
-                              selectedDepartment =
-                                  (_departmentList.indexOf(newValue!) + 1)
-                                      .toString();
-                            });
-                          }),
                           const SizedBox(height: 10),
                         ],
                       ),
@@ -161,13 +199,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                                 child: TextBlue(
                                     text: "Student Batch", fontSize: 15)),
                           ),
-                          _buildDropdownField(
-                              "Student Batch",
-                              _studentBatchList,
-                              (_studentBatchList
-                                          .indexOf(selectedStudentBatch!) +
-                                      1)
-                                  .toString(), (newValue) {
+                          _buildDropdownField("Student Batch", studentBatchList,
+                              selectedStudentBatch, (newValue) {
                             setState(() {
                               selectedStudentBatch = newValue;
                             });
@@ -232,51 +265,90 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     );
   }
 
-  final List<String> _departmentList = [
-    'DEIE',
-    'DCOM',
-    'DMME',
-    'DCEE',
-    'DMENA',
-  ];
-
-  final List<String> _studentBatchList = [
-    '20',
-    '21',
-    '22',
-    '23',
-    '24',
-    '25',
-    '26',
-    '27',
-  ];
-
-  final List<String> _semesterList = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-  ];
+  final List<String> departmentList = Utils.getDepartmentList();
+  final List<String> studentBatchList = Utils.getStudentBatchListList();
+  final List<String> semesterList = Utils.getSemesterList();
 
   void _updateDetails() async {
-    String updatedName = nameController.text;
-    String updatedEmail = emailController.text;
-    String updatedIndex = indexController.text;
-    String updatedSemester = selectedSemester!;
-    String updatedDepartment = selectedDepartment!;
-    int updatedStudentBatch = int.parse(selectedStudentBatch!);
+    String updatedName = nameController.text.trim();
+    String updatedEmail = emailController.text.trim();
+    String updatedIndex = indexController.text.trim();
+    String? updatedSemester = selectedSemester;
+    String? updatedDepartment = selectedDepartment;
+    String? updatedStudentBatch = selectedStudentBatch;
 
+    // Basic validations
+    if (updatedName.isEmpty) {
+      CustomSnackBar.showWarning(context, "Name cannot be empty.");
+      return;
+    }
+    if (updatedEmail.isEmpty) {
+      CustomSnackBar.showWarning(context, "Email cannot be empty.");
+      return;
+    }
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(updatedEmail)) {
+      CustomSnackBar.showWarning(
+          context, "Please enter a valid email address.");
+      return;
+    }
+    if (updatedIndex.isEmpty) {
+      CustomSnackBar.showWarning(context, "Index number cannot be empty.");
+      return;
+    }
+    if (updatedSemester == null) {
+      CustomSnackBar.showWarning(context, "Please select a semester.");
+      return;
+    }
+    if (updatedStudentBatch == null) {
+      CustomSnackBar.showWarning(context, "Please select a student batch.");
+      return;
+    }
+
+    // Department-specific validations
+    if (isDepartmentToggleEnabled) {
+      if (updatedDepartment == null || updatedDepartment.isEmpty) {
+        CustomSnackBar.showWarning(context, "Please select a department.");
+        return;
+      }
+      if (updatedSemester == "1" || updatedSemester == "2") {
+        CustomSnackBar.showWarning(context,
+            "Semester 1 and 2 are not available for departmental students.");
+        return;
+      }
+    } else {
+      if (!(updatedSemester == "1" || updatedSemester == "2")) {
+        CustomSnackBar.showWarning(
+            context, "Department is required for your selected semester.");
+        return;
+      }
+    }
+
+    // Additional validations
+    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
+    if (!indexNoRegex.hasMatch(updatedIndex)) {
+      CustomSnackBar.showWarning(
+          context, 'Please enter a valid index number (e.g., EG/20XX/XXXX).');
+      return;
+    }
+    if (int.tryParse(updatedStudentBatch) == null) {
+      CustomSnackBar.showWarning(context, "Invalid student batch selected.");
+      return;
+    }
+
+    debugPrint(
+        "Updating details: $updatedName, $updatedEmail, $updatedIndex, $updatedSemester, $updatedDepartment, $updatedStudentBatch");
+
+    // Proceed with the update
     await StudentUpdateSettingService.updateStudent(
-        context,
-        updatedName,
-        updatedIndex,
-        updatedEmail,
-        int.parse(updatedDepartment),
-        int.parse(updatedSemester),
-        updatedStudentBatch);
+      context,
+      updatedName,
+      updatedIndex,
+      updatedEmail,
+      isDepartmentToggleEnabled
+          ? departmentList.indexOf(updatedDepartment!) + 1
+          : -1,
+      int.parse(updatedSemester),
+      int.parse(updatedStudentBatch),
+    );
   }
 }

@@ -5,10 +5,7 @@ class ApiConstants {
       'http://10.50.227.44:8080'; // For Android App this IP is not working so use ngrok IP
   static const String awsIpAddress = '13.51.170.30';
   static const String devIp = 'http://192.168.1.10:8080';
-  static const String baseUrl =
-      'https://1682-2402-d000-a500-54c7-d971-7f13-d230-14a7.ngrok-free.app';
-  static const String mobileBaseUrl = devIp;
-  static const String baseUrlEmulater = 'http://10.0.2.2:8082';
+  static const String baseUrl = 'http://10.50.60.114:8080';
   static const String checkStudentEmailEndpoint =
       '/api/v1/auth/check-student-email';
   static const String checkStudentIndexNoEndpoint =
@@ -21,12 +18,10 @@ class ApiConstants {
   static const String studentGenerateOTP = '/api/v1/otp/generate-otp';
   static const String studentVerifyOtp = '/api/v1/otp/otp-verification';
   static const String markAttendanceEndpoint =
-      '/api/v1/attendance/mark-attendance';
+      '/api/v1/attendance/mark-attendance-for-event';
   static const String getAllAttendanceByStudentIdUrl =
       '/api/v1/lecture-attendance/get-all-attendance-history-by-studentId';
   static const String getAttendanceDistance = '/api/v1/location/get-distance';
-  static const String lectureAttendanceMarking =
-      '/api/v1/lecture-attendance/mark-attendance';
   static const String lectureAttendanceMarkingByLectureId =
       '/api/v1/attendance/mark-attendance-for-lecture';
   static const String getAllModuleByStudentId =
@@ -42,9 +37,10 @@ class ApiConstants {
       '/api/v1/lecture/get-all-lecture-by-moduleId-for-student';
   static const String getModuleAttendanceForStudent =
       '/api/v1/attendance/get-module-attendance-for-student';
-  static const String getEventByEventId = '/api/v1/event/get-event-by-eventId';
+  static const String getEventByEventId =
+      '/api/v1/lecture/get-lecture-by-lectureId';
   static const String getEventAttendanceHistoryUrl =
-      '/api/v1/attendance/get-all-attendance-by-studentId';
+      '/api/v1/attendance/get-all-event-attendance-for-student';
   static const String sendOTPForForgotPassword =
       '/api/v1/auth/forgot-password-send-otp-for-student';
   static const String verifyOTPForForgotPassword =

@@ -13,9 +13,9 @@ class ScannedModule extends StatefulWidget {
   final Module module;
 
   const ScannedModule({
-    Key? key,
+    super.key,
     required this.module,
-  }) : super(key: key);
+  });
 
   @override
   State<ScannedModule> createState() => _ScannedModuleState();
@@ -70,7 +70,7 @@ class _ScannedModuleState extends State<ScannedModule> {
       });
     } else {
       CustomSnackBar.showError(context,
-          "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+          "There Are No Any upcoming Lectures For This Module ${widget.module.moduleCode}");
     }
   }
 
@@ -126,8 +126,6 @@ class _ScannedModuleState extends State<ScannedModule> {
     try {
       await checkLocationPermission();
       await markLectureAttendance(lectureId, latitude, longitude, context);
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
     } finally {
       setState(() {
         isProcessing = false; // Set isProcessing to false when done
@@ -138,17 +136,13 @@ class _ScannedModuleState extends State<ScannedModule> {
 
   Future<void> markLectureAttendance(int lectureId, double latitude,
       double longitude, BuildContext context) async {
-    try {
-      bool isCloseDetails =
-          await LectureAttendanceService.markLectureAttendanceByLectureId(
-              lectureId, latitude, longitude, context);
-      if (isCloseDetails) {
-        setState(() {
-          // Refresh the state if necessary
-        });
-      }
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+    bool isCloseDetails =
+        await LectureAttendanceService.markLectureAttendanceByLectureId(
+            lectureId, latitude, longitude, context);
+    if (isCloseDetails) {
+      setState(() {
+        // Refresh the state if necessary
+      });
     }
   }
 
@@ -267,38 +261,36 @@ class _ScannedModuleState extends State<ScannedModule> {
             ),
             const SizedBox(width: 20),
             Flexible(
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lecture.name,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Date : ${lecture.lectureDate}",
-                      style: const TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Time : ${timeFormat.format(lecture.lectureStartTime)}",
-                      style: const TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Venue : ${lecture.locationName}",
-                      style: const TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lecture.name,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Date : ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Time : ${timeFormat.format(lecture.lectureStartTime)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Venue : ${lecture.locationName}",
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 10),
+            const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -306,23 +298,23 @@ class _ScannedModuleState extends State<ScannedModule> {
                     ? const CircularProgressIndicator(
                         color: Color(0xFF086494),
                       ) // Show CircularProgressIndicator if processing
-                    : OutlinedButton(
+                    : ElevatedButton(
                         onPressed: () => markAttendancePopup(context,
                             () => _handleMarkAttendance(lecture.id), lecture),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.green),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
                         child: const Text(
                           "Attend",
-                          style: TextStyle(fontSize: 12, color: Colors.green),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ),
               ],
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 15),
           ],
         ),
       ),

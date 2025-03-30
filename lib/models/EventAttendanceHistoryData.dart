@@ -2,7 +2,7 @@ class EventAttendanceHistory {
   final String eventName;
   final String attendedTime;
   final String attendedDate;
-  final bool attendanceStatus;
+  final String attendanceStatus;
 
   EventAttendanceHistory({
     required this.eventName,
@@ -19,5 +19,4 @@ class EventAttendanceHistory {
       attendanceStatus: json['attendanceStatus'],
     );
   }
-
 }

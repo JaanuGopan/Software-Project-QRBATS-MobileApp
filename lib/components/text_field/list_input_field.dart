@@ -7,35 +7,30 @@ class ListInputFieldWidget extends StatefulWidget {
   final List<String> options;
   final String? initialValue;
   final double height;
-  final double borderWidth;
   final void Function(String?)? onChanged;
 
   const ListInputFieldWidget({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.icon,
     required this.width,
     required this.options,
     this.initialValue,
     this.height = 55.0,
-    this.borderWidth = 1.0,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   _ListInputFieldWidgetState createState() => _ListInputFieldWidgetState();
 }
 
 class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
-  String? _selectedValue;
+  late String? _selectedValue;
 
   @override
   void initState() {
     super.initState();
-
-    if (widget.initialValue != null) {
-      _selectedValue = widget.initialValue;
-    }
+    _selectedValue = widget.initialValue;
   }
 
   @override
@@ -59,8 +54,8 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
             width: 0.25, // Set left border thickness
           ),
           bottom: BorderSide(
-            color: Color(0xFF086494),
-            width: 3,
+            color: Color(0xFF086494), // Set bottom border color
+            width: 3, // Set bottom border thickness
           ),
         ),
       ),
@@ -70,20 +65,17 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
           setState(() {
             _selectedValue = newValue;
           });
-          if (widget.onChanged != null) {
-            int index = int.parse(newValue!) - 1;
-            widget.onChanged!(widget.options[index]);
-          }
+          widget.onChanged?.call(newValue);
         },
-        items: List.generate(widget.options.length, (index) {
+        items: widget.options.map((option) {
           return DropdownMenuItem<String>(
-            value: (index + 1).toString(),
+            value: option,
             child: Text(
-              widget.options[index],
+              option,
               style: const TextStyle(color: Color(0xFF086494)),
             ),
           );
-        }),
+        }).toList(),
         decoration: InputDecoration(
           border: InputBorder.none,
           fillColor: Colors.transparent,
@@ -91,11 +83,10 @@ class _ListInputFieldWidgetState extends State<ListInputFieldWidget> {
             widget.icon.icon,
             color: const Color(0xFF086494),
           ),
-          prefixIconColor: const Color(0xFF086494),
           filled: true,
           hintText: widget.hintText,
           hintStyle: const TextStyle(
-            color: Color(0xFF086494),
+            color: Colors.grey,
           ),
         ),
       ),

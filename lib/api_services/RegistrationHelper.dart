@@ -8,7 +8,6 @@ import '../pages/login_signup_pages/login_page.dart';
 import '../widgets/snackbar/custom_snackbar.dart';
 
 class RegistrationHelper {
-  static const String mobileBaseUrl = ApiConstants.mobileBaseUrl;
   static const String studentRegisterEndpoint = ApiConstants.studentRegister;
   static const String checkStudentUserNameEndpoint =
       ApiConstants.checkStudentUserNameEndpoint;
@@ -22,7 +21,7 @@ class RegistrationHelper {
     String indexNumber,
     String email,
     String studentRole,
-    int departmentId,
+    int? departmentId,
     int currentSemester,
     int studentBatch,
   ) async {

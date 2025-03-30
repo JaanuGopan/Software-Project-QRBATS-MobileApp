@@ -52,7 +52,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         });
       }
     } else {
-      CustomSnackBar.showError(context, "Please Enter a Valid Email.");
+      CustomSnackBar.showWarning(context, "Please Enter a Valid Email.");
     }
   }
 

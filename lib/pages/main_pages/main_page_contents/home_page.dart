@@ -109,14 +109,4 @@ class _HomeState extends State<Home> {
       },
     );
   }
-
-  BoxDecoration _buildContainerDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(10.0),
-      border: Border.all(
-        color: Color(0xFF086494),
-        width: 0.2,
-      ),
-    );
-  }
 }

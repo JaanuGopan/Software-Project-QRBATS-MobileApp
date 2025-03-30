@@ -17,28 +17,20 @@ class LoginService {
     final String endpoint =
         '${ApiConstants.studentlogin}?userName=$userName&password=$password';
 
-    try {
-      // Use ApiService to make the GET request
-      final response = await ApiService.get(endpoint, context);
+    // Use ApiService to make the GET request
+    final response = await ApiService.get(endpoint, context);
 
-      if (response != null && response.statusCode == 200) {
-        var jsonResponse = jsonDecode(response.body);
-        var authToken = jsonResponse['token'];
-        preferences.setString("token", authToken);
-        CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) {
-            return MainPage(token: authToken);
-          }),
-        );
-      } else {
-        // Handle error response
-        CustomSnackBar.showError(context, 'Error In Login Service');
-      }
-    } catch (error) {
-      print('Error logging in: $error');
-      CustomSnackBar.showError(context, "Error In Login Service, Try Again.");
+    if (response != null && response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      var authToken = jsonResponse['token'];
+      preferences.setString("token", authToken);
+      CustomSnackBar.showSuccess(context, 'Welcome To SkyTicker.');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return MainPage(token: authToken);
+        }),
+      );
     }
   }
 }

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qrbats_sp/api_services/EventService.dart';
-import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/api_services/ModuleService.dart';
 import 'package:qrbats_sp/components/scanqrcode_components/scanned_event_component.dart';
@@ -52,17 +52,31 @@ class _QRCodeScanState extends State<QRCodeScan> {
     print('Longitude: ${position.longitude}');
   }
 
-  Future<void> checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+  Future<void> checkPermissions() async {
+    // Check location permission
+    LocationPermission locationPermission = await Geolocator.checkPermission();
+    if (locationPermission == LocationPermission.denied) {
+      locationPermission = await Geolocator.requestPermission();
+      if (locationPermission == LocationPermission.denied) {
         return;
       }
     }
-    if (permission == LocationPermission.deniedForever) {
+    if (locationPermission == LocationPermission.deniedForever) {
       return;
     }
+
+    // Check camera permission
+    PermissionStatus cameraPermission = await Permission.camera.status;
+    if (cameraPermission.isDenied) {
+      cameraPermission = await Permission.camera.request();
+      if (cameraPermission.isDenied) {
+        return;
+      }
+    }
+    if (cameraPermission.isPermanentlyDenied) {
+      return;
+    }
+
     getLocation();
   }
 
@@ -121,17 +135,20 @@ class _QRCodeScanState extends State<QRCodeScan> {
               details['moduleId'] != null) {
             int scannedModuleId = details['moduleId'];
             debugPrint("Module ID: $scannedModuleId");
-            getModule(scannedModuleId);
-            setState(() {
-              qrCodeDetails = LectureQRCodeDetails.fromJson(details);
-              showQRCodeDetails = true;
-            });
+            getModule(scannedModuleId).then((value) => {
+                  setState(() {
+                    qrCodeDetails = LectureQRCodeDetails.fromJson(details);
+                    showQRCodeDetails = true;
+                  })
+                });
           } else {
             CustomSnackBar.showError(context, "Scanned QR Code is not valid.");
           }
         } catch (e) {
-          debugPrint("Error parsing QR code data: $e");
-          CustomSnackBar.showError(context, "Error parsing QR code data.");
+          debugPrint(
+              "The scanned QR code format is not supported by this app: $e");
+          CustomSnackBar.showError(context,
+              "The scanned QR code format is not supported by this app.");
         }
       } else {
         CustomSnackBar.showError(context, "Scanning canceled or failed.");
@@ -151,24 +168,12 @@ class _QRCodeScanState extends State<QRCodeScan> {
       scannedModule = module;
       showScannedModule = true;
     });
-    print(module.toString());
   }
 
   Future<void> markAttendance(int eventID, int attendeeID, double latitude,
       double longitude, BuildContext context) async {
     bool isCloseDetails = await MarkAttendanceService.markAttendance(
         eventID, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {
-        showQRCodeDetails = false;
-      });
-    }
-  }
-
-  Future<void> markLectureAttendance(int studentId, String moduleCode,
-      double latitude, double longitude, BuildContext context) async {
-    bool isCloseDetails = await LectureAttendanceService.markLectureAttendance(
-        studentId, moduleCode, latitude, longitude, context);
     if (isCloseDetails) {
       setState(() {
         showQRCodeDetails = false;
@@ -245,7 +250,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {
-                        checkLocationPermission();
+                        checkPermissions();
                         scanQRCode();
                       },
                       style: ElevatedButton.styleFrom(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkEventAttendancePopup.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
@@ -80,34 +79,28 @@ class _ScannedEventState extends State<ScannedEvent> {
     try {
       await checkLocationPermission();
       await markEventAttendance(
-          widget.event.eventId, latitude, longitude, context);
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
+              widget.event.eventId, latitude, longitude, context)
+          .then((value) {
+        if (value) {
+          CustomSnackBar.showSuccess(context, 'Successfully marked attendance');
+        }
+      });
     } finally {
       setState(() {
-        isProcessing = false; // Set isProcessing to false when done
+        isProcessing = false;
       });
     }
   }
 
-  Future<void> markEventAttendance(int eventId, double latitude,
+  Future<bool> markEventAttendance(int eventId, double latitude,
       double longitude, BuildContext context) async {
-    try {
-      bool isCloseDetails = await MarkAttendanceService.markAttendance(
-          eventId, latitude, longitude, context);
-      if (isCloseDetails) {
-        setState(() {
-          // Refresh the state if necessary
-        });
-      }
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to mark attendance: $e');
-    }
+    bool isCloseDetails = await MarkAttendanceService.markAttendance(
+        eventId, latitude, longitude, context);
+    return isCloseDetails;
   }
 
   @override
   Widget build(BuildContext context) {
-    final timeFormat = DateFormat('HH:mm a');
     return Container(
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
@@ -178,20 +171,20 @@ class _ScannedEventState extends State<ScannedEvent> {
                     ? const CircularProgressIndicator(
                         color: Color(0xFF086494),
                       ) // Show CircularProgressIndicator if processing
-                    : OutlinedButton(
+                    : ElevatedButton(
                         onPressed: () => markEventAttendancePopup(context,
                             () => _handleMarkAttendance(), widget.event),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.green),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
                         child: const Text(
                           "Attend",
-                          style: TextStyle(fontSize: 12, color: Colors.green),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
-                      )
+                      ),
               ],
             ),
           ),

@@ -31,6 +31,7 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
   void initState() {
     super.initState();
     _fetchAllEnrolledModuleData();
+    _fetchEventAttendanceData();
   }
 
   Future<void> _fetchAllEnrolledModuleData() async {
@@ -141,21 +142,23 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
   }
 
   Widget _buildEnrolledModuleAttendance() {
-    return ListView.builder(
-      itemCount: _allEnrolledModuleList.length,
-      itemBuilder: (context, index) {
-        final module = _allEnrolledModuleList[index];
-        return EnrolledModuleAttendance(
-          enrolledModule: module,
-          number: index + 1,
-          attendancePercentage: 80.0, // Placeholder
-          onTap: (module) {
-            _fetchAttendanceData(module.id);
-            setState(() => selectedModule = module);
-          },
-        );
-      },
-    );
+    return _allEnrolledModuleList.isEmpty
+        ? const Center(child: Text('No Enrolled Module'))
+        : ListView.builder(
+            itemCount: _allEnrolledModuleList.length,
+            itemBuilder: (context, index) {
+              final module = _allEnrolledModuleList[index];
+              return EnrolledModuleAttendance(
+                enrolledModule: module,
+                number: index + 1,
+                attendancePercentage: 80.0, // Placeholder
+                onTap: (module) {
+                  _fetchAttendanceData(module.id);
+                  setState(() => selectedModule = module);
+                },
+              );
+            },
+          );
   }
 
   Widget _buildLectureHistory(Module module) {
@@ -169,127 +172,279 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     final missedLectureCount =
         studentAttendanceResultDto?.notAttendanceCount ?? 0;
     final completedLectureHours =
-        studentAttendanceResultDto?.finishedLectureHours.inHours ?? 0;
+        studentAttendanceResultDto?.finishedLectureHours ?? 0;
     final attendedLectureHours =
-        studentAttendanceResultDto?.attendanceHours.inHours ?? 0;
+        studentAttendanceResultDto?.attendanceHours ?? 0;
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => setState(() => selectedModule = null),
-            ),
-            Expanded(
-              child: Text(
-                '${module.moduleName} (${module.moduleCode})',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                maxLines: 1, // Ensures text remains on a single line
-                softWrap: false, // Prevents text from wrapping to a new line
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => setState(() => selectedModule = null),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${module.moduleName} (${module.moduleCode})',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1, // Ensures text remains on a single line
+                      softWrap:
+                          false, // Prevents text from wrapping to a new line
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12, // Soft shadow
-                  blurRadius: 6.0,
-                  spreadRadius: 2.0,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Attendance Summary',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                const SizedBox(height: 12),
-                Text('Total Finished Lectures: $totalLectureCount'),
-                Text('Attended Lectures: $attendedLectureCount'),
-                Text('Missed Lectures: $missedLectureCount'),
-                Text('Total Finished Lectures Hours: $completedLectureHours'),
-                Text('Attended Lecture Hours: $attendedLectureHours'),
-                Text(
-                  'Attendance Percentage: ${attendancePercentage.toStringAsFixed(2)}%',
-                  style: TextStyle(
-                    color:
-                        attendancePercentage > 80 ? Colors.green : Colors.red,
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+                child: SingleChildScrollView(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.0),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12, // Soft shadow
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width -
+                                  100, // Adjust width dynamically
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Attendance Summary',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      const Text('Total Finished Lectures: '),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            '$totalLectureCount',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text('Attended Lectures: '),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            '$attendedLectureCount',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text('Missed Lectures: '),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            '$missedLectureCount',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text('Finished Lectures Hours: '),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            '$completedLectureHours',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text('Attended Lecture Hours: '),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            '$attendedLectureHours',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Center(
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12, // Soft shadow
+                                    blurRadius: 6.0,
+                                    spreadRadius: 2.0,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(16.0),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 80.0, // Increased size
+                                    height: 80.0, // Increased size
+                                    child: CircularProgressIndicator(
+                                      value: attendancePercentage / 100,
+                                      strokeWidth:
+                                          8.0, // Increased stroke width
+                                      backgroundColor: Colors.grey[300],
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        attendancePercentage > 80
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${attendancePercentage.toStringAsFixed(1)}%',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: attendancePercentage > 80.0
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              )),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 10),
+              const Row(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+                    child: Text(
+                      'Lecture History',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                ],
+              ),
+              isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF086494),
+                      ),
+                    )
+                  : Expanded(
+                      child: studentAttendanceResultDto!
+                              .studentAttendancesLectureList.isEmpty
+                          ? const Center(child: Text('No Lecture History'))
+                          : ListView.builder(
+                              itemCount: studentAttendanceResultDto
+                                      ?.studentAttendancesLectureList.length ??
+                                  0,
+                              itemBuilder: (context, index) {
+                                final attendanceData =
+                                    studentAttendanceResultDto!
+                                        .studentAttendancesLectureList[index];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 8.0),
+                                  child: LectureAttendanceHistoryItem(
+                                    studentAttendanceLectureDto: attendanceData,
+                                    number: index + 1,
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+            ],
           ),
         ),
-        const SizedBox(height: 10),
-        const Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
-              child: Text(
-                'Lecture History',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
-              ),
-            ),
-          ],
-        ),
-        isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF086494),
-                ),
-              )
-            : Expanded(
-                child: ListView.builder(
-                  itemCount: studentAttendanceResultDto
-                          ?.studentAttendancesLectureList.length ??
-                      0,
-                  itemBuilder: (context, index) {
-                    final attendanceData = studentAttendanceResultDto!
-                        .studentAttendancesLectureList[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 8.0),
-                      child: LectureAttendanceHistoryItem(
-                        studentAttendanceLectureDto: attendanceData,
-                        number: index + 1,
-                      ),
-                    );
-                  },
-                ),
-              ),
-      ],
+      ),
     );
   }
 
   Widget _buildEventHistory() {
-    return ListView.builder(
-      itemCount: _eventAttendanceData.length,
-      itemBuilder: (context, index) {
-        return EventAttendanceHistoryItem(
-          eventAttendanceHistory: _eventAttendanceData[index],
-          number: index + 1,
-        );
-      },
-    );
+    return _eventAttendanceData.isEmpty
+        ? const Center(child: Text('No Event History'))
+        : ListView.builder(
+            itemCount: _eventAttendanceData.length,
+            itemBuilder: (context, index) {
+              return EventAttendanceHistoryItem(
+                eventAttendanceHistory: _eventAttendanceData[index],
+                number: index + 1,
+              );
+            },
+          );
   }
 }

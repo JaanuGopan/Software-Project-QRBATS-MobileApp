@@ -12,43 +12,24 @@ class ModuleService {
       BuildContext context, int moduleId) async {
     final endpoint = '${ApiConstants.getModuleByModuleCode}?moduleId=$moduleId';
 
-    try {
-      final response = await ApiService.get(endpoint, context);
+    final response = await ApiService.get(endpoint, context);
 
-      if (response != null && response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        Module returnModule = Module.fromJson(responseData);
-        return returnModule;
-      } else {
-        String errorMessage = response?.body ?? "Unexpected error occurred.";
-        CustomSnackBar.showError(context, errorMessage);
-        throw Exception(errorMessage);
-      }
-    } catch (error) {
-      CustomSnackBar.showError(context, "Error In Getting Module.");
-      throw Exception("Error In Getting Module: ${error.toString()}");
-    }
+    final responseData = jsonDecode(response!.body);
+    Module returnModule = Module.fromJson(responseData);
+    return returnModule;
   }
 
   // 🔹 Get All Modules
   static Future<List<Module>> getAllModule(BuildContext context) async {
-    final endpoint = ApiConstants.getAllModuleByStudentId;
+    const endpoint = ApiConstants.getAllModuleByStudentId;
 
-    try {
-      final response = await ApiService.get(endpoint, context);
+    final response = await ApiService.get(endpoint, context);
 
-      if (response != null && response.statusCode == 200) {
-        final List<dynamic> responseData = jsonDecode(response.body);
-        return responseData.map((data) => Module.fromJson(data)).toList();
-      } else {
-        String errorMessage = response?.body ?? "Unexpected error occurred.";
-        CustomSnackBar.showError(context, errorMessage);
-        throw Exception(errorMessage);
-      }
-    } catch (error) {
-      CustomSnackBar.showError(context, "Error In Getting Modules.");
-      throw Exception("Error In Getting Modules.");
+    if (response != null && response.statusCode == 200) {
+      final List<dynamic> responseData = jsonDecode(response.body);
+      return responseData.map((data) => Module.fromJson(data)).toList();
     }
+    return [];
   }
 
   // 🔹 Enroll in a Module

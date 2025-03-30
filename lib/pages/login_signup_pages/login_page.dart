@@ -68,6 +68,11 @@ class _LoginState extends State<Login> {
       CustomSnackBar.showWarning(context, "Please Enter UserName.");
       return;
     }
+    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
+      CustomSnackBar.showWarning(
+          context, "User name should not include special characters.");
+      return;
+    }
     if (password == "") {
       CustomSnackBar.showWarning(context, "Please Enter Password.");
     }
@@ -76,8 +81,6 @@ class _LoginState extends State<Login> {
         _isLoginLoading = true;
       });
       await LoginService.login(context, userName, password);
-    } on Exception catch (e) {
-      CustomSnackBar.showError(context, "Error in Login.");
     } finally {
       setState(() {
         _isLoginLoading = false;
@@ -172,6 +175,7 @@ class _LoginState extends State<Login> {
                                     ),
                             ),
                           ),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
                               const Spacer(),
@@ -184,7 +188,7 @@ class _LoginState extends State<Login> {
                               TextButton(
                                 onPressed: signUpPage,
                                 child: const Text(
-                                  "SignUp",
+                                  "Create Account",
                                   style: TextStyle(color: Color(0xFF086494)),
                                 ),
                               ),

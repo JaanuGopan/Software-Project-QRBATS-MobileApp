@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
 
-void markEventAttendancePopup(BuildContext context, Function markAttendance,EventQRCodeDetails event) {
+void markEventAttendancePopup(
+    BuildContext context, Function markAttendance, EventQRCodeDetails event) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -13,41 +13,51 @@ void markEventAttendancePopup(BuildContext context, Function markAttendance,Even
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: Center(child: const Text("Mark Attendance",style: TextStyle(fontWeight: FontWeight.bold),)),
+              const ListTile(
+                title: Center(
+                    child: Text(
+                  "Mark Attendance",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )),
               ),
               Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         event.eventName,
-                        style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Date : ${event!.eventDate}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Date : ${event.eventDate}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Start Time : ${event!.eventTime}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Start Time : ${event.eventTime}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "End Time : ${event!.eventEndTime}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "End Time : ${event.eventEndTime}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Venue : ${event!.eventVenue}",
-                        style: TextStyle(fontSize: 12, color: Colors.black),
+                        "Venue : ${event.eventVenue}",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
-
                     ],
                   ),
                 ),
@@ -63,20 +73,20 @@ void markEventAttendancePopup(BuildContext context, Function markAttendance,Even
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
-                  OutlinedButton(
+                  ElevatedButton(
                     onPressed: () {
                       markAttendance();
                       Navigator.of(context).pop();
                     },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.green),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                     child: const Text(
                       "Attend",
-                      style: TextStyle(fontSize: 12, color: Colors.green),
+                      style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),
                 ],
@@ -98,7 +108,7 @@ final BoxDecoration _alertBoxDecoration = BoxDecoration(
       color: Colors.black.withOpacity(0.5), // Shadow color
       spreadRadius: 1, // Spread radius
       blurRadius: 10, // Blur radius
-      offset: Offset(0, 3), // Shadow position
+      offset: const Offset(0, 3), // Shadow position
     ),
   ],
 );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
 import 'package:qrbats_sp/components/buttons/round_button.dart';
 import 'package:qrbats_sp/components/text_field/list_input_field.dart';
+import 'package:qrbats_sp/config/Utils.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -17,25 +18,9 @@ class Signup1 extends StatefulWidget {
   State<Signup1> createState() => _Signup1State();
 }
 
-final List<String> departmentList = [
-  "DEIE",
-  "DCOM",
-  "DMME",
-  "DCEE",
-  "DMENA",
-];
-final List<String> semesterList = ["1", "2", "3", "4", "5", "6", "7", "8"];
-
-final List<String> studentBatchList = [
-  '20',
-  '21',
-  '22',
-  '23',
-  '24',
-  '25',
-  '26',
-  '27',
-];
+final List<String> departmentList = Utils.getDepartmentList();
+final List<String> semesterList = Utils.getSemesterList();
+final List<String> studentBatchList = Utils.getStudentBatchListList();
 
 class _Signup1State extends State<Signup1> {
   final _studentNameTextController = TextEditingController();
@@ -45,6 +30,7 @@ class _Signup1State extends State<Signup1> {
   String? selectedCurrentSemester;
   String? selectedStudentRole;
   String? selectedStudentBatch;
+  bool isDepartmentToggleEnabled = true;
 
   void otpVerificationPage() {
     Navigator.push(
@@ -55,19 +41,12 @@ class _Signup1State extends State<Signup1> {
           email: _emailTextController.text,
           indexNumber: _indexNumberTextController.text,
           studentRole: "STUDENT",
-          departmentId: departmentList.indexOf(selectedDepartment!),
-          currentSemester: semesterList.indexOf(selectedCurrentSemester!),
+          departmentId: isDepartmentToggleEnabled
+              ? departmentList.indexOf(selectedDepartment!) + 1
+              : -1,
+          currentSemester: int.parse(selectedCurrentSemester!),
           studentBatch: int.parse(selectedStudentBatch!),
         );
-        /* return OtpVerificationPage(
-          studentName: "John Doe",
-          email: "john.doe@example.com",
-          indexNumber: "EG/2020/1234",
-          studentRole: "STUDENT",
-          departmentId: 1, // Assuming "DEIE" is selected
-          currentSemester: 2, // Assuming "2" is selected
-          studentBatch: 21, // Assuming '21' is selected
-        ); */
       }),
     );
   }
@@ -91,6 +70,7 @@ class _Signup1State extends State<Signup1> {
       _studentNameTextController.text,
       _indexNumberTextController.text,
       _emailTextController.text,
+      isDepartmentToggleEnabled,
       selectedDepartment,
       selectedCurrentSemester,
       selectedStudentBatch,
@@ -122,11 +102,11 @@ class _Signup1State extends State<Signup1> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
+          /*  Positioned(
             top: 20,
             left: 20,
             child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-          ),
+          ), */
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -135,8 +115,9 @@ class _Signup1State extends State<Signup1> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
-                    const Center(child: TextBlue(text: "SignUp", fontSize: 30)),
-                    const SizedBox(height: 30),
+                    const Center(
+                        child: TextBlue(text: "Create Account", fontSize: 30)),
+                    const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: Column(
@@ -165,25 +146,48 @@ class _Signup1State extends State<Signup1> {
                             icon: const Icon(Icons.numbers),
                           ),
                           const SizedBox(height: 10),
-                          const Align(
-                              alignment: Alignment.centerLeft,
-                              child:
-                                  TextBlue(text: "Department", fontSize: 15)),
-                          _buildListInputField(
-                            hintText: "select one",
-                            width: double.infinity,
-                            icon: Icons.list_sharp,
-                            options: departmentList,
-                            onChanged: (selectedValue) {
-                              selectedDepartment = selectedValue;
-                            },
+                          Row(
+                            children: [
+                              const TextBlue(
+                                  text: "Select Department", fontSize: 15),
+                              const SizedBox(width: 10),
+                              Switch(
+                                value: isDepartmentToggleEnabled,
+                                focusColor: const Color(0xFF086494),
+                                activeColor: const Color(0xFF086494),
+                                inactiveThumbColor: Colors.white,
+                                inactiveTrackColor: Colors.grey,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedDepartment = null;
+                                    selectedCurrentSemester == null;
+                                    isDepartmentToggleEnabled = value;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
+                          if (isDepartmentToggleEnabled) ...[
+                            const Align(
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    TextBlue(text: "Department", fontSize: 15)),
+                            _buildListInputField(
+                              hintText: "Select Department",
+                              width: double.infinity,
+                              icon: Icons.list_sharp,
+                              options: departmentList,
+                              onChanged: (selectedValue) {
+                                selectedDepartment = selectedValue;
+                              },
+                            ),
+                          ],
                           const SizedBox(height: 10),
                           const Align(
                               alignment: Alignment.centerLeft,
                               child: TextBlue(text: "Semester", fontSize: 15)),
                           _buildListInputField(
-                            hintText: "select one",
+                            hintText: "Select Semester",
                             width: double.infinity,
                             icon: Icons.list_sharp,
                             options: semesterList,
@@ -197,7 +201,7 @@ class _Signup1State extends State<Signup1> {
                               child: TextBlue(
                                   text: "Student Batch", fontSize: 15)),
                           _buildListInputField(
-                            hintText: "select one",
+                            hintText: "Select Batch",
                             width: double.infinity,
                             icon: Icons.list_sharp,
                             options: studentBatchList,
@@ -225,7 +229,7 @@ class _Signup1State extends State<Signup1> {
                               TextButton(
                                 onPressed: loginPage,
                                 child: const Text(
-                                  "SignIn",
+                                  "LogIn",
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Color(0xFF086494),
