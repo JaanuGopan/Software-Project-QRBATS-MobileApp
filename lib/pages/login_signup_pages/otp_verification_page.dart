@@ -119,7 +119,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       setState(() {
         _isVerifyOTPLoading = true;
       });
-      OTPServices.verifyOTP(
+      await OTPServices.verifyOTP(
           context, widget.email, _otpController.text, nextPage);
     } finally {
       setState(() {
