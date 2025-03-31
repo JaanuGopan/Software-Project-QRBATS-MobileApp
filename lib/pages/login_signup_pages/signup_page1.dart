@@ -26,11 +26,91 @@ class _Signup1State extends State<Signup1> {
   final _studentNameTextController = TextEditingController();
   final _indexNumberTextController = TextEditingController();
   final _emailTextController = TextEditingController();
+  bool isStudentNameHasError = false;
+  bool isIndexNumberHasError = false;
+  bool isEmailHasError = false;
+  String studentNameError = '';
+  String indexNumberError = '';
+  String emailError = '';
+
   String? selectedDepartment;
   String? selectedCurrentSemester;
   String? selectedStudentRole;
   String? selectedStudentBatch;
   bool isDepartmentToggleEnabled = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _studentNameTextController.addListener(_studentNameValidationListener);
+    _indexNumberTextController.addListener(_indexNumberValidationListener);
+    _emailTextController.addListener(_emailValidationListener);
+  }
+
+  void _studentNameValidationListener() {
+    if (_studentNameTextController.text.isEmpty) {
+      setState(() {
+        isStudentNameHasError = true;
+        studentNameError = 'Please enter your name';
+      });
+      return;
+    }
+
+    setState(() {
+      isStudentNameHasError = false;
+      studentNameError = '';
+    });
+  }
+
+  void _indexNumberValidationListener() {
+    if (_indexNumberTextController.text.isEmpty) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError = 'Please enter your index number';
+      });
+      return;
+    }
+
+    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
+    if (!indexNoRegex.hasMatch(_indexNumberTextController.text)) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError =
+            'Please enter a valid index number (e.g., EG/20XX/XXXX).';
+      });
+      return;
+    }
+
+    setState(() {
+      isIndexNumberHasError = false;
+      indexNumberError = '';
+    });
+  }
+
+  void _emailValidationListener() {
+    if (_emailTextController.text.isEmpty) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter your email';
+      });
+      return;
+    }
+
+    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(_emailTextController.text)) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter a valid email';
+      });
+      return;
+    }
+
+    setState(() {
+      isEmailHasError = false;
+      emailError = '';
+    });
+  }
 
   void otpVerificationPage() {
     Navigator.push(
@@ -132,6 +212,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.drive_file_rename_outline),
+                            hasError: isStudentNameHasError,
+                            errorText: studentNameError,
                           ),
                           const SizedBox(height: 10),
                           const Align(
@@ -144,6 +226,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.numbers),
+                            hasError: isIndexNumberHasError,
+                            errorText: indexNumberError,
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -220,6 +304,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.email),
+                            hasError: isEmailHasError,
+                            errorText: emailError,
                           ),
                           const SizedBox(height: 10),
                           Row(

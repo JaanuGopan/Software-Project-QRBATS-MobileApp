@@ -18,6 +18,39 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
 
+  bool isEmailHasError = false;
+  String emailError = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_emailValidationListener);
+  }
+
+  void _emailValidationListener() {
+    if (_emailController.text.isEmpty) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter your email';
+      });
+      return;
+    }
+
+    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(_emailController.text)) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter a valid email';
+      });
+      return;
+    }
+
+    setState(() {
+      isEmailHasError = false;
+      emailError = '';
+    });
+  }
+
   void navigateToLoginPage() {
     Navigator.push(
       context,
@@ -106,6 +139,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.email),
+                            hasError: isEmailHasError,
+                            errorText: emailError,
                           ),
                           const SizedBox(height: 20),
                           _isOTPSend
