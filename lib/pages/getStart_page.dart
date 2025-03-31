@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
 
-import '../components/buttons/button_white.dart';
-import 'login_signup_pages/signup_page1.dart';
-
 class OpeningPage extends StatefulWidget {
   const OpeningPage({super.key});
 
@@ -14,13 +11,13 @@ class OpeningPage extends StatefulWidget {
 class _OpeningPageState extends State<OpeningPage> {
   void getStart() {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Login();
+      return const Login();
     }));
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeColour = Color(0xFF086494);
+    final themeColour = const Color(0xFF086494);
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -48,14 +45,14 @@ class _OpeningPageState extends State<OpeningPage> {
                   height: screenHeight * 0.02,
                 ),
                 Image(
-                  image: AssetImage("lib/assets/logo/logo.png"),
+                  image: const AssetImage("lib/assets/logo/logo.png"),
                   height: screenHeight * 0.3,
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                   decoration: BoxDecoration(
                     color: themeColour,
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(100.0),
                       bottomLeft: Radius.circular(100.0),
                     ),
@@ -85,20 +82,23 @@ class _OpeningPageState extends State<OpeningPage> {
                             },
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: BorderSide(color: Colors.white),
+                              side: const BorderSide(color: Colors.white),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               "Get Start",
-                              style: TextStyle(color: Color(0xFF086494),fontWeight: FontWeight.bold,fontSize: 20),
+                              style: TextStyle(
+                                  color: Color(0xFF086494),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
                             )),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
               ],

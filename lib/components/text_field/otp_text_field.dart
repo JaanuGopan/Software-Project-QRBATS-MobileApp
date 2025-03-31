@@ -51,8 +51,8 @@ class _OTPTextFieldState extends State<OTPTextField> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(widget.length, (index) {
         return Container(
-          width: 80.0,
-          height: 80.0,
+          width: 60.0,
+          height: 60.0,
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),

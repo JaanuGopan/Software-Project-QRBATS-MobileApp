@@ -65,6 +65,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     }
 
+    if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(newPassword)) {
+      CustomSnackBar.showWarning(context,
+          "Password should not include the characters '#', '%', '?', or '\$'.");
+      return;
+    }
+
     try {
       setState(() {
         isLoading = true;
@@ -81,7 +87,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool isValidPassword(String password) {
     // Password must contain at least 8 characters, one uppercase letter,
     // one lowercase letter, and one number
-    final regex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$');
+    final regex = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$');
     return regex.hasMatch(password);
   }
 

@@ -128,7 +128,7 @@ class _Signup1State extends State<Signup1> {
                                   TextBlue(text: "Student Name", fontSize: 15)),
                           MyTextField(
                             controller: _studentNameTextController,
-                            hintText: "student name",
+                            hintText: "Perera A.B.C.D",
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.drive_file_rename_outline),
