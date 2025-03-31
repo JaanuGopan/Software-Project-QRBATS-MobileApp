@@ -65,6 +65,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     }
 
+    if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(newPassword)) {
+      CustomSnackBar.showWarning(context,
+          "Password should not include the characters '#', '%', '?', or '\$'.");
+      return;
+    }
+
     try {
       setState(() {
         isLoading = true;

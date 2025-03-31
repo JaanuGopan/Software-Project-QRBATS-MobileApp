@@ -84,9 +84,16 @@ class _SignUp3State extends State<SignUp3> {
             context, "Password And Confirm Password Are Not Match.");
         return;
       }
-      if (!isValidPassword(_password.text)) {
+      if (!RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$')
+          .hasMatch(_password.text)) {
         CustomSnackBar.showWarning(context,
             "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+        return;
+      }
+
+      if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(_password.text)) {
+        CustomSnackBar.showWarning(context,
+            "Password should not include the characters '#', '%', '?', or '\$'.");
         return;
       }
 
@@ -108,12 +115,6 @@ class _SignUp3State extends State<SignUp3> {
         _isSignUpLoading = false;
       });
     }
-  }
-
-  bool isValidPassword(String password) {
-    // Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number
-    final regex = RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$');
-    return regex.hasMatch(password);
   }
 
   @override
