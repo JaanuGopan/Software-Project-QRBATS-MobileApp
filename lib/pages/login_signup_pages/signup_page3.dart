@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/RegistrationHelper.dart'; // Adjust import path as needed
+import 'package:qrbats_sp/components/buttons/round_button.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 import '../../components/buttons/button_dark_large.dart';
-import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 import '../main_pages/main_page.dart';
@@ -49,6 +53,29 @@ class _SignUp3State extends State<SignUp3> {
     _userNameTextController.addListener(_validateUserName);
     _password.addListener(_validatePassword);
     _confirmPassword.addListener(_validateConfirmPassword);
+  }
+
+  Future<String?> getDeviceId() async {
+    try {
+      var deviceInfo = DeviceInfoPlugin();
+
+      if (kIsWeb) {
+        print("Running on Web - Device ID not available");
+        return "Web_Device"; // Placeholder value for web
+      } else if (Platform.isAndroid) {
+        var androidInfo = await deviceInfo.androidInfo;
+        print("Android ID: " + androidInfo.id);
+        return androidInfo.id; // Unique Android ID
+      } else if (Platform.isIOS) {
+        var iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor; // Unique iOS ID
+      }
+
+      return null;
+    } on Exception catch (e) {
+      print("Error getting device ID: $e");
+      return null;
+    }
   }
 
   void _validateUserName() {
@@ -200,6 +227,8 @@ class _SignUp3State extends State<SignUp3> {
         return;
       }
 
+      String? deviceId = await getDeviceId();
+
       await RegistrationHelper.register(
         context,
         _userNameTextController.text,
@@ -212,6 +241,7 @@ class _SignUp3State extends State<SignUp3> {
         widget.departmentId,
         widget.currentSemester,
         widget.studentBatch,
+        deviceId,
       );
     } finally {
       setState(() {
@@ -226,11 +256,6 @@ class _SignUp3State extends State<SignUp3> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -309,6 +334,11 @@ class _SignUp3State extends State<SignUp3> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
           ),
         ],
       ),

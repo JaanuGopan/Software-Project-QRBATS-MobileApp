@@ -13,18 +13,18 @@ class RegistrationHelper {
       ApiConstants.checkStudentUserNameEndpoint;
 
   static Future<void> register(
-    BuildContext context,
-    String username,
-    String password,
-    String confirmPassword,
-    String studentName,
-    String indexNumber,
-    String email,
-    String studentRole,
-    int? departmentId,
-    int currentSemester,
-    int studentBatch,
-  ) async {
+      BuildContext context,
+      String username,
+      String password,
+      String confirmPassword,
+      String studentName,
+      String indexNumber,
+      String email,
+      String studentRole,
+      int? departmentId,
+      int currentSemester,
+      int studentBatch,
+      String? deviceId) async {
     if (password != confirmPassword) {
       // Use CustomSnackBar to show the snackbar
       CustomSnackBar.showWarning(context, 'Passwords do not match.');
@@ -41,6 +41,7 @@ class RegistrationHelper {
       'departmentId': departmentId,
       'semester': currentSemester,
       'batch': studentBatch,
+      'deviceId': deviceId
     };
 
     try {

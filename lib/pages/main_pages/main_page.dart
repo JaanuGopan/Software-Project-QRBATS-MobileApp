@@ -221,7 +221,7 @@ class _MainPageState extends State<MainPage> {
                                 Text(
                                   'Skyticker is a smart QR-based attendance tracking app designed to simplify and automate attendance management '
                                   'with fast QR scanning and real-time tracking, ensuring accuracy and efficiency. Developed by 22nd Computer Engineering '
-                                  'batch students—Janugopan S, Harintharan N, Sivakkanth K, and Dilexan H.A.L.—this app aims to digitalize the attendance '
+                                  'batch students—Janugopan S, Harintharan N, Sivakkanth K, and Dilexsan H.A.L.—this app aims to digitalize the attendance '
                                   'marking system at the University of Ruhuna, Faculty of Engineering, making the process seamless and modern.',
                                 ),
                               ],

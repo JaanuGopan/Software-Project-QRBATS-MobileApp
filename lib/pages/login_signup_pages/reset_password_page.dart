@@ -209,12 +209,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -317,6 +311,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child:
+                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
           ),
         ],
       ),

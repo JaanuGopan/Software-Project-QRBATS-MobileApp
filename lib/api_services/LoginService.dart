@@ -9,13 +9,13 @@ import '../../pages/main_pages/main_page.dart';
 import '../widgets/snackbar/custom_snackbar.dart'; // Import CustomSnackBar class
 
 class LoginService {
-  static Future<void> login(
-      BuildContext context, String userName, String password) async {
+  static Future<void> login(BuildContext context, String userName,
+      String password, String? deviceId) async {
     late SharedPreferences preferences;
     preferences = await SharedPreferences.getInstance();
 
     final String endpoint =
-        '${ApiConstants.studentlogin}?userName=$userName&password=$password';
+        '${ApiConstants.studentlogin}?userName=$userName&password=$password&deviceId=$deviceId';
 
     // Use ApiService to make the GET request
     final response = await ApiService.get(endpoint, context);

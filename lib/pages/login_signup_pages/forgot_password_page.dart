@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
 import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
+import 'package:qrbats_sp/components/buttons/round_button.dart';
 import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
 
-import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 import '../../widgets/snackbar/custom_snackbar.dart';
@@ -95,12 +95,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -164,6 +158,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child:
+                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
           ),
         ],
       ),

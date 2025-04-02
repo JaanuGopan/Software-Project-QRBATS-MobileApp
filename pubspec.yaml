@@ -44,6 +44,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   encrypt: ^5.0.0
   logger: ^2.5.0
+  device_info_plus: 10.0.1
 
 dev_dependencies:
   flutter_test:

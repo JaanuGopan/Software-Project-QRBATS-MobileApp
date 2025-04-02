@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
 import 'package:qrbats_sp/components/buttons/round_button.dart';
@@ -143,9 +147,34 @@ class _Signup1State extends State<Signup1> {
     }));
   }
 
+  Future<String?> getDeviceId() async {
+    try {
+      var deviceInfo = DeviceInfoPlugin();
+
+      if (kIsWeb) {
+        print("Running on Web - Device ID not available");
+        return "Web_Device"; // Placeholder value for web
+      } else if (Platform.isAndroid) {
+        var androidInfo = await deviceInfo.androidInfo;
+        print("Android ID: " + androidInfo.id);
+        return androidInfo.id; // Unique Android ID
+      } else if (Platform.isIOS) {
+        var iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor; // Unique iOS ID
+      }
+
+      return null;
+    } on Exception catch (e) {
+      print("Error getting device ID: $e");
+      return null;
+    }
+  }
+
   bool _isLoadingForOTPVerificationPage = false;
 
   Future<void> handleVerifySignupStep1() async {
+    String? deviceId = await getDeviceId();
+
     bool isValidInputs = SignUpInputValidations.validateInputs(
       _studentNameTextController.text,
       _indexNumberTextController.text,
@@ -165,6 +194,7 @@ class _Signup1State extends State<Signup1> {
         await CheckStudentInfo.checkStudentInfo(
           _emailTextController.text,
           _indexNumberTextController.text,
+          deviceId,
           otpVerificationPage,
           context,
         );
@@ -182,11 +212,6 @@ class _Signup1State extends State<Signup1> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          /*  Positioned(
-            top: 20,
-            left: 20,
-            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-          ), */
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -351,6 +376,11 @@ class _Signup1State extends State<Signup1> {
               ),
             ),
           ),
+          /* Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
+          ), */
         ],
       ),
     );
