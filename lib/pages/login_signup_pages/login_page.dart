@@ -190,6 +190,18 @@ class _LoginState extends State<Login> {
       CustomSnackBar.showWarning(context, "Please Enter Password.");
       return;
     }
+    if (!RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$')
+        .hasMatch(_password.text)) {
+      CustomSnackBar.showWarning(context,
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+      return;
+    }
+
+    if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(_password.text)) {
+      CustomSnackBar.showWarning(context,
+          "Password should not include the characters '#', '%', '?', or '\$'.");
+      return;
+    }
 
     try {
       setState(() {

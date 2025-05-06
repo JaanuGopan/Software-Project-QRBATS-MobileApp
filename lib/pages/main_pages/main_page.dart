@@ -219,10 +219,38 @@ class _MainPageState extends State<MainPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Skyticker is a smart QR-based attendance tracking app designed to simplify and automate attendance management '
-                                  'with fast QR scanning and real-time tracking, ensuring accuracy and efficiency. Developed by 22nd Computer Engineering '
-                                  'batch students—Janugopan S, Harintharan N, Sivakkanth K, and Dilexsan H.A.L.—this app aims to digitalize the attendance '
-                                  'marking system at the University of Ruhuna, Faculty of Engineering, making the process seamless and modern.',
+                                  'SkyTicker is a smart QR-based attendance app designed for fast, accurate tracking. '
+                                  'Developed by:',
+                                  textAlign: TextAlign.start,
+                                ),
+                                Text(
+                                  '• Janugopan S.\n'
+                                  '• Harintharan N.\n'
+                                  '• Sivakkanth K.\n'
+                                  '• Dilexsan H.A.L.',
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  'from the 22nd Computer Engineering batch, it modernizes attendance marking at the '
+                                  'University of Ruhuna, Faculty of Engineering.\n',
+                                  textAlign: TextAlign.start,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Contact us: ',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    Text(
+                                      'skyticker.uor@gmail.com',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

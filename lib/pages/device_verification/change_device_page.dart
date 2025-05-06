@@ -342,7 +342,7 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
 
   BackdropFilter _showDeviceVerificationPopup(BuildContext context) {
     return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5), // Apply blur
+      filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2), // Apply blur
       child: AlertDialog(
         contentPadding: EdgeInsets.zero,
         content: Container(
@@ -371,12 +371,12 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                 ),
               ),
               const Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Your device is not linked to your account. Please verify your device or use your original device to log in. Once verified, this device will be linked to your account. If this is not your original device, please switch to the correct one. If this device is already linked to a different account, you will not be able to use it to log in.",
+                      "This device is not linked to your account. Please verify your device or use your verified device to log in. Once verified, this device will be linked to your account. If this is not your original device, please switch to the correct one. If this device is already linked to a different account, you will not be able to use it to log in.",
                       style: TextStyle(fontWeight: FontWeight.normal),
                     ),
                   ],

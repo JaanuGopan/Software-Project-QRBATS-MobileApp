@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+
 import 'getStart_page.dart';
 
 class StartingPage extends StatefulWidget {
@@ -83,7 +83,7 @@ class _StartingPageState extends State<StartingPage> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: w * 0.1),
                       child: Text(
-                        "This is the best app to take attendance using QR code with GPS tracking",
+                        "SkyTicker is an app for taking attendance using QR code with location verification",
                         style: TextStyle(
                           fontSize: h * 0.02,
                           fontWeight: FontWeight.bold,

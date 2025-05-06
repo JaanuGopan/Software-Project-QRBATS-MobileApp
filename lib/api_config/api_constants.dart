@@ -4,7 +4,8 @@ class ApiConstants {
   static const String facultyLocalIp = 'http://10.50.227.44:8080';
   static const String devIp1 = 'http://192.168.43.136:8080';
   static const String devIp2 = 'http://localhost:8080';
-  static const String baseUrl = facultyHostedNgrokIp;
+  static const String facultyHostedIp = 'http://192.248.50.239:8080';
+  static const String baseUrl = facultyHostedIp;
   static const String checkStudentEmailEndpoint =
       '/api/v1/auth/check-student-email';
   static const String checkStudentIndexNoEndpoint =
