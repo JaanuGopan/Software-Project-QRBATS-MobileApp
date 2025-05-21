@@ -25,6 +25,109 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool isLoading = false;
   bool isUsernameToggleEnabled = false;
 
+  bool userNameHasError = false;
+  bool passwordHasError = false;
+  bool confirmPasswordHasError = false;
+  String userNameError = "";
+  String passwordError = "";
+  String confirmPasswordError = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_validateUserName);
+    _newPasswordController.addListener(_validatePassword);
+    _confirmPasswordController.addListener(_validateConfirmPassword);
+  }
+
+  void _validateUserName() {
+    if (_usernameController.text == "") {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "Please Enter UserName.";
+      });
+    } else if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_usernameController.text)) {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "User name should not include special characters.";
+      });
+    } else if (_usernameController.text.length < 6) {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "User name should be at least 6 characters long.";
+      });
+    } else {
+      setState(() {
+        userNameHasError = false;
+        userNameError = "";
+      });
+    }
+  }
+
+  void _validatePassword() {
+    String password = _newPasswordController.text;
+
+    if (password.isEmpty) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Please enter a password.";
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must be at least 8 characters long.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one uppercase letter.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one lowercase letter.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'\d').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one number.";
+      });
+      return;
+    }
+
+    // If all conditions pass, the password is valid
+    setState(() {
+      passwordHasError = false;
+      passwordError = "";
+    });
+  }
+
+  void _validateConfirmPassword() {
+    if (_confirmPasswordController.text != _newPasswordController.text) {
+      setState(() {
+        confirmPasswordHasError = true;
+        confirmPasswordError = "Passwords do not match.";
+      });
+    } else {
+      setState(() {
+        confirmPasswordHasError = false;
+        confirmPasswordError = "";
+      });
+    }
+  }
+
   Future<void> resetPassword() async {
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmPasswordController.text;
@@ -106,12 +209,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -157,6 +254,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               width: double.infinity,
                               obscureText: false,
                               icon: const Icon(Icons.person),
+                              hasError: userNameHasError,
+                              errorText: userNameError,
                             ),
                             const SizedBox(height: 10),
                           ],
@@ -170,6 +269,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             width: double.infinity,
                             obscureText: true,
                             icon: const Icon(Icons.lock),
+                            hasError: passwordHasError,
+                            errorText: passwordError,
                           ),
                           const SizedBox(height: 10),
                           const Align(
@@ -182,6 +283,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             width: double.infinity,
                             obscureText: true,
                             icon: const Icon(Icons.lock),
+                            hasError: confirmPasswordHasError,
+                            errorText: confirmPasswordError,
                           ),
                           const SizedBox(height: 40),
                           Center(
@@ -208,6 +311,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child:
+                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
           ),
         ],
       ),

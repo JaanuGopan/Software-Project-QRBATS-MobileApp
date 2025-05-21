@@ -17,11 +17,11 @@ class ProfileSettingPage extends StatefulWidget {
 }
 
 class _ProfileSettingPageState extends State<ProfileSettingPage> {
-  late TextEditingController emailController;
-  late TextEditingController semesterController;
-  late TextEditingController roleController;
-  late TextEditingController nameController;
-  late TextEditingController indexController;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController semesterController = TextEditingController();
+  final TextEditingController roleController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController indexController = TextEditingController();
 
   String? selectedDepartment;
   String? selectedSemester;
@@ -30,17 +30,85 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
   bool _isLoading = true;
   bool isDepartmentToggleEnabled = false;
 
+  bool isEmailHasError = false;
+  bool isStudentNameHasError = false;
+  bool isIndexNumberHasError = false;
+
+  String emailErrorText = '';
+  String studentNameError = '';
+  String indexNumberError = '';
+
   @override
   void initState() {
     super.initState();
-
-    emailController = TextEditingController();
-    semesterController = TextEditingController();
-    roleController = TextEditingController();
-    nameController = TextEditingController();
-    indexController = TextEditingController();
-
     _loadStudentData();
+    nameController.addListener(_studentNameValidationListener);
+    indexController.addListener(_indexNumberValidationListener);
+    emailController.addListener(_emailValidationListener);
+  }
+
+  void _studentNameValidationListener() {
+    if (nameController.text.isEmpty) {
+      setState(() {
+        isStudentNameHasError = true;
+        studentNameError = 'Please enter your name';
+      });
+      return;
+    }
+
+    setState(() {
+      isStudentNameHasError = false;
+      studentNameError = '';
+    });
+  }
+
+  void _indexNumberValidationListener() {
+    if (indexController.text.isEmpty) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError = 'Please enter your index number';
+      });
+      return;
+    }
+
+    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
+    if (!indexNoRegex.hasMatch(indexController.text)) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError =
+            'Please enter a valid index number (e.g., EG/20XX/XXXX).';
+      });
+      return;
+    }
+
+    setState(() {
+      isIndexNumberHasError = false;
+      indexNumberError = '';
+    });
+  }
+
+  void _emailValidationListener() {
+    if (emailController.text.isEmpty) {
+      setState(() {
+        isEmailHasError = true;
+        emailErrorText = 'Please enter your email';
+      });
+      return;
+    }
+
+    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(emailController.text)) {
+      setState(() {
+        isEmailHasError = true;
+        emailErrorText = 'Please enter a valid email';
+      });
+      return;
+    }
+
+    setState(() {
+      isEmailHasError = false;
+      emailErrorText = '';
+    });
   }
 
   Future<void> _loadStudentData() async {
@@ -107,7 +175,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           alignment: Alignment.centerLeft,
                           child: TextBlue(text: "Name", fontSize: 15)),
                     ),
-                    _buildTextField("Name", nameController),
+                    _buildTextField("Name", nameController,
+                        isStudentNameHasError, studentNameError),
                     const SizedBox(height: 10),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -115,7 +184,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           alignment: Alignment.centerLeft,
                           child: TextBlue(text: "Email", fontSize: 15)),
                     ),
-                    _buildTextField("Email", emailController),
+                    _buildTextField("Email", emailController, isEmailHasError,
+                        emailErrorText),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -214,7 +284,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           alignment: Alignment.centerLeft,
                           child: TextBlue(text: "Index Number", fontSize: 15)),
                     ),
-                    _buildTextField("Index Number", indexController),
+                    _buildTextField("Index Number", indexController,
+                        isIndexNumberHasError, indexNumberError),
                     const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -233,7 +304,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      bool hasError, String errorText) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: MyTextField(
@@ -242,6 +314,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
         width: double.infinity,
         obscureText: false,
         icon: const Icon(Icons.text_fields),
+        hasError: hasError,
+        errorText: errorText,
       ),
     );
   }

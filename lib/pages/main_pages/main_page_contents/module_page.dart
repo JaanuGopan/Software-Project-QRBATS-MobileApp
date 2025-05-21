@@ -23,11 +23,11 @@ class _ModulePageState extends State<ModulePage> {
   @override
   void initState() {
     super.initState();
-    _fetchAllModuleData(context);
-    _fetchAllEnrolledModuleData(context);
+    _fetchAllModuleData();
+    _fetchAllEnrolledModuleData();
   }
 
-  Future<void> _fetchAllModuleData(BuildContext context) async {
+  Future<void> _fetchAllModuleData() async {
     setState(() {
       isAllModuleLoading = true;
     });
@@ -37,16 +37,15 @@ class _ModulePageState extends State<ModulePage> {
       setState(() {
         allModuleList = modulesList;
         notEnrolledModuleList = modulesList;
-        isAllModuleLoading = false;
       });
-    } catch (e) {
+    } finally {
       setState(() {
         isAllModuleLoading = false;
       });
     }
   }
 
-  Future<void> _fetchAllEnrolledModuleData(BuildContext context) async {
+  Future<void> _fetchAllEnrolledModuleData() async {
     setState(() {
       isAllEnrolledModuleLoading = true;
     });
@@ -56,9 +55,8 @@ class _ModulePageState extends State<ModulePage> {
       setState(() {
         allEnrolledModuleList = modulesList;
         notEnrolledModuleList = modulesList;
-        isAllEnrolledModuleLoading = false;
       });
-    } catch (e) {
+    } finally {
       setState(() {
         isAllEnrolledModuleLoading = false;
       });
@@ -68,15 +66,15 @@ class _ModulePageState extends State<ModulePage> {
   void _enrollModule(int moduleId, String enrollmentKey) async {
     if (enrollmentKey.isNotEmpty) {
       await ModuleService.moduleEnrollment(context, moduleId, enrollmentKey);
-      _fetchAllEnrolledModuleData(context); // Refresh enrolled modules
-      _fetchAllModuleData(context); // Refresh all modules
+      await _fetchAllEnrolledModuleData(); // Refresh enrolled modules
+      await _fetchAllModuleData(); // Refresh all modules
     }
   }
 
   void _unEnrollModule(int moduleId) async {
     await ModuleService.moduleUnEnrollment(context, moduleId);
-    _fetchAllEnrolledModuleData(context); // Refresh enrolled modules
-    _fetchAllModuleData(context); // Refresh all modules
+    await _fetchAllEnrolledModuleData(); // Refresh enrolled modules
+    await _fetchAllModuleData(); // Refresh all modules
   }
 
   @override
@@ -100,10 +98,10 @@ class _ModulePageState extends State<ModulePage> {
                           isSelected: [showEnrolledModule, !showEnrolledModule],
                           onPressed: (int index) {
                             if (index == 1) {
-                              _fetchAllModuleData(context);
+                              _fetchAllModuleData();
                             }
                             if (index == 0) {
-                              _fetchAllEnrolledModuleData(context);
+                              _fetchAllEnrolledModuleData();
                             }
                             setState(() {
                               showEnrolledModule = index == 0;
@@ -125,7 +123,7 @@ class _ModulePageState extends State<ModulePage> {
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Text('Not Entrolled Module'),
+                              child: Text('Not Enrolled Module'),
                             ),
                           ],
                         ),
@@ -140,23 +138,21 @@ class _ModulePageState extends State<ModulePage> {
                               )
                             ]
                           : [
-                              if (allEnrolledModuleList.isNotEmpty &&
-                                  showEnrolledModule)
-                                _buildEnrolledModuleList(),
-                              if (showEnrolledModule &&
-                                  allEnrolledModuleList.isEmpty)
-                                const Center(
-                                  child: Text("No Enrolled Modules."),
-                                ),
-                              const SizedBox(height: 10),
-                              if (notEnrolledModuleList.isNotEmpty &&
-                                  !showEnrolledModule)
-                                _buildNotEnrolledModuleList(),
-                              if (!showEnrolledModule &&
-                                  notEnrolledModuleList.isEmpty)
-                                const Center(
-                                  child: Text("No Modules For Enrollment."),
-                                ),
+                              if (showEnrolledModule) ...[
+                                if (allEnrolledModuleList.isNotEmpty) ...[
+                                  _buildEnrolledModuleList(),
+                                ] else
+                                  const Center(
+                                    child: Text("No Enrolled Modules."),
+                                  ),
+                              ] else ...[
+                                if (notEnrolledModuleList.isNotEmpty) ...[
+                                  _buildNotEnrolledModuleList(),
+                                ] else
+                                  const Center(
+                                    child: Text("No Modules For Enrollment."),
+                                  ),
+                              ]
                             ]
                     ],
                   ),

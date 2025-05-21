@@ -134,12 +134,6 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child: RoundButton(
-                onTap: () => Navigator.pop(context), icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -220,6 +214,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(
+                onTap: () => Navigator.pop(context), icon: Icons.arrow_back),
           ),
         ],
       ),

@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
 import 'package:qrbats_sp/components/buttons/round_button.dart';
@@ -26,11 +30,91 @@ class _Signup1State extends State<Signup1> {
   final _studentNameTextController = TextEditingController();
   final _indexNumberTextController = TextEditingController();
   final _emailTextController = TextEditingController();
+  bool isStudentNameHasError = false;
+  bool isIndexNumberHasError = false;
+  bool isEmailHasError = false;
+  String studentNameError = '';
+  String indexNumberError = '';
+  String emailError = '';
+
   String? selectedDepartment;
   String? selectedCurrentSemester;
   String? selectedStudentRole;
   String? selectedStudentBatch;
   bool isDepartmentToggleEnabled = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _studentNameTextController.addListener(_studentNameValidationListener);
+    _indexNumberTextController.addListener(_indexNumberValidationListener);
+    _emailTextController.addListener(_emailValidationListener);
+  }
+
+  void _studentNameValidationListener() {
+    if (_studentNameTextController.text.isEmpty) {
+      setState(() {
+        isStudentNameHasError = true;
+        studentNameError = 'Please enter your name';
+      });
+      return;
+    }
+
+    setState(() {
+      isStudentNameHasError = false;
+      studentNameError = '';
+    });
+  }
+
+  void _indexNumberValidationListener() {
+    if (_indexNumberTextController.text.isEmpty) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError = 'Please enter your index number';
+      });
+      return;
+    }
+
+    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
+    if (!indexNoRegex.hasMatch(_indexNumberTextController.text)) {
+      setState(() {
+        isIndexNumberHasError = true;
+        indexNumberError =
+            'Please enter a valid index number (e.g., EG/20XX/XXXX).';
+      });
+      return;
+    }
+
+    setState(() {
+      isIndexNumberHasError = false;
+      indexNumberError = '';
+    });
+  }
+
+  void _emailValidationListener() {
+    if (_emailTextController.text.isEmpty) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter your email';
+      });
+      return;
+    }
+
+    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(_emailTextController.text)) {
+      setState(() {
+        isEmailHasError = true;
+        emailError = 'Please enter a valid email';
+      });
+      return;
+    }
+
+    setState(() {
+      isEmailHasError = false;
+      emailError = '';
+    });
+  }
 
   void otpVerificationPage() {
     Navigator.push(
@@ -63,9 +147,34 @@ class _Signup1State extends State<Signup1> {
     }));
   }
 
+  Future<String?> getDeviceId() async {
+    try {
+      var deviceInfo = DeviceInfoPlugin();
+
+      if (kIsWeb) {
+        print("Running on Web - Device ID not available");
+        return "Web_Device"; // Placeholder value for web
+      } else if (Platform.isAndroid) {
+        var androidInfo = await deviceInfo.androidInfo;
+        print("Android ID: " + androidInfo.id);
+        return androidInfo.id; // Unique Android ID
+      } else if (Platform.isIOS) {
+        var iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor; // Unique iOS ID
+      }
+
+      return null;
+    } on Exception catch (e) {
+      print("Error getting device ID: $e");
+      return null;
+    }
+  }
+
   bool _isLoadingForOTPVerificationPage = false;
 
   Future<void> handleVerifySignupStep1() async {
+    String? deviceId = await getDeviceId();
+
     bool isValidInputs = SignUpInputValidations.validateInputs(
       _studentNameTextController.text,
       _indexNumberTextController.text,
@@ -85,6 +194,7 @@ class _Signup1State extends State<Signup1> {
         await CheckStudentInfo.checkStudentInfo(
           _emailTextController.text,
           _indexNumberTextController.text,
+          deviceId,
           otpVerificationPage,
           context,
         );
@@ -102,11 +212,6 @@ class _Signup1State extends State<Signup1> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          /*  Positioned(
-            top: 20,
-            left: 20,
-            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-          ), */
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -132,6 +237,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.drive_file_rename_outline),
+                            hasError: isStudentNameHasError,
+                            errorText: studentNameError,
                           ),
                           const SizedBox(height: 10),
                           const Align(
@@ -144,6 +251,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.numbers),
+                            hasError: isIndexNumberHasError,
+                            errorText: indexNumberError,
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -220,6 +329,8 @@ class _Signup1State extends State<Signup1> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.email),
+                            hasError: isEmailHasError,
+                            errorText: emailError,
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -265,6 +376,11 @@ class _Signup1State extends State<Signup1> {
               ),
             ),
           ),
+          /* Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
+          ), */
         ],
       ),
     );

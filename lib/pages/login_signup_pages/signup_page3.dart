@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qrbats_sp/api_services/RegistrationHelper.dart'; // Adjust import path as needed
+import 'package:qrbats_sp/components/buttons/round_button.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 import '../../components/buttons/button_dark_large.dart';
-import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 import '../main_pages/main_page.dart';
@@ -36,6 +40,132 @@ class _SignUp3State extends State<SignUp3> {
   final TextEditingController _userNameTextController = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
+  bool userNameHasError = false;
+  bool passwordHasError = false;
+  bool confirmPasswordHasError = false;
+  String userNameError = "";
+  String passwordError = "";
+  String confirmPasswordError = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _userNameTextController.addListener(_validateUserName);
+    _password.addListener(_validatePassword);
+    _confirmPassword.addListener(_validateConfirmPassword);
+  }
+
+  Future<String?> getDeviceId() async {
+    try {
+      var deviceInfo = DeviceInfoPlugin();
+
+      if (kIsWeb) {
+        print("Running on Web - Device ID not available");
+        return "Web_Device"; // Placeholder value for web
+      } else if (Platform.isAndroid) {
+        var androidInfo = await deviceInfo.androidInfo;
+        print("Android ID: " + androidInfo.id);
+        return androidInfo.id; // Unique Android ID
+      } else if (Platform.isIOS) {
+        var iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor; // Unique iOS ID
+      }
+
+      return null;
+    } on Exception catch (e) {
+      print("Error getting device ID: $e");
+      return null;
+    }
+  }
+
+  void _validateUserName() {
+    if (_userNameTextController.text == "") {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "Please Enter UserName.";
+      });
+    } else if (!RegExp(r'^[a-zA-Z0-9]+$')
+        .hasMatch(_userNameTextController.text)) {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "User name should not include special characters.";
+      });
+    } else if (_userNameTextController.text.length < 6) {
+      setState(() {
+        userNameHasError = true;
+        userNameError = "User name should be at least 6 characters long.";
+      });
+    } else {
+      setState(() {
+        userNameHasError = false;
+        userNameError = "";
+      });
+    }
+  }
+
+  void _validatePassword() {
+    String password = _password.text;
+
+    if (password.isEmpty) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Please enter a password.";
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must be at least 8 characters long.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one uppercase letter.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one lowercase letter.";
+      });
+      return;
+    }
+
+    if (!RegExp(r'\d').hasMatch(password)) {
+      setState(() {
+        passwordHasError = true;
+        passwordError = "Password must contain at least one number.";
+      });
+      return;
+    }
+
+    // If all conditions pass, the password is valid
+    setState(() {
+      passwordHasError = false;
+      passwordError = "";
+    });
+  }
+
+  void _validateConfirmPassword() {
+    if (_confirmPassword.text != _password.text) {
+      setState(() {
+        confirmPasswordHasError = true;
+        confirmPasswordError = "Passwords do not match.";
+      });
+    } else {
+      setState(() {
+        confirmPasswordHasError = false;
+        confirmPasswordError = "";
+      });
+    }
+  }
 
   void previousPage() {
     Navigator.pop(context);
@@ -97,6 +227,8 @@ class _SignUp3State extends State<SignUp3> {
         return;
       }
 
+      String? deviceId = await getDeviceId();
+
       await RegistrationHelper.register(
         context,
         _userNameTextController.text,
@@ -109,6 +241,7 @@ class _SignUp3State extends State<SignUp3> {
         widget.departmentId,
         widget.currentSemester,
         widget.studentBatch,
+        deviceId,
       );
     } finally {
       setState(() {
@@ -123,11 +256,6 @@ class _SignUp3State extends State<SignUp3> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
-          ),
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -151,6 +279,8 @@ class _SignUp3State extends State<SignUp3> {
                             width: double.infinity,
                             obscureText: false,
                             icon: const Icon(Icons.person),
+                            hasError: userNameHasError,
+                            errorText: userNameError,
                           ),
                           const SizedBox(height: 10),
                           const Align(
@@ -162,6 +292,8 @@ class _SignUp3State extends State<SignUp3> {
                             width: double.infinity,
                             obscureText: true,
                             icon: const Icon(Icons.lock),
+                            hasError: passwordHasError,
+                            errorText: passwordError,
                           ),
                           const SizedBox(height: 10),
                           const Align(
@@ -174,6 +306,8 @@ class _SignUp3State extends State<SignUp3> {
                             width: double.infinity,
                             obscureText: true,
                             icon: const Icon(Icons.lock),
+                            hasError: confirmPasswordHasError,
+                            errorText: confirmPasswordError,
                           ),
                           const SizedBox(height: 10),
                           Center(
@@ -200,6 +334,11 @@ class _SignUp3State extends State<SignUp3> {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: RoundButton(onTap: previousPage, icon: Icons.arrow_back),
           ),
         ],
       ),

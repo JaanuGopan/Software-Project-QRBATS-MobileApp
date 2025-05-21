@@ -7,86 +7,82 @@ class MyTextField extends StatefulWidget {
   final Icon icon;
   final double width;
   final double height;
-  final double borderWidth; // Added border thickness property
+  final bool hasError;
+  final String errorText;
 
   const MyTextField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
     required this.icon,
-    required this.width, // Set default width to infinity
-    this.height = 55.0, // Set default height to 65.0
-    this.borderWidth = 1.0, // Set default border thickness to 1.0
-  }) : super(key: key);
+    required this.width,
+    this.height = 55.0,
+    this.hasError = false,
+    this.errorText = '',
+  });
 
   @override
   _MyTextFieldState createState() => _MyTextFieldState();
 }
 
 class _MyTextFieldState extends State<MyTextField> {
-  bool _obscureText = true; // Default to false, not obscuring
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.width,
-      height: widget.height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0), // Add border corner radius
-        border: const Border(
-          top: BorderSide(
-            color: Color(0xFF086494), // Set top border color
-            width: 0.5, // Set top border thickness
+    Color borderColor = widget.hasError ? Colors.red : const Color(0xFF086494);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: widget.width,
+          height: widget.height, // Increase height if there's an error
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border(
+              top: BorderSide(color: borderColor, width: 0.5),
+              right: BorderSide(color: borderColor, width: 0.25),
+              left: BorderSide(color: borderColor, width: 0.25),
+              bottom: BorderSide(color: borderColor, width: 3),
+            ),
           ),
-          right: BorderSide(
-            color: Color(0xFF086494), // Set right border color
-            width: 0.25, // Set right border thickness
-          ),
-          left: BorderSide(
-            color: Color(0xFF086494), // Set left border color
-            width: 0.25, // Set left border thickness
-          ),
-          bottom: BorderSide(
-            color: Color(0xFF086494), // Set bottom border color
-            width: 3, // Set bottom border thickness
-          ),
-        ),
-      ),
-      child: TextField(
-        controller: widget.controller,
-        obscureText: widget.obscureText && _obscureText,
-        style: const TextStyle(
-          color: Color(0xFF086494), // Changed text color
-        ),
-        decoration: InputDecoration(
-          border: InputBorder.none, // Remove default border
-          fillColor: Colors.transparent,
-          prefixIcon: Icon(
-            widget.icon.icon,
-            color: const Color(0xFF086494), // Changed prefix icon color
-          ),
-          prefixIconColor: const Color(0xFF086494), // Changed prefix icon color
-          suffixIcon: widget.obscureText
-              ? IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility : Icons.visibility_off,
-                    color: const Color(0xFF086494), // Changed suffix icon color
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                )
-              : null,
-          filled: true,
-          hintText: widget.hintText,
-          hintStyle: const TextStyle(
-            color: Color(0xFF888888), // Changed hint text color
+          child: TextField(
+            controller: widget.controller,
+            obscureText: widget.obscureText && _obscureText,
+            style: TextStyle(color: borderColor),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: Icon(widget.icon.icon, color: borderColor),
+              suffixIcon: widget.obscureText
+                  ? IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility : Icons.visibility_off,
+                        color: borderColor,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                  : null,
+              hintText: widget.hintText,
+              hintStyle: const TextStyle(color: Color(0xFF888888)),
+            ),
           ),
         ),
-      ),
+        if (widget.hasError)
+          Padding(
+            padding: const EdgeInsets.only(top: 5, left: 5),
+            child: Text(
+              widget.errorText,
+              style: const TextStyle(fontSize: 10, color: Colors.red),
+            ),
+          ),
+      ],
     );
   }
 }

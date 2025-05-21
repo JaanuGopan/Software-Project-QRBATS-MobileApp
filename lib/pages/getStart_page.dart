@@ -68,7 +68,7 @@ class _OpeningPageState extends State<OpeningPage> {
                             horizontal: 35,
                           ),
                           child: Text(
-                            "This is the best app to take Attendance using QR code with GPS tracking",
+                            "SkyTicker is an app for taking attendance using QR code with location verification",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,

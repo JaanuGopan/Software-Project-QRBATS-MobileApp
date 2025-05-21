@@ -38,19 +38,10 @@ class ModuleService {
     final endpoint =
         '${ApiConstants.moduleEnrollmentUrl}?moduleId=$moduleId&enrollmentKey=$enrollmentKey';
 
-    try {
-      final response = await ApiService.post(endpoint, {}, context);
+    final response = await ApiService.post(endpoint, {}, context);
 
-      if (response != null && response.statusCode == 200) {
-        CustomSnackBar.showSuccess(context, "Module Successfully Enrolled.");
-      } else {
-        String errorMessage = response?.body ?? "Unexpected error occurred.";
-        CustomSnackBar.showError(context, errorMessage);
-        throw Exception(errorMessage);
-      }
-    } catch (error) {
-      CustomSnackBar.showError(context, "Error In Module Enrollment.");
-      throw Exception("Error In Module Enrollment.");
+    if (response != null && response.statusCode == 200) {
+      CustomSnackBar.showSuccess(context, "Module Successfully Enrolled.");
     }
   }
 

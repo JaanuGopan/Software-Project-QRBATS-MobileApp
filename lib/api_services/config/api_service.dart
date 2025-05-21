@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qrbats_sp/api_config/api_constants.dart';
+import 'package:qrbats_sp/pages/device_verification/change_device_page.dart';
 import 'package:qrbats_sp/pages/getStart_page.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,9 +76,10 @@ class ApiService {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         final String errorMessage = responseBody['message'] ?? "Bad request";
         CustomSnackBar.showError(context, errorMessage);
-      } else {
-        CustomSnackBar.showError(
-            context, "Request failed with status ${response.statusCode}");
+      } else if (response.statusCode == 500) {
+        CustomSnackBar.showError(context, "Internal server error");
+      } else if (response.statusCode == 403) {
+        CustomSnackBar.showError(context, "Forbidden access.");
       }
 
       void logout() async {
@@ -90,7 +92,19 @@ class ApiService {
       }
 
       if (response.statusCode == 401 || response.statusCode == 403) {
-        logout();
+        if (response.statusCode == 401 && response.body.isNotEmpty) {
+          final data = jsonDecode(response.body);
+
+          if (data["error"] == "DEVICE_VERIFICATION_FAILED") {
+            CustomSnackBar.showError(context, data['message']);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChangeDevicePage()),
+            );
+          }
+        } else {
+          logout();
+        }
       }
     }
 
