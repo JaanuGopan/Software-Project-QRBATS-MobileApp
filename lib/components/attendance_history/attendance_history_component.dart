@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:qrbats_sp/models/EventAttendanceHistoryData.dart';
-import 'package:qrbats_sp/models/StudentAttendanceResultDto.dart';
+import 'package:skyticker/models/EventAttendanceHistoryData.dart';
+import 'package:skyticker/models/StudentAttendanceResultDto.dart';
 
 class LectureAttendanceHistoryItem extends StatelessWidget {
   final StudentAttendanceLectureDto studentAttendanceLectureDto;
@@ -53,11 +53,7 @@ class LectureAttendanceHistoryItem extends StatelessWidget {
         attendanceText = "Late";
         break;
       default:
-        attendanceIcon = const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 50,
-        );
+        attendanceIcon = const Icon(Icons.cancel, color: Colors.red, size: 50);
         attendanceColor = Colors.red;
         attendanceText = "Absent";
         break;
@@ -83,8 +79,10 @@ class LectureAttendanceHistoryItem extends StatelessWidget {
           Row(
             children: [
               SizedBox(width: 10),
-              Text(number.toString(),
-                  style: TextStyle(fontSize: titleFontSize)),
+              Text(
+                number.toString(),
+                style: TextStyle(fontSize: titleFontSize),
+              ),
               SizedBox(width: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,14 +90,18 @@ class LectureAttendanceHistoryItem extends StatelessWidget {
                   Text(
                     studentAttendanceLectureDto.lectureName,
                     style: TextStyle(
-                        fontSize: titleFontSize, fontWeight: FontWeight.bold),
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
                   Text(
                     'Lecture Date: ${DateFormat('yyyy-MM-dd').format(studentAttendanceLectureDto.lectureDate)}',
                     style: TextStyle(
-                        fontSize: contentFontSize, color: Colors.grey),
+                      fontSize: contentFontSize,
+                      color: Colors.grey,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (studentAttendanceLectureDto.attendanceStatus !=
@@ -107,31 +109,41 @@ class LectureAttendanceHistoryItem extends StatelessWidget {
                     Text(
                       'Attended Time: ${studentAttendanceLectureDto.attendedTime?.substring(0, 8)}',
                       style: TextStyle(
-                          fontSize: contentFontSize, color: Colors.grey),
+                        fontSize: contentFontSize,
+                        color: Colors.grey,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   Text(
                     'Lecture Start Time: ${studentAttendanceLectureDto.lectureStartTime}',
                     style: TextStyle(
-                        fontSize: contentFontSize, color: Colors.grey),
+                      fontSize: contentFontSize,
+                      color: Colors.grey,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     'Lecture End Time: ${studentAttendanceLectureDto.lectureEndTime}',
                     style: TextStyle(
-                        fontSize: contentFontSize, color: Colors.grey),
+                      fontSize: contentFontSize,
+                      color: Colors.grey,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     'Lecture Venue: ${studentAttendanceLectureDto.locationName}',
                     style: TextStyle(
-                        fontSize: contentFontSize, color: Colors.grey),
+                      fontSize: contentFontSize,
+                      color: Colors.grey,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     'Attendance Status: $attendanceText',
                     style: TextStyle(
-                        fontSize: contentFontSize, color: attendanceColor),
+                      fontSize: contentFontSize,
+                      color: attendanceColor,
+                    ),
                   ),
                 ],
               ),
@@ -200,31 +212,41 @@ class EventAttendanceHistoryItem extends StatelessWidget {
                 Text(
                   "Event Name: ${eventAttendanceHistory.eventName}",
                   style: TextStyle(
-                      fontSize: titleFontSize, fontWeight: FontWeight.bold),
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 4),
                 Text(
                   'Date: ${eventAttendanceHistory.attendedDate}',
-                  style:
-                      TextStyle(fontSize: contentFontSize, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: contentFontSize,
+                    color: Colors.grey,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   'Time: ${eventAttendanceHistory.attendedTime}',
-                  style:
-                      TextStyle(fontSize: contentFontSize, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: contentFontSize,
+                    color: Colors.grey,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'Status: ${eventAttendanceHistory.attendanceStatus == "PRESENT" ? "Present" : eventAttendanceHistory.attendanceStatus == "LATE" ? "Late" : "Absent"}',
+                  'Status: ${eventAttendanceHistory.attendanceStatus == "PRESENT"
+                      ? "Present"
+                      : eventAttendanceHistory.attendanceStatus == "LATE"
+                      ? "Late"
+                      : "Absent"}',
                   style: TextStyle(
                     fontSize: contentFontSize,
                     color: eventAttendanceHistory.attendanceStatus == "PRESENT"
                         ? Colors.green
                         : eventAttendanceHistory.attendanceStatus == "ABSENT"
-                            ? Colors.orange
-                            : Colors.red,
+                        ? Colors.orange
+                        : Colors.red,
                   ),
                 ),
               ],

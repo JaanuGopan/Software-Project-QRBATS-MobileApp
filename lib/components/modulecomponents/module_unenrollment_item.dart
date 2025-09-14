@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/components/modulecomponents/ModuleUnEnrolmentPopup.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/components/modulecomponents/ModuleUnEnrolmentPopup.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class ModuleUnEnrollContent extends StatelessWidget {
   final Module module;
@@ -81,11 +81,11 @@ class ModuleUnEnrollContent extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => showUnEnrollmentDialog(
-                context, () => onUnEnroll(module.id), module),
-            icon: Icon(
-              Icons.delete_forever_outlined,
-              color: Colors.red,
+              context,
+              () => onUnEnroll(module.id),
+              module,
             ),
+            icon: Icon(Icons.delete_forever_outlined, color: Colors.red),
           ),
         ],
       ),

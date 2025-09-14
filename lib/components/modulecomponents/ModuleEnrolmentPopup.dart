@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
-void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module module) {
+void showEnrollmentDialog(
+  BuildContext context,
+  Function(String) onEnroll,
+  Module module,
+) {
   TextEditingController enrollmentKeyController = TextEditingController();
   showDialog(
     context: context,
@@ -28,7 +32,11 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
                   children: [
                     Text(
                       module.moduleName,
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4),
@@ -39,9 +47,7 @@ void showEnrollmentDialog(BuildContext context, Function(String) onEnroll,Module
                     SizedBox(height: 4),
                     TextField(
                       controller: enrollmentKeyController,
-                      decoration: InputDecoration(
-                        hintText: "Enrollment Key",
-                      ),
+                      decoration: InputDecoration(hintText: "Enrollment Key"),
                     ),
                   ],
                 ),

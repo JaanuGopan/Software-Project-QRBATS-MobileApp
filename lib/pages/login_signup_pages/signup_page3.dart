@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/RegistrationHelper.dart'; // Adjust import path as needed
-import 'package:qrbats_sp/components/buttons/round_button.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:skyticker/api/service/RegistrationHelper.dart';
+import 'package:skyticker/components/buttons/round_button.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 import '../../components/buttons/button_dark_large.dart';
 import '../../components/text_field/text_field.dart';
@@ -84,8 +84,9 @@ class _SignUp3State extends State<SignUp3> {
         userNameHasError = true;
         userNameError = "Please Enter UserName.";
       });
-    } else if (!RegExp(r'^[a-zA-Z0-9]+$')
-        .hasMatch(_userNameTextController.text)) {
+    } else if (!RegExp(
+      r'^[a-zA-Z0-9]+$',
+    ).hasMatch(_userNameTextController.text)) {
       setState(() {
         userNameHasError = true;
         userNameError = "User name should not include special characters.";
@@ -174,9 +175,11 @@ class _SignUp3State extends State<SignUp3> {
   void nextPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const MainPage();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const MainPage();
+        },
+      ),
     );
   }
 
@@ -193,12 +196,16 @@ class _SignUp3State extends State<SignUp3> {
       }
       if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
         CustomSnackBar.showWarning(
-            context, "User name should not include special characters.");
+          context,
+          "User name should not include special characters.",
+        );
         return;
       }
       if (_userNameTextController.text.length < 6) {
         CustomSnackBar.showWarning(
-            context, "User name should be at least 6 characters long.");
+          context,
+          "User name should be at least 6 characters long.",
+        );
         return;
       }
       if (_password.text == "") {
@@ -211,19 +218,26 @@ class _SignUp3State extends State<SignUp3> {
       }
       if (_confirmPassword.text != _password.text) {
         CustomSnackBar.showWarning(
-            context, "Password And Confirm Password Are Not Match.");
+          context,
+          "Password And Confirm Password Are Not Match.",
+        );
         return;
       }
-      if (!RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$')
-          .hasMatch(_password.text)) {
-        CustomSnackBar.showWarning(context,
-            "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+      if (!RegExp(
+        r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$',
+      ).hasMatch(_password.text)) {
+        CustomSnackBar.showWarning(
+          context,
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
+        );
         return;
       }
 
       if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(_password.text)) {
-        CustomSnackBar.showWarning(context,
-            "Password should not include the characters '#', '%', '?', or '\$'.");
+        CustomSnackBar.showWarning(
+          context,
+          "Password should not include the characters '#', '%', '?', or '\$'.",
+        );
         return;
       }
 
@@ -271,8 +285,9 @@ class _SignUp3State extends State<SignUp3> {
                       child: Column(
                         children: [
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "User Name", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "User Name", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _userNameTextController,
                             hintText: "user name",
@@ -284,8 +299,9 @@ class _SignUp3State extends State<SignUp3> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Password", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _password,
                             hintText: "password",
@@ -297,9 +313,12 @@ class _SignUp3State extends State<SignUp3> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Confirm Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Confirm Password",
+                              fontSize: 15,
+                            ),
+                          ),
                           MyTextField(
                             controller: _confirmPassword,
                             hintText: "confirm password",
@@ -313,7 +332,9 @@ class _SignUp3State extends State<SignUp3> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
                               child: _isSignUpLoading
                                   ? const Center(
                                       child: CircularProgressIndicator(

@@ -1,6 +1,6 @@
 {
-    "name": "qrbats_sp",
-    "short_name": "qrbats_sp",
+    "name": "skyticker",
+    "short_name": "skyticker",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

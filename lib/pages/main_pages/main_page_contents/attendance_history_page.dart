@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/EventService.dart';
-import 'package:qrbats_sp/api_services/LectureAttendedHistoryService.dart';
-import 'package:qrbats_sp/api_services/ModuleService.dart';
-import 'package:qrbats_sp/components/attendance_history/attendance_history_component.dart';
-import 'package:qrbats_sp/components/attendance_history/enrolled_module_attendance.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
-import 'package:qrbats_sp/models/EventAttendanceHistoryData.dart';
-import 'package:qrbats_sp/models/StudentAttendanceResultDto.dart';
+import 'package:skyticker/api/service/EventService.dart';
+import 'package:skyticker/api/service/LectureAttendedHistoryService.dart';
+import 'package:skyticker/api/service/ModuleService.dart';
+import 'package:skyticker/components/attendance_history/attendance_history_component.dart';
+import 'package:skyticker/components/attendance_history/enrolled_module_attendance.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
+import 'package:skyticker/models/EventAttendanceHistoryData.dart';
+import 'package:skyticker/models/StudentAttendanceResultDto.dart';
 
 class AttendanceHistoryPage extends StatefulWidget {
   const AttendanceHistoryPage({super.key});
@@ -54,7 +54,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
     try {
       final resultDto =
           await LectureAttendedHistoryService.fetchModuleAttendanceForStudent(
-              moduleId, context);
+            moduleId,
+            context,
+          );
       setState(() {
         studentAttendanceResultDto = resultDto;
         isLoading = false;
@@ -69,10 +71,12 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
 
   Future<void> _fetchEventAttendanceData() async {
     try {
-      final eventAttendanceList =
-          await EventService.getEventAttendanceHistory(context);
-      eventAttendanceList
-          .sort((a, b) => b.attendedDate.compareTo(a.attendedDate));
+      final eventAttendanceList = await EventService.getEventAttendanceHistory(
+        context,
+      );
+      eventAttendanceList.sort(
+        (a, b) => b.attendedDate.compareTo(a.attendedDate),
+      );
       setState(() {
         _eventAttendanceData = eventAttendanceList;
         isEventAttendanceHistoryLoading = false;
@@ -93,13 +97,11 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
         padding: const EdgeInsets.all(10.0),
         child: isAllEnrolledModuleLoading
             ? const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF086494),
-                ),
+                child: CircularProgressIndicator(color: Color(0xFF086494)),
               )
             : errorMessage.isNotEmpty
-                ? Center(child: Text(errorMessage))
-                : _buildAttendanceContent(),
+            ? Center(child: Text(errorMessage))
+            : _buildAttendanceContent(),
       ),
     );
   }
@@ -111,14 +113,6 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
         if (selectedModule == null)
           Center(
             child: ToggleButtons(
-              children: const [
-                Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Lecture History')),
-                Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Event History')),
-              ],
               isSelected: [showLectureHistory, !showLectureHistory],
               onPressed: (index) =>
                   setState(() => showLectureHistory = index == 0),
@@ -127,14 +121,24 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
               fillColor: const Color(0xFF086494),
               selectedBorderColor: const Color(0xFF086494),
               borderRadius: BorderRadius.circular(8.0),
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Lecture History'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Event History'),
+                ),
+              ],
             ),
           ),
         if (selectedModule == null) const SizedBox(height: 20),
         Expanded(
           child: showLectureHistory
               ? (selectedModule != null
-                  ? _buildLectureHistory(selectedModule!)
-                  : _buildEnrolledModuleAttendance())
+                    ? _buildLectureHistory(selectedModule!)
+                    : _buildEnrolledModuleAttendance())
               : _buildEventHistory(),
         ),
       ],
@@ -202,8 +206,10 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
               ],
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 8.0,
+              ),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -225,7 +231,8 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width -
+                          width:
+                              MediaQuery.of(context).size.width -
                               100, // Adjust width dynamically
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,9 +240,10 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                               const Text(
                                 'Attendance Summary',
                                 style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                               const SizedBox(height: 12),
                               Row(
@@ -247,8 +255,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                                       child: Text(
                                         '$totalLectureCount',
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -264,8 +273,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                                       child: Text(
                                         '$attendedLectureCount',
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -281,8 +291,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                                       child: Text(
                                         '$missedLectureCount',
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -298,8 +309,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                                       child: Text(
                                         '$completedLectureHours',
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -315,8 +327,9 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                                       child: Text(
                                         '$attendedLectureHours',
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                         overflow: TextOverflow.visible,
                                       ),
                                     ),
@@ -331,49 +344,50 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
                     const SizedBox(width: 16),
                     Center(
                       child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12.0),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12, // Soft shadow
-                                blurRadius: 6.0,
-                                spreadRadius: 2.0,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(16.0),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: 80.0, // Increased size
-                                height: 80.0, // Increased size
-                                child: CircularProgressIndicator(
-                                  value: attendancePercentage / 100,
-                                  strokeWidth: 8.0, // Increased stroke width
-                                  backgroundColor: Colors.grey[300],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    attendancePercentage > 80
-                                        ? Colors.green
-                                        : Colors.red,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '${attendancePercentage.toStringAsFixed(1)}%',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: attendancePercentage > 80.0
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12, // Soft shadow
+                              blurRadius: 6.0,
+                              spreadRadius: 2.0,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 80.0, // Increased size
+                              height: 80.0, // Increased size
+                              child: CircularProgressIndicator(
+                                value: attendancePercentage / 100,
+                                strokeWidth: 8.0, // Increased stroke width
+                                backgroundColor: Colors.grey[300],
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  attendancePercentage > 80
                                       ? Colors.green
                                       : Colors.red,
                                 ),
                               ),
-                            ],
-                          )),
-                    )
+                            ),
+                            Text(
+                              '${attendancePercentage.toStringAsFixed(1)}%',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: attendancePercentage > 80.0
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -382,8 +396,10 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
             const Row(
               children: [
                 Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 8.0,
+                  ),
                   child: Text(
                     'Lecture History',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -394,25 +410,29 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
             ),
             isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF086494),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xFF086494)),
                   )
                 : Expanded(
-                    child: studentAttendanceResultDto!
-                            .studentAttendancesLectureList.isEmpty
+                    child:
+                        studentAttendanceResultDto!
+                            .studentAttendancesLectureList
+                            .isEmpty
                         ? const Center(child: Text('No Lecture History'))
                         : ListView.builder(
                             scrollDirection: Axis.vertical,
-                            itemCount: studentAttendanceResultDto
-                                    ?.studentAttendancesLectureList.length ??
+                            itemCount:
+                                studentAttendanceResultDto
+                                    ?.studentAttendancesLectureList
+                                    .length ??
                                 0,
                             itemBuilder: (context, index) {
                               final attendanceData = studentAttendanceResultDto!
                                   .studentAttendancesLectureList[index];
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 10.0, horizontal: 8.0),
+                                  vertical: 10.0,
+                                  horizontal: 8.0,
+                                ),
                                 child: LectureAttendanceHistoryItem(
                                   studentAttendanceLectureDto: attendanceData,
                                   number: index + 1,

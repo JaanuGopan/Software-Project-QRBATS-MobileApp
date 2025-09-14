@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
-void showUnEnrollmentDialog(BuildContext context, Function() onUnEnroll,Module module) {
+void showUnEnrollmentDialog(
+  BuildContext context,
+  Function() onUnEnroll,
+  Module module,
+) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -27,7 +31,11 @@ void showUnEnrollmentDialog(BuildContext context, Function() onUnEnroll,Module m
                   children: [
                     Text(
                       module.moduleName,
-                      style: const TextStyle(fontSize: 12, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4),
@@ -36,7 +44,6 @@ void showUnEnrollmentDialog(BuildContext context, Function() onUnEnroll,Module m
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                     SizedBox(height: 4),
-
                   ],
                 ),
               ),

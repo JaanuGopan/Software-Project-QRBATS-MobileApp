@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class ModuleItem extends StatelessWidget {
   final Module module;
   final VoidCallback onViewDetails;
 
-  const ModuleItem({Key? key, required this.module, required this.onViewDetails}) : super(key: key);
+  const ModuleItem({
+    Key? key,
+    required this.module,
+    required this.onViewDetails,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +33,10 @@ class ModuleItem extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(module.moduleCode, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              module.moduleCode,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

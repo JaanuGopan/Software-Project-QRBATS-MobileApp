@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
-import 'package:qrbats_sp/components/buttons/round_button.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
+import 'package:skyticker/api/service/ForgotPasswordService.dart';
+import 'package:skyticker/components/buttons/button_dark_large.dart';
+import 'package:skyticker/components/buttons/round_button.dart';
+import 'package:skyticker/pages/login_signup_pages/login_page.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -54,19 +54,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void navigateToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const Login();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const Login();
+        },
+      ),
     );
   }
 
   bool showOTPVerifyWindow = false;
-
-  void _handleOpenAndCloseVerifyOTP() {
-    setState(() {
-      showOTPVerifyWindow = !showOTPVerifyWindow;
-    });
-  }
 
   bool _isOTPSend = true;
 
@@ -104,7 +100,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   children: [
                     const SizedBox(height: 20),
                     const Center(
-                        child: TextBlue(text: "Forgot Password", fontSize: 30)),
+                      child: TextBlue(text: "Forgot Password", fontSize: 30),
+                    ),
                     const SizedBox(height: 30),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -115,17 +112,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             child: Center(
                               child: Text(
                                 "You need to enter the email address, and then you will receive an OTP sent to that email.",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Email Address", fontSize: 20)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Email Address",
+                              fontSize: 20,
+                            ),
+                          ),
                           const SizedBox(height: 10),
                           MyTextField(
                             controller: _emailController,
@@ -162,8 +164,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           Positioned(
             top: 20,
             left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
+            child: RoundButton(
+              onTap: navigateToLoginPage,
+              icon: Icons.arrow_back,
+            ),
           ),
         ],
       ),

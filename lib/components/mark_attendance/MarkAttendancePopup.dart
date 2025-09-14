@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:qrbats_sp/models/Lecture.dart';
+import 'package:skyticker/models/Lecture.dart';
 
 void markAttendancePopup(
-    BuildContext context, Function markAttendance, Lecture lecture) {
+  BuildContext context,
+  Function markAttendance,
+  Lecture lecture,
+) {
   final timeFormat = DateFormat('HH:mm a');
   showDialog(
     context: context,
@@ -17,10 +20,11 @@ void markAttendancePopup(
             children: [
               const ListTile(
                 title: Center(
-                    child: Text(
-                  "Mark Attendance",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                )),
+                  child: Text(
+                    "Mark Attendance",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -31,34 +35,43 @@ void markAttendancePopup(
                       Text(
                         lecture.name,
                         style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Date : ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Start Time : ${timeFormat.format(lecture.lectureStartTime)}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "End Time : ${timeFormat.format(lecture.lectureEndTime)}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Venue : ${lecture.locationName}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),

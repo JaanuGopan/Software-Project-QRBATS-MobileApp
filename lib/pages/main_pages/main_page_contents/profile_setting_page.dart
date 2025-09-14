@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/StudentUpdateSettingService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
-import 'package:qrbats_sp/components/profile_update/profile_update_popup.dart';
-import 'package:qrbats_sp/components/text_field/list_input_field.dart';
-import 'package:qrbats_sp/components/text_field/text_field.dart';
-import 'package:qrbats_sp/components/texts/TextBlue.dart';
-import 'package:qrbats_sp/config/Utils.dart';
-import 'package:qrbats_sp/models/student_dto.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:skyticker/api/service/StudentUpdateSettingService.dart';
+import 'package:skyticker/components/buttons/button_dark_large.dart';
+import 'package:skyticker/components/profile_update/profile_update_popup.dart';
+import 'package:skyticker/components/text_field/list_input_field.dart';
+import 'package:skyticker/components/text_field/text_field.dart';
+import 'package:skyticker/components/texts/TextBlue.dart';
+import 'package:skyticker/config/Utils.dart';
+import 'package:skyticker/models/student_dto.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class ProfileSettingPage extends StatefulWidget {
   const ProfileSettingPage({super.key});
@@ -117,8 +117,9 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     });
 
     try {
-      StudentDto student =
-          await StudentUpdateSettingService.getStudent(context);
+      StudentDto student = await StudentUpdateSettingService.getStudent(
+        context,
+      );
 
       setState(() {
         emailController.text = student.email ?? '';
@@ -153,9 +154,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
           padding: const EdgeInsets.all(10.0),
           child: _isLoading
               ? const Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFF086494),
-                  ),
+                  child: CircularProgressIndicator(color: Color(0xFF086494)),
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,37 +163,51 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                     const Text(
                       "Update Profile",
                       style: TextStyle(
-                          color: Color(0xFF086494),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
+                        color: Color(0xFF086494),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextBlue(text: "Name", fontSize: 15)),
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Name", fontSize: 15),
+                      ),
                     ),
-                    _buildTextField("Name", nameController,
-                        isStudentNameHasError, studentNameError),
+                    _buildTextField(
+                      "Name",
+                      nameController,
+                      isStudentNameHasError,
+                      studentNameError,
+                    ),
                     const SizedBox(height: 10),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextBlue(text: "Email", fontSize: 15)),
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Email", fontSize: 15),
+                      ),
                     ),
-                    _buildTextField("Email", emailController, isEmailHasError,
-                        emailErrorText),
+                    _buildTextField(
+                      "Email",
+                      emailController,
+                      isEmailHasError,
+                      emailErrorText,
+                    ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Select Department", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Select Department",
+                              fontSize: 15,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Switch(
@@ -218,17 +231,20 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Align(
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    TextBlue(text: "Department", fontSize: 15)),
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Department", fontSize: 15),
+                            ),
                           ),
                           _buildDropdownField(
-                              "Department", departmentList, selectedDepartment,
-                              (newValue) {
-                            setState(() {
-                              selectedDepartment = newValue;
-                            });
-                          }),
+                            "Department",
+                            departmentList,
+                            selectedDepartment,
+                            (newValue) {
+                              setState(() {
+                                selectedDepartment = newValue;
+                              });
+                            },
+                          ),
                           const SizedBox(height: 10),
                         ],
                       ),
@@ -241,9 +257,9 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Align(
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    TextBlue(text: "Semester", fontSize: 15)),
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Semester", fontSize: 15),
+                            ),
                           ),
                           _buildDropdownField(
                             "Select Semester",
@@ -265,27 +281,39 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: TextBlue(
-                                    text: "Student Batch", fontSize: 15)),
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(
+                                text: "Student Batch",
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
-                          _buildDropdownField("Student Batch", studentBatchList,
-                              selectedStudentBatch, (newValue) {
-                            setState(() {
-                              selectedStudentBatch = newValue;
-                            });
-                          }),
+                          _buildDropdownField(
+                            "Student Batch",
+                            studentBatchList,
+                            selectedStudentBatch,
+                            (newValue) {
+                              setState(() {
+                                selectedStudentBatch = newValue;
+                              });
+                            },
+                          ),
                           const SizedBox(height: 10),
                         ],
                       ),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextBlue(text: "Index Number", fontSize: 15)),
+                        alignment: Alignment.centerLeft,
+                        child: TextBlue(text: "Index Number", fontSize: 15),
+                      ),
                     ),
-                    _buildTextField("Index Number", indexController,
-                        isIndexNumberHasError, indexNumberError),
+                    _buildTextField(
+                      "Index Number",
+                      indexController,
+                      isIndexNumberHasError,
+                      indexNumberError,
+                    ),
                     const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -296,7 +324,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                         text: "Update Profile",
                         width: double.infinity,
                       ),
-                    )
+                    ),
                   ],
                 ),
         ),
@@ -304,8 +332,12 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      bool hasError, String errorText) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    bool hasError,
+    String errorText,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: MyTextField(
@@ -362,7 +394,9 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     }
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(updatedEmail)) {
       CustomSnackBar.showWarning(
-          context, "Please enter a valid email address.");
+        context,
+        "Please enter a valid email address.",
+      );
       return;
     }
     if (updatedIndex.isEmpty) {
@@ -385,14 +419,18 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
         return;
       }
       if (updatedSemester == "1" || updatedSemester == "2") {
-        CustomSnackBar.showWarning(context,
-            "Semester 1 and 2 are not available for departmental students.");
+        CustomSnackBar.showWarning(
+          context,
+          "Semester 1 and 2 are not available for departmental students.",
+        );
         return;
       }
     } else {
       if (!(updatedSemester == "1" || updatedSemester == "2")) {
         CustomSnackBar.showWarning(
-            context, "Department is required for your selected semester.");
+          context,
+          "Department is required for your selected semester.",
+        );
         return;
       }
     }
@@ -401,7 +439,9 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
     if (!indexNoRegex.hasMatch(updatedIndex)) {
       CustomSnackBar.showWarning(
-          context, 'Please enter a valid index number (e.g., EG/20XX/XXXX).');
+        context,
+        'Please enter a valid index number (e.g., EG/20XX/XXXX).',
+      );
       return;
     }
     if (int.tryParse(updatedStudentBatch) == null) {
@@ -410,7 +450,8 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     }
 
     debugPrint(
-        "Updating details: $updatedName, $updatedEmail, $updatedIndex, $updatedSemester, $updatedDepartment, $updatedStudentBatch");
+      "Updating details: $updatedName, $updatedEmail, $updatedIndex, $updatedSemester, $updatedDepartment, $updatedStudentBatch",
+    );
 
     // Proceed with the update
     await StudentUpdateSettingService.updateStudent(

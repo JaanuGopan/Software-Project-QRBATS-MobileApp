@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/ModuleService.dart';
-import 'package:qrbats_sp/components/modulecomponents/module_enrolled_item.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/api/service/ModuleService.dart';
+import 'package:skyticker/components/modulecomponents/module_enrolled_item.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -37,14 +37,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void _unEnrollModule(int moduleId) async {
-    if (moduleId.isFinite) {
-      await ModuleService.moduleUnEnrollment(context, moduleId);
-      _fetchEnrolledModuleData(
-          context); // Refresh module list after unenrollment
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,22 +58,22 @@ class _HomeState extends State<Home> {
                           ),
                         )
                       : errorMessage.isNotEmpty
-                          ? Center(child: Text(errorMessage))
-                          : moduleList.isEmpty
-                              ? const Center(child: Text("No Enrolled Modules"))
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Center(
-                                      child: Text(
-                                        "Enrolled Modules",
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    _buildEnrolledModuleList(),
-                                  ],
-                                ),
+                      ? Center(child: Text(errorMessage))
+                      : moduleList.isEmpty
+                      ? const Center(child: Text("No Enrolled Modules"))
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Center(
+                              child: Text(
+                                "Enrolled Modules",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildEnrolledModuleList(),
+                          ],
+                        ),
                 ),
               ],
             ),
@@ -99,10 +91,7 @@ class _HomeState extends State<Home> {
       itemBuilder: (context, index) {
         return Column(
           children: [
-            ModuleEnrolledContent(
-              module: moduleList[index],
-              number: index + 1,
-            ),
+            ModuleEnrolledContent(module: moduleList[index], number: index + 1),
             const SizedBox(height: 10),
           ],
         );

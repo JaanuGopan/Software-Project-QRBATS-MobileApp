@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/OTPService.dart';
-import 'package:qrbats_sp/components/buttons/round_button.dart';
-import 'package:qrbats_sp/components/text_field/otp_text_field.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/signup_page3.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:skyticker/api/service/OTPService.dart';
+import 'package:skyticker/components/buttons/round_button.dart';
+import 'package:skyticker/components/text_field/otp_text_field.dart';
+import 'package:skyticker/pages/login_signup_pages/signup_page3.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 import '../../components/texts/TextBlue.dart';
 
@@ -67,17 +67,22 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void nextPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SignUp3(
-        studentName: widget.studentName,
-        email: widget.email,
-        indexNumber: widget.indexNumber,
-        studentRole: widget.studentRole,
-        departmentId: widget.departmentId,
-        currentSemester: widget.currentSemester,
-        studentBatch: widget.studentBatch,
-      );
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return SignUp3(
+            studentName: widget.studentName,
+            email: widget.email,
+            indexNumber: widget.indexNumber,
+            studentRole: widget.studentRole,
+            departmentId: widget.departmentId,
+            currentSemester: widget.currentSemester,
+            studentBatch: widget.studentBatch,
+          );
+        },
+      ),
+    );
   }
 
   String get _formattedTime {
@@ -120,7 +125,11 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         _isVerifyOTPLoading = true;
       });
       await OTPServices.verifyOTP(
-          context, widget.email, _otpController.text, nextPage);
+        context,
+        widget.email,
+        _otpController.text,
+        nextPage,
+      );
     } finally {
       setState(() {
         _isVerifyOTPLoading = false;
@@ -143,8 +152,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   children: [
                     const SizedBox(height: 20),
                     const Center(
-                        child:
-                            TextBlue(text: "OTP Verification", fontSize: 30)),
+                      child: TextBlue(text: "OTP Verification", fontSize: 30),
+                    ),
                     const SizedBox(height: 30),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -157,7 +166,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   child: Text(
                                     'The OTP has been sent to ${widget.email}',
                                     style: const TextStyle(
-                                        fontSize: 15, color: Colors.black),
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                    ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -180,32 +191,34 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                   ),
                                 )
                               : showResendOTPButton
-                                  ? Column(
-                                      children: [
-                                        const Center(
-                                          child: Text(
-                                              "Click the button below to resend OTP"),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        RoundButton(
-                                          onTap: handleResendOTP,
-                                          icon: Icons.refresh,
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      children: [
-                                        RoundButton(
-                                          onTap: handleVerifyOTP,
-                                          icon: Icons.check,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Center(
-                                          child: Text(
-                                              "The OTP will expire in $_formattedTime"),
-                                        ),
-                                      ],
+                              ? Column(
+                                  children: [
+                                    const Center(
+                                      child: Text(
+                                        "Click the button below to resend OTP",
+                                      ),
                                     ),
+                                    const SizedBox(height: 10),
+                                    RoundButton(
+                                      onTap: handleResendOTP,
+                                      icon: Icons.refresh,
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    RoundButton(
+                                      onTap: handleVerifyOTP,
+                                      icon: Icons.check,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Center(
+                                      child: Text(
+                                        "The OTP will expire in $_formattedTime",
+                                      ),
+                                    ),
+                                  ],
+                                ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -219,7 +232,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             top: 20,
             left: 20,
             child: RoundButton(
-                onTap: () => Navigator.pop(context), icon: Icons.arrow_back),
+              onTap: () => Navigator.pop(context),
+              icon: Icons.arrow_back,
+            ),
           ),
         ],
       ),

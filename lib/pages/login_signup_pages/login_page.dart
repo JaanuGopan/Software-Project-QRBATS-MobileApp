@@ -3,22 +3,20 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/pages/getStart_page.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/forgot_password_page.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/signup_page1.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skyticker/api/service/LoginService.dart';
+import 'package:skyticker/pages/getStart_page.dart';
+import 'package:skyticker/pages/login_signup_pages/forgot_password_page.dart';
+import 'package:skyticker/pages/login_signup_pages/signup_page1.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
-import '../../api_services/LoginService.dart';
 import '../../components/buttons/button_dark_large.dart';
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
 
 class Login extends StatefulWidget {
-  const Login({
-    super.key,
-  });
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -75,8 +73,9 @@ class _LoginState extends State<Login> {
         userNameHasError = true;
         userNameError = "Please Enter UserName.";
       });
-    } else if (!RegExp(r'^[a-zA-Z0-9]+$')
-        .hasMatch(_userNameTextController.text)) {
+    } else if (!RegExp(
+      r'^[a-zA-Z0-9]+$',
+    ).hasMatch(_userNameTextController.text)) {
       setState(() {
         userNameHasError = true;
         userNameError = "User name should not include special characters.";
@@ -147,59 +146,80 @@ class _LoginState extends State<Login> {
   void previousPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const OpeningPage();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const OpeningPage();
+        },
+      ),
     );
   }
 
   void forgotPasswordPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const ForgotPasswordPage();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const ForgotPasswordPage();
+        },
+      ),
     );
   }
 
   void signUpPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return const Signup1();
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const Signup1();
+        },
+      ),
+    );
   }
 
   bool _isLoginLoading = false;
 
   Future<void> _handelLogin(
-      BuildContext context, String userName, String password) async {
+    BuildContext context,
+    String userName,
+    String password,
+  ) async {
     if (userName == "") {
       CustomSnackBar.showWarning(context, "Please Enter UserName.");
       return;
     }
     if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
       CustomSnackBar.showWarning(
-          context, "User name should not include special characters.");
+        context,
+        "User name should not include special characters.",
+      );
       return;
     }
     if (_userNameTextController.text.length < 6) {
       CustomSnackBar.showWarning(
-          context, "User name should be at least 6 characters long.");
+        context,
+        "User name should be at least 6 characters long.",
+      );
       return;
     }
     if (password == "") {
       CustomSnackBar.showWarning(context, "Please Enter Password.");
       return;
     }
-    if (!RegExp(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$')
-        .hasMatch(_password.text)) {
-      CustomSnackBar.showWarning(context,
-          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+    if (!RegExp(
+      r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$',
+    ).hasMatch(_password.text)) {
+      CustomSnackBar.showWarning(
+        context,
+        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
+      );
       return;
     }
 
     if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(_password.text)) {
-      CustomSnackBar.showWarning(context,
-          "Password should not include the characters '#', '%', '?', or '\$'.");
+      CustomSnackBar.showWarning(
+        context,
+        "Password should not include the characters '#', '%', '?', or '\$'.",
+      );
       return;
     }
 
@@ -237,8 +257,9 @@ class _LoginState extends State<Login> {
                       child: Column(
                         children: [
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "User Name", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "User Name", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _userNameTextController,
                             hintText: "user name",
@@ -248,12 +269,11 @@ class _LoginState extends State<Login> {
                             hasError: userNameHasError,
                             errorText: userNameError,
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Password", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _password,
                             hintText: "password",
@@ -285,7 +305,9 @@ class _LoginState extends State<Login> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
                               child: _isLoginLoading
                                   ? const Center(
                                       child: CircularProgressIndicator(
@@ -294,9 +316,10 @@ class _LoginState extends State<Login> {
                                     )
                                   : MyButtonDS(
                                       onTap: () => _handelLogin(
-                                          context,
-                                          _userNameTextController.text,
-                                          _password.text),
+                                        context,
+                                        _userNameTextController.text,
+                                        _password.text,
+                                      ),
                                       text: "LogIn",
                                       width: double.infinity,
                                     ),
@@ -310,7 +333,9 @@ class _LoginState extends State<Login> {
                                 "If you don't have an account? ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 15, color: Colors.black),
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
                               ),
                               TextButton(
                                 onPressed: signUpPage,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
+import 'package:skyticker/api/service/ForgotPasswordService.dart';
+import 'package:skyticker/components/buttons/button_dark_large.dart';
+import 'package:skyticker/pages/login_signup_pages/login_page.dart';
 
 import '../../components/buttons/round_button.dart';
 import '../../components/text_field/text_field.dart';
@@ -140,12 +140,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       }
       if (username.length < 6) {
         CustomSnackBar.showWarning(
-            context, "User name should be at least 6 characters long.");
+          context,
+          "User name should be at least 6 characters long.",
+        );
         return;
       }
       if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(username)) {
         CustomSnackBar.showWarning(
-            context, "User name should not include special characters.");
+          context,
+          "User name should not include special characters.",
+        );
         return;
       }
     }
@@ -163,14 +167,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       return;
     }
     if (!isValidPassword(newPassword)) {
-      CustomSnackBar.showWarning(context,
-          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.");
+      CustomSnackBar.showWarning(
+        context,
+        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
+      );
       return;
     }
 
     if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(newPassword)) {
-      CustomSnackBar.showWarning(context,
-          "Password should not include the characters '#', '%', '?', or '\$'.");
+      CustomSnackBar.showWarning(
+        context,
+        "Password should not include the characters '#', '%', '?', or '\$'.",
+      );
       return;
     }
 
@@ -178,8 +186,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       setState(() {
         isLoading = true;
       });
-      await ForgotPasswordService.resetPassword(context, widget.email,
-          newPassword, isUsernameToggleEnabled, username);
+      await ForgotPasswordService.resetPassword(
+        context,
+        widget.email,
+        newPassword,
+        isUsernameToggleEnabled,
+        username,
+      );
     } finally {
       setState(() {
         isLoading = false;
@@ -197,9 +210,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   void navigateToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const Login();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const Login();
+        },
+      ),
     );
   }
 
@@ -218,7 +233,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   children: [
                     const SizedBox(height: 20),
                     const Center(
-                        child: TextBlue(text: "Reset Password", fontSize: 30)),
+                      child: TextBlue(text: "Reset Password", fontSize: 30),
+                    ),
                     const SizedBox(height: 30),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -227,7 +243,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           Row(
                             children: [
                               const TextBlue(
-                                  text: "Change Username", fontSize: 15),
+                                text: "Change Username",
+                                fontSize: 15,
+                              ),
                               const SizedBox(width: 10),
                               Switch(
                                 value: isUsernameToggleEnabled,
@@ -245,9 +263,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           ),
                           if (isUsernameToggleEnabled) ...[
                             const Align(
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    TextBlue(text: "Username", fontSize: 15)),
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Username", fontSize: 15),
+                            ),
                             MyTextField(
                               controller: _usernameController,
                               hintText: "Enter new username",
@@ -260,9 +278,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             const SizedBox(height: 10),
                           ],
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child:
-                                  TextBlue(text: "New Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "New Password", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _newPasswordController,
                             hintText: "Enter new password",
@@ -274,9 +292,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Confirm Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Confirm Password",
+                              fontSize: 15,
+                            ),
+                          ),
                           MyTextField(
                             controller: _confirmPasswordController,
                             hintText: "Confirm new password",
@@ -289,8 +310,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           const SizedBox(height: 40),
                           Center(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                               child: isLoading
                                   ? const Center(
                                       child: CircularProgressIndicator(
@@ -315,8 +337,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           Positioned(
             top: 20,
             left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
+            child: RoundButton(
+              onTap: navigateToLoginPage,
+              icon: Icons.arrow_back,
+            ),
           ),
         ],
       ),

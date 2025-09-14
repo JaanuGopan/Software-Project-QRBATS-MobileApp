@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/components/modulecomponents/module_enrollement_item.dart';
-import 'package:qrbats_sp/components/modulecomponents/module_unenrollment_item.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
-
-import '../../../api_services/ModuleService.dart';
+import 'package:skyticker/api/service/ModuleService.dart';
+import 'package:skyticker/components/modulecomponents/module_enrollement_item.dart';
+import 'package:skyticker/components/modulecomponents/module_unenrollment_item.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class ModulePage extends StatefulWidget {
   const ModulePage({super.key});
@@ -32,8 +31,9 @@ class _ModulePageState extends State<ModulePage> {
       isAllModuleLoading = true;
     });
     try {
-      final List<Module> modulesList =
-          await ModuleService.getAllModule(context);
+      final List<Module> modulesList = await ModuleService.getAllModule(
+        context,
+      );
       setState(() {
         allModuleList = modulesList;
         notEnrolledModuleList = modulesList;
@@ -50,8 +50,9 @@ class _ModulePageState extends State<ModulePage> {
       isAllEnrolledModuleLoading = true;
     });
     try {
-      final List<Module> modulesList =
-          await ModuleService.getAllEnrolledModule(context);
+      final List<Module> modulesList = await ModuleService.getAllEnrolledModule(
+        context,
+      );
       setState(() {
         allEnrolledModuleList = modulesList;
         notEnrolledModuleList = modulesList;
@@ -135,7 +136,7 @@ class _ModulePageState extends State<ModulePage> {
                                 child: CircularProgressIndicator(
                                   color: Color(0xFF086494),
                                 ),
-                              )
+                              ),
                             ]
                           : [
                               if (showEnrolledModule) ...[
@@ -152,8 +153,8 @@ class _ModulePageState extends State<ModulePage> {
                                   const Center(
                                     child: Text("No Modules For Enrollment."),
                                   ),
-                              ]
-                            ]
+                              ],
+                            ],
                     ],
                   ),
                 ),

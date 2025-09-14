@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
-import 'package:qrbats_sp/components/mark_attendance/MarkEventAttendancePopup.dart';
-import 'package:qrbats_sp/models/QRCodeDetails.dart';
-import 'package:qrbats_sp/utils/LocationUtils.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:skyticker/api/service/MerkAttendanceService.dart';
+import 'package:skyticker/components/mark_attendance/MarkEventAttendancePopup.dart';
+import 'package:skyticker/models/QRCodeDetails.dart';
+import 'package:skyticker/utils/LocationUtils.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class ScannedEvent extends StatefulWidget {
   final EventQRCodeDetails event;
 
-  const ScannedEvent({
-    super.key,
-    required this.event,
-  });
+  const ScannedEvent({super.key, required this.event});
 
   @override
   State<ScannedEvent> createState() => _ScannedEventState();
@@ -32,22 +29,31 @@ class _ScannedEventState extends State<ScannedEvent> {
     try {
       bool isPermissionGranted = await LocationUtils.checkPermissions();
       if (isPermissionGranted) {
-        await LocationUtils.getLocation().then((position) async {
-          await markEventAttendance(widget.event.eventId, position.latitude,
-                  position.longitude, context)
-              .then((value) {
-            if (value) {
-              CustomSnackBar.showSuccess(
-                  context, 'Successfully marked attendance');
-            }
-          });
-        }).catchError((error) {
-          debugPrint('Error getting location: $error');
-          CustomSnackBar.showError(context, 'Error in getting location.');
-        });
+        await LocationUtils.getLocation()
+            .then((position) async {
+              await markEventAttendance(
+                widget.event.eventId,
+                position.latitude,
+                position.longitude,
+                context,
+              ).then((value) {
+                if (value) {
+                  CustomSnackBar.showSuccess(
+                    context,
+                    'Successfully marked attendance',
+                  );
+                }
+              });
+            })
+            .catchError((error) {
+              debugPrint('Error getting location: $error');
+              CustomSnackBar.showError(context, 'Error in getting location.');
+            });
       } else {
         CustomSnackBar.showError(
-            context, 'Location permission is required to mark attendance.');
+          context,
+          'Location permission is required to mark attendance.',
+        );
       }
     } finally {
       setState(() {
@@ -56,10 +62,18 @@ class _ScannedEventState extends State<ScannedEvent> {
     }
   }
 
-  Future<bool> markEventAttendance(int eventId, double latitude,
-      double longitude, BuildContext context) async {
+  Future<bool> markEventAttendance(
+    int eventId,
+    double latitude,
+    double longitude,
+    BuildContext context,
+  ) async {
     bool isCloseDetails = await MarkAttendanceService.markAttendance(
-        eventId, latitude, longitude, context);
+      eventId,
+      latitude,
+      longitude,
+      context,
+    );
     return isCloseDetails;
   }
 
@@ -101,28 +115,35 @@ class _ScannedEventState extends State<ScannedEvent> {
                             Text(
                               "Event Name : ${widget.event.eventName}",
                               style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               "Date : ${widget.event.eventDate}",
                               style: const TextStyle(
-                                  fontSize: 12, color: Colors.black),
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               "Time : ${widget.event.eventTime}",
                               style: const TextStyle(
-                                  fontSize: 12, color: Colors.black),
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               "Venue : ${widget.event.eventVenue}",
                               style: const TextStyle(
-                                  fontSize: 12, color: Colors.black),
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
                             ),
                           ],
                         ),
@@ -136,8 +157,11 @@ class _ScannedEventState extends State<ScannedEvent> {
                         color: Color(0xFF086494),
                       ) // Show CircularProgressIndicator if processing
                     : ElevatedButton(
-                        onPressed: () => markEventAttendancePopup(context,
-                            () => _handleMarkAttendance(), widget.event),
+                        onPressed: () => markEventAttendancePopup(
+                          context,
+                          () => _handleMarkAttendance(),
+                          widget.event,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(

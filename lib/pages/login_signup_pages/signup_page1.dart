@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/CheckStudentInfo.dart';
-import 'package:qrbats_sp/components/buttons/round_button.dart';
-import 'package:qrbats_sp/components/text_field/list_input_field.dart';
-import 'package:qrbats_sp/config/Utils.dart';
+import 'package:skyticker/api/service/CheckStudentInfo.dart';
+import 'package:skyticker/components/buttons/round_button.dart';
+import 'package:skyticker/components/text_field/list_input_field.dart';
+import 'package:skyticker/config/Utils.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -119,32 +119,44 @@ class _Signup1State extends State<Signup1> {
   void otpVerificationPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return OtpVerificationPage(
-          studentName: _studentNameTextController.text,
-          email: _emailTextController.text,
-          indexNumber: _indexNumberTextController.text,
-          studentRole: "STUDENT",
-          departmentId: isDepartmentToggleEnabled
-              ? departmentList.indexOf(selectedDepartment!) + 1
-              : -1,
-          currentSemester: int.parse(selectedCurrentSemester!),
-          studentBatch: int.parse(selectedStudentBatch!),
-        );
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return OtpVerificationPage(
+            studentName: _studentNameTextController.text,
+            email: _emailTextController.text,
+            indexNumber: _indexNumberTextController.text,
+            studentRole: "STUDENT",
+            departmentId: isDepartmentToggleEnabled
+                ? departmentList.indexOf(selectedDepartment!) + 1
+                : -1,
+            currentSemester: int.parse(selectedCurrentSemester!),
+            studentBatch: int.parse(selectedStudentBatch!),
+          );
+        },
+      ),
     );
   }
 
   void previousPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return const OpeningPage();
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const OpeningPage();
+        },
+      ),
+    );
   }
 
   void loginPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return const Login();
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const Login();
+        },
+      ),
+    );
   }
 
   Future<String?> getDeviceId() async {
@@ -221,16 +233,17 @@ class _Signup1State extends State<Signup1> {
                   children: [
                     const SizedBox(height: 20),
                     const Center(
-                        child: TextBlue(text: "Create Account", fontSize: 30)),
+                      child: TextBlue(text: "Create Account", fontSize: 30),
+                    ),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child:
-                                  TextBlue(text: "Student Name", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Student Name", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _studentNameTextController,
                             hintText: "Perera A.B.C.D",
@@ -242,9 +255,9 @@ class _Signup1State extends State<Signup1> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child:
-                                  TextBlue(text: "Index Number", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Index Number", fontSize: 15),
+                          ),
                           MyTextField(
                             controller: _indexNumberTextController,
                             hintText: "EG/20XX/XXXX",
@@ -258,7 +271,9 @@ class _Signup1State extends State<Signup1> {
                           Row(
                             children: [
                               const TextBlue(
-                                  text: "Select Department", fontSize: 15),
+                                text: "Select Department",
+                                fontSize: 15,
+                              ),
                               const SizedBox(width: 10),
                               Switch(
                                 value: isDepartmentToggleEnabled,
@@ -278,9 +293,9 @@ class _Signup1State extends State<Signup1> {
                           ),
                           if (isDepartmentToggleEnabled) ...[
                             const Align(
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    TextBlue(text: "Department", fontSize: 15)),
+                              alignment: Alignment.centerLeft,
+                              child: TextBlue(text: "Department", fontSize: 15),
+                            ),
                             _buildListInputField(
                               hintText: "Select Department",
                               width: double.infinity,
@@ -293,8 +308,9 @@ class _Signup1State extends State<Signup1> {
                           ],
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Semester", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Semester", fontSize: 15),
+                          ),
                           _buildListInputField(
                             hintText: "Select Semester",
                             width: double.infinity,
@@ -306,9 +322,12 @@ class _Signup1State extends State<Signup1> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Student Batch", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Student Batch",
+                              fontSize: 15,
+                            ),
+                          ),
                           _buildListInputField(
                             hintText: "Select Batch",
                             width: double.infinity,
@@ -320,9 +339,12 @@ class _Signup1State extends State<Signup1> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Email Address", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Email Address",
+                              fontSize: 15,
+                            ),
+                          ),
                           MyTextField(
                             controller: _emailTextController,
                             hintText: "email",
@@ -355,7 +377,9 @@ class _Signup1State extends State<Signup1> {
                           Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
                               child: _isLoadingForOTPVerificationPage
                                   ? const Center(
                                       child: CircularProgressIndicator(
