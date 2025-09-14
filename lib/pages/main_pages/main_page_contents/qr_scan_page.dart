@@ -2,15 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:qrbats_sp/api_services/EventService.dart';
-import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/api_services/ModuleService.dart';
 import 'package:qrbats_sp/components/scanqrcode_components/scanned_event_component.dart';
 import 'package:qrbats_sp/components/scanqrcode_components/scanned_module_component.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
+import 'package:qrbats_sp/utils/CameraUtils.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 import 'package:simple_barcode_scanner/enum.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
@@ -40,44 +38,18 @@ class _QRCodeScanState extends State<QRCodeScan> {
   double longitude = 0.0;
   double distance = 99999;
 
-  Future<void> getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      latitude = position.latitude;
-      longitude = position.longitude;
+  void _handleOpenCamera() {
+    CameraUtils.checkCameraPermissions(context).then((isCameraAuthorized) {
+      if (isCameraAuthorized) {
+        scanQRCode();
+      } else {
+        CustomSnackBar.showError(context, "Camera permission is required.");
+      }
+    }).catchError((error) {
+      debugPrint("Error in checking camera permissions: $error");
+      CustomSnackBar.showError(
+          context, "Error in checking camera permissions.");
     });
-    print('Latitude: ${position.latitude}');
-    print('Longitude: ${position.longitude}');
-  }
-
-  Future<void> checkPermissions() async {
-    // Check location permission
-    LocationPermission locationPermission = await Geolocator.checkPermission();
-    if (locationPermission == LocationPermission.denied) {
-      locationPermission = await Geolocator.requestPermission();
-      if (locationPermission == LocationPermission.denied) {
-        return;
-      }
-    }
-    if (locationPermission == LocationPermission.deniedForever) {
-      return;
-    }
-
-    // Check camera permission
-    PermissionStatus cameraPermission = await Permission.camera.status;
-    if (cameraPermission.isDenied) {
-      cameraPermission = await Permission.camera.request();
-      if (cameraPermission.isDenied) {
-        return;
-      }
-    }
-    if (cameraPermission.isPermanentlyDenied) {
-      return;
-    }
-
-    getLocation();
   }
 
   Future<void> scanQRCode() async {
@@ -110,55 +82,59 @@ class _QRCodeScanState extends State<QRCodeScan> {
               cancelButtonText: "Close",
             ),
           ));
-      setState(() {
-        if (result is String) {
-          result = result;
-        }
-      });
 
-      debugPrint("Scanned QR Code: $result");
-
-      if (result != null && result != "-1") {
-        try {
-          String decodedString = utf8.decode(base64Decode(result!));
-          Map<String, dynamic> details = json.decode(decodedString);
-
-          if (details.containsKey('eventId') && details['eventId'] != null) {
-            String scannedEventId = details['eventId'].toString();
-            if (scannedEventId.isNotEmpty) {
-              getEvent(int.parse(scannedEventId));
-              setState(() {
-                showScannedDetails = true;
-              });
-            }
-          } else if (details.containsKey('moduleId') &&
-              details['moduleId'] != null) {
-            int scannedModuleId = details['moduleId'];
-            debugPrint("Module ID: $scannedModuleId");
-            getModule(scannedModuleId).then((value) => {
-                  setState(() {
-                    qrCodeDetails = LectureQRCodeDetails.fromJson(details);
-                    showQRCodeDetails = true;
-                  })
-                });
-          } else {
-            CustomSnackBar.showError(context, "Scanned QR Code is not valid.");
-          }
-        } catch (e) {
-          debugPrint(
-              "The scanned QR code format is not supported by this app: $e");
-          CustomSnackBar.showError(context,
-              "The scanned QR code format is not supported by this app.");
-        }
-      } else {
-        CustomSnackBar.showError(context, "Scanning canceled or failed.");
-      }
+      handleScannedQRCode(result);
     } on PlatformException {
-      result = "Failed to scan QR Code.";
-      CustomSnackBar.showError(context, result!);
+      CustomSnackBar.showError(context, "Failed to scan QR Code.");
     }
     if (!mounted) return;
     debugPrint("THE RESULT IS $result");
+  }
+
+  void handleScannedQRCode(result) {
+    setState(() {
+      if (result is String) {
+        result = result;
+      }
+    });
+
+    debugPrint("Scanned QR Code: $result");
+
+    if (result != null && result != "-1") {
+      try {
+        String decodedString = utf8.decode(base64Decode(result!));
+        Map<String, dynamic> details = json.decode(decodedString);
+
+        if (details.containsKey('eventId') && details['eventId'] != null) {
+          String scannedEventId = details['eventId'].toString();
+          if (scannedEventId.isNotEmpty) {
+            getEvent(int.parse(scannedEventId));
+            setState(() {
+              showScannedDetails = true;
+            });
+          }
+        } else if (details.containsKey('moduleId') &&
+            details['moduleId'] != null) {
+          int scannedModuleId = details['moduleId'];
+          debugPrint("Module ID: $scannedModuleId");
+          getModule(scannedModuleId).then((value) => {
+                setState(() {
+                  qrCodeDetails = LectureQRCodeDetails.fromJson(details);
+                  showQRCodeDetails = true;
+                })
+              });
+        } else {
+          CustomSnackBar.showError(context, "Scanned QR Code is not valid.");
+        }
+      } catch (e) {
+        debugPrint(
+            "The scanned QR code format is not supported by this app: $e");
+        CustomSnackBar.showError(context,
+            "The scanned QR code format is not supported by this app.");
+      }
+    } else {
+      CustomSnackBar.showError(context, "Scanning canceled or failed.");
+    }
   }
 
   Future<void> getModule(int moduleId) async {
@@ -168,17 +144,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
       scannedModule = module;
       showScannedModule = true;
     });
-  }
-
-  Future<void> markAttendance(int eventID, int attendeeID, double latitude,
-      double longitude, BuildContext context) async {
-    bool isCloseDetails = await MarkAttendanceService.markAttendance(
-        eventID, latitude, longitude, context);
-    if (isCloseDetails) {
-      setState(() {
-        showQRCodeDetails = false;
-      });
-    }
   }
 
   Future<void> getEvent(int eventId) async {
@@ -191,7 +156,8 @@ class _QRCodeScanState extends State<QRCodeScan> {
         showEventQrCodeDetails = true;
       });
     } on Exception catch (e) {
-      // TODO
+      debugPrint("Error fetching event details: $e");
+      CustomSnackBar.showError(context, "Error fetching event details.");
     }
   }
 
@@ -250,8 +216,7 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {
-                        checkPermissions();
-                        scanQRCode();
+                        _handleOpenCamera();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF086494),
