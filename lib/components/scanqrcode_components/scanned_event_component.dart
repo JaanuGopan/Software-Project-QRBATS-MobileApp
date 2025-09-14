@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:qrbats_sp/api_services/MerkAttendanceService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkEventAttendancePopup.dart';
 import 'package:qrbats_sp/models/QRCodeDetails.dart';
+import 'package:qrbats_sp/utils/LocationUtils.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
 
 class ScannedEvent extends StatefulWidget {
@@ -20,56 +20,9 @@ class ScannedEvent extends StatefulWidget {
 class _ScannedEventState extends State<ScannedEvent> {
   bool isProcessing = false; // Add this state variable
 
-  double latitude = 0.0;
-  double longitude = 0.0;
-
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> getLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        CustomSnackBar.showError(context, 'Location services are disabled.');
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          CustomSnackBar.showError(context, 'Location permission denied.');
-          return;
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        CustomSnackBar.showError(
-            context, 'Location permission permanently denied.');
-        return;
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(
-            seconds: 10), // Add a timeout to avoid waiting indefinitely
-      );
-
-      setState(() {
-        latitude = position.latitude;
-        longitude = position.longitude;
-      });
-
-      print('Latitude: ${position.latitude}');
-      print('Longitude: ${position.longitude}');
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to get location: $e');
-    }
-  }
-
-  Future<void> checkLocationPermission() async {
-    await getLocation();
   }
 
   void _handleMarkAttendance() async {
@@ -77,14 +30,25 @@ class _ScannedEventState extends State<ScannedEvent> {
       isProcessing = true;
     });
     try {
-      await checkLocationPermission();
-      await markEventAttendance(
-              widget.event.eventId, latitude, longitude, context)
-          .then((value) {
-        if (value) {
-          CustomSnackBar.showSuccess(context, 'Successfully marked attendance');
-        }
-      });
+      bool isPermissionGranted = await LocationUtils.checkPermissions();
+      if (isPermissionGranted) {
+        await LocationUtils.getLocation().then((position) async {
+          await markEventAttendance(widget.event.eventId, position.latitude,
+                  position.longitude, context)
+              .then((value) {
+            if (value) {
+              CustomSnackBar.showSuccess(
+                  context, 'Successfully marked attendance');
+            }
+          });
+        }).catchError((error) {
+          debugPrint('Error getting location: $error');
+          CustomSnackBar.showError(context, 'Error in getting location.');
+        });
+      } else {
+        CustomSnackBar.showError(
+            context, 'Location permission is required to mark attendance.');
+      }
     } finally {
       setState(() {
         isProcessing = false;

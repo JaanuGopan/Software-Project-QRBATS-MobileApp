@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
 import 'package:qrbats_sp/api_services/LectureService.dart';
 import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
 import 'package:qrbats_sp/models/EnrolledModule.dart';
 import 'package:qrbats_sp/models/Lecture.dart';
+import 'package:qrbats_sp/utils/LocationUtils.dart';
 import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
 
 class ScannedModule extends StatefulWidget {
@@ -28,9 +28,6 @@ class _ScannedModuleState extends State<ScannedModule> {
   String errorMessage = "";
   bool isProcessing = false; // Add this state variable
   int processingLectureId = -1;
-
-  double latitude = 0.0;
-  double longitude = 0.0;
 
   Future<void> _fetchLecturesByModuleCode(
       BuildContext context, int moduleId) async {
@@ -74,58 +71,25 @@ class _ScannedModuleState extends State<ScannedModule> {
     }
   }
 
-  Future<void> getLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        CustomSnackBar.showError(context, 'Location services are disabled.');
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          CustomSnackBar.showError(context, 'Location permission denied.');
-          return;
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        CustomSnackBar.showError(
-            context, 'Location permission permanently denied.');
-        return;
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(
-            seconds: 10), // Add a timeout to avoid waiting indefinitely
-      );
-
-      setState(() {
-        latitude = position.latitude;
-        longitude = position.longitude;
-      });
-
-      print('Latitude: ${position.latitude}');
-      print('Longitude: ${position.longitude}');
-    } catch (e) {
-      CustomSnackBar.showError(context, 'Failed to get location: $e');
-    }
-  }
-
-  Future<void> checkLocationPermission() async {
-    await getLocation();
-  }
-
   void _handleMarkAttendance(int lectureId) async {
     setState(() {
       isProcessing = true; // Set isProcessing to true when starting
       processingLectureId = lectureId;
     });
     try {
-      await checkLocationPermission();
-      await markLectureAttendance(lectureId, latitude, longitude, context);
+      bool isPermissionGranted = await LocationUtils.checkPermissions();
+      if (isPermissionGranted) {
+        await LocationUtils.getLocation().then((position) async {
+          await markLectureAttendance(
+              lectureId, position.latitude, position.longitude, context);
+        }).catchError((error) {
+          debugPrint('Error getting location: $error');
+          CustomSnackBar.showError(context, 'Error in getting location.');
+        });
+      } else {
+        CustomSnackBar.showError(
+            context, 'Location permission is required to mark attendance.');
+      }
     } finally {
       setState(() {
         isProcessing = false; // Set isProcessing to false when done
