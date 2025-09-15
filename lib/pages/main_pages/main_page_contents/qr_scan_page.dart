@@ -177,14 +177,20 @@ class _QRCodeScanState extends State<QRCodeScan> {
                       horizontal: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(8, 100, 148, 0.9),
+                      color: const Color.fromRGBO(8, 100, 148, 0.8),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text(
-                      "Click Scan QR Code button to scan QR Code from your camera. And you can get the lecture or event details.",
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
+                    child: showQRCodeDetails || showEventQrCodeDetails
+                        ? Text(
+                            "To mark your attendance, click the Attend button in the details section. Location access is required to complete attendance; if location access is not enabled, attendance cannot be recorded. If you encounter any issues, please try again.",
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                            textAlign: TextAlign.justify,
+                          )
+                        : Text(
+                            "Click the Scan QR Code button to scan a QR code using your camera. After scanning, you can view lecture or event details and mark your attendance. If camera or location access is denied, please enable them in your device settings.",
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                            textAlign: TextAlign.justify,
+                          ),
                   ),
                 ],
               ),
@@ -198,15 +204,6 @@ class _QRCodeScanState extends State<QRCodeScan> {
                   bottom: 10,
                 ),
                 padding: const EdgeInsets.all(8.0),
-                /* decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  border: const Border(
-                    top: BorderSide(color: Color(0xFF086494), width: 1.0),
-                    bottom: BorderSide(color: Color(0xFF086494), width: 1.0),
-                    left: BorderSide(color: Color(0xFF086494), width: 1.0),
-                    right: BorderSide(color: Color(0xFF086494), width: 1.0),
-                  ),
-                ), */
                 child: isScanning
                     ? Column(
                         children: [

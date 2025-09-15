@@ -7,6 +7,7 @@ import 'package:skyticker/api/service/CheckStudentInfo.dart';
 import 'package:skyticker/components/buttons/round_button.dart';
 import 'package:skyticker/components/text_field/list_input_field.dart';
 import 'package:skyticker/config/Utils.dart';
+import 'package:skyticker/validations/ValidationError.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -45,7 +46,6 @@ class _Signup1State extends State<Signup1> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _studentNameTextController.addListener(_studentNameValidationListener);
     _indexNumberTextController.addListener(_indexNumberValidationListener);
@@ -53,66 +53,37 @@ class _Signup1State extends State<Signup1> {
   }
 
   void _studentNameValidationListener() {
-    if (_studentNameTextController.text.isEmpty) {
-      setState(() {
-        isStudentNameHasError = true;
-        studentNameError = 'Please enter your name';
-      });
-      return;
-    }
+    ValidationError studentNameValidationError =
+        SignUpInputValidations.validateStudentName(
+          _studentNameTextController.text,
+        );
 
     setState(() {
-      isStudentNameHasError = false;
-      studentNameError = '';
+      isStudentNameHasError = studentNameValidationError.hasError;
+      studentNameError = studentNameValidationError.message;
     });
   }
 
   void _indexNumberValidationListener() {
-    if (_indexNumberTextController.text.isEmpty) {
-      setState(() {
-        isIndexNumberHasError = true;
-        indexNumberError = 'Please enter your index number';
-      });
-      return;
-    }
-
-    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
-    if (!indexNoRegex.hasMatch(_indexNumberTextController.text)) {
-      setState(() {
-        isIndexNumberHasError = true;
-        indexNumberError =
-            'Please enter a valid index number (e.g., EG/20XX/XXXX).';
-      });
-      return;
-    }
+    ValidationError indexNumberValidationError =
+        SignUpInputValidations.validateIndexNumber(
+          _indexNumberTextController.text,
+        );
 
     setState(() {
-      isIndexNumberHasError = false;
-      indexNumberError = '';
+      isIndexNumberHasError = indexNumberValidationError.hasError;
+      indexNumberError = indexNumberValidationError.message;
     });
   }
 
   void _emailValidationListener() {
-    if (_emailTextController.text.isEmpty) {
-      setState(() {
-        isEmailHasError = true;
-        emailError = 'Please enter your email';
-      });
-      return;
-    }
-
-    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(_emailTextController.text)) {
-      setState(() {
-        isEmailHasError = true;
-        emailError = 'Please enter a valid email';
-      });
-      return;
-    }
+    ValidationError emailValidationError = SignUpInputValidations.validateEmail(
+      _emailTextController.text,
+    );
 
     setState(() {
-      isEmailHasError = false;
-      emailError = '';
+      isEmailHasError = emailValidationError.hasError;
+      emailError = emailValidationError.message;
     });
   }
 

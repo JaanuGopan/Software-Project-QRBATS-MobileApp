@@ -3,6 +3,8 @@ import 'package:skyticker/api/service/ForgotPasswordService.dart';
 import 'package:skyticker/components/buttons/button_dark_large.dart';
 import 'package:skyticker/components/buttons/round_button.dart';
 import 'package:skyticker/pages/login_signup_pages/login_page.dart';
+import 'package:skyticker/validations/SignUpInputValidations.dart';
+import 'package:skyticker/validations/ValidationError.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -28,26 +30,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   void _emailValidationListener() {
-    if (_emailController.text.isEmpty) {
-      setState(() {
-        isEmailHasError = true;
-        emailError = 'Please enter your email';
-      });
-      return;
-    }
-
-    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(_emailController.text)) {
-      setState(() {
-        isEmailHasError = true;
-        emailError = 'Please enter a valid email';
-      });
-      return;
-    }
-
+    ValidationError emailValidationError = SignUpInputValidations.validateEmail(
+      _emailController.text,
+    );
     setState(() {
-      isEmailHasError = false;
-      emailError = '';
+      isEmailHasError = emailValidationError.hasError;
+      emailError = emailValidationError.message;
     });
   }
 
@@ -67,21 +55,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   bool _isOTPSend = true;
 
   Future<void> sendOTP(BuildContext context, String email) async {
-    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-
-    if (email.isNotEmpty && emailRegex.hasMatch(email)) {
-      try {
-        setState(() {
-          _isOTPSend = false;
-        });
-        await ForgotPasswordService.sendOTPForForgotPassword(context, email);
-      } finally {
-        setState(() {
-          _isOTPSend = true;
-        });
-      }
-    } else {
-      CustomSnackBar.showWarning(context, "Please Enter a Valid Email.");
+    ValidationError emailValidationError = SignUpInputValidations.validateEmail(
+      email,
+    );
+    if (emailValidationError.hasError) {
+      CustomSnackBar.showWarning(context, emailValidationError.message);
+      return;
+    }
+    try {
+      setState(() {
+        _isOTPSend = false;
+      });
+      await ForgotPasswordService.sendOTPForForgotPassword(context, email);
+    } finally {
+      setState(() {
+        _isOTPSend = true;
+      });
     }
   }
 

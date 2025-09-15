@@ -8,6 +8,8 @@ import 'package:skyticker/api/service/LoginService.dart';
 import 'package:skyticker/pages/getStart_page.dart';
 import 'package:skyticker/pages/login_signup_pages/forgot_password_page.dart';
 import 'package:skyticker/pages/login_signup_pages/signup_page1.dart';
+import 'package:skyticker/validations/SignUpInputValidations.dart';
+import 'package:skyticker/validations/ValidationError.dart';
 import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 import '../../components/buttons/button_dark_large.dart';
@@ -29,8 +31,8 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     initSharedPreference();
-    _userNameTextController.addListener(_validateUserName);
-    _password.addListener(_validatePassword);
+    _userNameTextController.addListener(_validateUserNameListener);
+    _password.addListener(_validatePasswordListener);
   }
 
   Future<String?> getDeviceId() async {
@@ -67,79 +69,21 @@ class _LoginState extends State<Login> {
   String userNameError = "";
   String passwordError = "";
 
-  void _validateUserName() {
-    if (_userNameTextController.text == "") {
-      setState(() {
-        userNameHasError = true;
-        userNameError = "Please Enter UserName.";
-      });
-    } else if (!RegExp(
-      r'^[a-zA-Z0-9]+$',
-    ).hasMatch(_userNameTextController.text)) {
-      setState(() {
-        userNameHasError = true;
-        userNameError = "User name should not include special characters.";
-      });
-    } else if (_userNameTextController.text.length < 6) {
-      setState(() {
-        userNameHasError = true;
-        userNameError = "User name should be at least 6 characters long.";
-      });
-    } else {
-      setState(() {
-        userNameHasError = false;
-        userNameError = "";
-      });
-    }
+  void _validateUserNameListener() {
+    ValidationError userNameValidationError =
+        SignUpInputValidations.validateUsername(_userNameTextController.text);
+    setState(() {
+      userNameHasError = userNameValidationError.hasError;
+      userNameError = userNameValidationError.message;
+    });
   }
 
-  void _validatePassword() {
-    String password = _password.text;
-
-    if (password.isEmpty) {
-      setState(() {
-        passwordHasError = true;
-        passwordError = "Please enter a password.";
-      });
-      return;
-    }
-
-    if (password.length < 8) {
-      setState(() {
-        passwordHasError = true;
-        passwordError = "Password must be at least 8 characters long.";
-      });
-      return;
-    }
-
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      setState(() {
-        passwordHasError = true;
-        passwordError = "Password must contain at least one uppercase letter.";
-      });
-      return;
-    }
-
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
-      setState(() {
-        passwordHasError = true;
-        passwordError = "Password must contain at least one lowercase letter.";
-      });
-      return;
-    }
-
-    if (!RegExp(r'\d').hasMatch(password)) {
-      setState(() {
-        passwordHasError = true;
-        passwordError = "Password must contain at least one number.";
-      });
-      return;
-    }
-
-    // If all conditions pass, the password is valid
+  void _validatePasswordListener() {
+    ValidationError passwordValidationError =
+        SignUpInputValidations.validatePassword(_password.text);
     setState(() {
-      passwordHasError = false;
-      passwordError = "";
+      passwordHasError = passwordValidationError.hasError;
+      passwordError = passwordValidationError.message;
     });
   }
 
@@ -183,43 +127,16 @@ class _LoginState extends State<Login> {
     String userName,
     String password,
   ) async {
-    if (userName == "") {
-      CustomSnackBar.showWarning(context, "Please Enter UserName.");
+    ValidationError userNameValidationError =
+        SignUpInputValidations.validateUsername(userName);
+    ValidationError passwordValidationError =
+        SignUpInputValidations.validatePassword(password);
+    if (userNameValidationError.hasError) {
+      CustomSnackBar.showWarning(context, userNameValidationError.message);
       return;
     }
-    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
-      CustomSnackBar.showWarning(
-        context,
-        "User name should not include special characters.",
-      );
-      return;
-    }
-    if (_userNameTextController.text.length < 6) {
-      CustomSnackBar.showWarning(
-        context,
-        "User name should be at least 6 characters long.",
-      );
-      return;
-    }
-    if (password == "") {
-      CustomSnackBar.showWarning(context, "Please Enter Password.");
-      return;
-    }
-    if (!RegExp(
-      r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$',
-    ).hasMatch(_password.text)) {
-      CustomSnackBar.showWarning(
-        context,
-        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
-      );
-      return;
-    }
-
-    if (RegExp(r'^(?=.*[#,?$%]).+$').hasMatch(_password.text)) {
-      CustomSnackBar.showWarning(
-        context,
-        "Password should not include the characters '#', '%', '?', or '\$'.",
-      );
+    if (passwordValidationError.hasError) {
+      CustomSnackBar.showWarning(context, passwordValidationError.message);
       return;
     }
 

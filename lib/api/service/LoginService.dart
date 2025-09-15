@@ -17,8 +17,15 @@ class LoginService {
     late SharedPreferences preferences;
     preferences = await SharedPreferences.getInstance();
 
-    final String endpoint =
-        '${ApiConstants.studentlogin}?userName=$userName&password=$password&deviceId=$deviceId';
+    final uri = Uri.parse(ApiConstants.studentlogin).replace(
+      queryParameters: {
+        'userName': userName,
+        'password': password,
+        'deviceId': deviceId,
+      },
+    );
+
+    final String endpoint = uri.toString();
 
     // Use ApiService to make the GET request
     final response = await ApiService.get(endpoint, context);

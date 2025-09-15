@@ -7,6 +7,8 @@ import 'package:skyticker/components/text_field/text_field.dart';
 import 'package:skyticker/components/texts/TextBlue.dart';
 import 'package:skyticker/config/Utils.dart';
 import 'package:skyticker/models/student_dto.dart';
+import 'package:skyticker/validations/SignUpInputValidations.dart';
+import 'package:skyticker/validations/ValidationError.dart';
 import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class ProfileSettingPage extends StatefulWidget {
@@ -48,66 +50,30 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
   }
 
   void _studentNameValidationListener() {
-    if (nameController.text.isEmpty) {
-      setState(() {
-        isStudentNameHasError = true;
-        studentNameError = 'Please enter your name';
-      });
-      return;
-    }
-
+    ValidationError studentNameValidationError =
+        SignUpInputValidations.validateStudentName(nameController.text);
     setState(() {
-      isStudentNameHasError = false;
-      studentNameError = '';
+      isStudentNameHasError = studentNameValidationError.hasError;
+      studentNameError = studentNameValidationError.message;
     });
   }
 
   void _indexNumberValidationListener() {
-    if (indexController.text.isEmpty) {
-      setState(() {
-        isIndexNumberHasError = true;
-        indexNumberError = 'Please enter your index number';
-      });
-      return;
-    }
-
-    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
-    if (!indexNoRegex.hasMatch(indexController.text)) {
-      setState(() {
-        isIndexNumberHasError = true;
-        indexNumberError =
-            'Please enter a valid index number (e.g., EG/20XX/XXXX).';
-      });
-      return;
-    }
-
+    ValidationError indexNumberValidationError =
+        SignUpInputValidations.validateIndexNumber(indexController.text);
     setState(() {
-      isIndexNumberHasError = false;
-      indexNumberError = '';
+      isIndexNumberHasError = indexNumberValidationError.hasError;
+      indexNumberError = indexNumberValidationError.message;
     });
   }
 
   void _emailValidationListener() {
-    if (emailController.text.isEmpty) {
-      setState(() {
-        isEmailHasError = true;
-        emailErrorText = 'Please enter your email';
-      });
-      return;
-    }
-
-    RegExp emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!emailRegex.hasMatch(emailController.text)) {
-      setState(() {
-        isEmailHasError = true;
-        emailErrorText = 'Please enter a valid email';
-      });
-      return;
-    }
-
+    ValidationError emailValidationError = SignUpInputValidations.validateEmail(
+      emailController.text,
+    );
     setState(() {
-      isEmailHasError = false;
-      emailErrorText = '';
+      isEmailHasError = emailValidationError.hasError;
+      emailErrorText = emailValidationError.message;
     });
   }
 
@@ -383,26 +349,26 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     String? updatedDepartment = selectedDepartment;
     String? updatedStudentBatch = selectedStudentBatch;
 
-    // Basic validations
-    if (updatedName.isEmpty) {
-      CustomSnackBar.showWarning(context, "Name cannot be empty.");
+    ValidationError nameValidationError =
+        SignUpInputValidations.validateStudentName(updatedName);
+    ValidationError emailValidationError = SignUpInputValidations.validateEmail(
+      updatedEmail,
+    );
+    ValidationError indexNumberValidationError =
+        SignUpInputValidations.validateIndexNumber(updatedIndex);
+    if (nameValidationError.hasError) {
+      CustomSnackBar.showWarning(context, nameValidationError.message);
       return;
     }
-    if (updatedEmail.isEmpty) {
-      CustomSnackBar.showWarning(context, "Email cannot be empty.");
+    if (emailValidationError.hasError) {
+      CustomSnackBar.showWarning(context, emailValidationError.message);
       return;
     }
-    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(updatedEmail)) {
-      CustomSnackBar.showWarning(
-        context,
-        "Please enter a valid email address.",
-      );
+    if (indexNumberValidationError.hasError) {
+      CustomSnackBar.showWarning(context, indexNumberValidationError.message);
       return;
     }
-    if (updatedIndex.isEmpty) {
-      CustomSnackBar.showWarning(context, "Index number cannot be empty.");
-      return;
-    }
+
     if (updatedSemester == null) {
       CustomSnackBar.showWarning(context, "Please select a semester.");
       return;
@@ -436,14 +402,6 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     }
 
     // Additional validations
-    RegExp indexNoRegex = RegExp(r'^EG/20\d{2}/\d{4}$');
-    if (!indexNoRegex.hasMatch(updatedIndex)) {
-      CustomSnackBar.showWarning(
-        context,
-        'Please enter a valid index number (e.g., EG/20XX/XXXX).',
-      );
-      return;
-    }
     if (int.tryParse(updatedStudentBatch) == null) {
       CustomSnackBar.showWarning(context, "Invalid student batch selected.");
       return;

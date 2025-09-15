@@ -75,11 +75,22 @@ class ForgotPasswordService {
     bool isEnableUsername,
     String username,
   ) async {
-    String endpoint =
-        '${ApiConstants.resetPasswordUrl}?email=$email&password=$password';
+    Uri uri;
     if (isEnableUsername) {
-      endpoint += '&userName=$username';
+      uri = Uri.parse(ApiConstants.resetPasswordUrl).replace(
+        queryParameters: {
+          'email': email,
+          'password': password,
+          'userName': username,
+        },
+      );
+    } else {
+      uri = Uri.parse(
+        ApiConstants.resetPasswordUrl,
+      ).replace(queryParameters: {'email': email, 'password': password});
     }
+
+    String endpoint = uri.toString();
 
     try {
       final response = await ApiService.put(endpoint, {}, context);
