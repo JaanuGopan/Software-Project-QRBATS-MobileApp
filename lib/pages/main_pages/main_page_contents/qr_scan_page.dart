@@ -167,18 +167,38 @@ class _QRCodeScanState extends State<QRCodeScan> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              const Text(
-                "Scan QR Code to Mark Attendance",
-                style: TextStyle(fontSize: 15),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: screenWidth * 0.9,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(8, 100, 148, 0.9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      "Click Scan QR Code button to scan QR Code from your camera. And you can get the lecture or event details.",
+                      style: TextStyle(fontSize: 15, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               Container(
-                width: screenWidth * 0.8,
-                margin: EdgeInsets.only(
-                  left: screenWidth * 0.07,
-                  right: screenWidth * 0.07,
+                width: double.infinity,
+                margin: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 10,
+                  bottom: 10,
                 ),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(8.0),
+                /* decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
                   border: const Border(
                     top: BorderSide(color: Color(0xFF086494), width: 1.0),
@@ -186,87 +206,127 @@ class _QRCodeScanState extends State<QRCodeScan> {
                     left: BorderSide(color: Color(0xFF086494), width: 1.0),
                     right: BorderSide(color: Color(0xFF086494), width: 1.0),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Image(
-                        image: AssetImage(
-                          "lib/assets/qrcode/barcode-scanner.png",
-                        ),
-                        height: 70,
+                ), */
+                child: isScanning
+                    ? Column(
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image(
+                                  image: const AssetImage(
+                                    "lib/assets/qrcode/barcode-scanner.png",
+                                  ),
+                                  height: screenWidth * 0.8,
+                                ),
+                              ),
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      height: screenWidth * 0.7,
+                                      width: screenWidth * 0.7,
+                                      child: QRView(
+                                        key: qrKey,
+                                        onQRViewCreated: _onQRViewCreated,
+                                        overlay: QrScannerOverlayShape(
+                                          borderColor: Color(0xFF086494),
+                                          borderRadius: 10,
+                                          borderLength: 30,
+                                          borderWidth: 10,
+                                          cutOutSize: screenWidth * 0.6,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    height: screenWidth * 0.7,
+                                    width: screenWidth * 0.7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      border: Border.all(
+                                        color: Color(0xFF086494),
+                                        width: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: screenWidth * 0.5,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await qrController?.stopCamera();
+                                setState(() {
+                                  isScanning = false;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: const Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image(
+                              image: const AssetImage(
+                                "lib/assets/qrcode/barcode-scanner.png",
+                              ),
+                              height: screenWidth * 0.8,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: screenWidth * 0.5,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _handleOpenCamera();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF086494),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: const Text(
+                                "Scan QR Code",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        _handleOpenCamera();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF086494),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      child: const Text(
-                        "Scan QR Code",
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
               ),
               const SizedBox(height: 10),
-              if (isScanning)
-                Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                          color: const Color(0xFF086494),
-                          width: 2.0,
-                        ),
-                      ),
-                      width: screenWidth * 0.8,
-                      height: screenWidth * 0.8,
-                      child: QRView(
-                        key: qrKey,
-                        onQRViewCreated: _onQRViewCreated,
-                        overlay: QrScannerOverlayShape(
-                          borderColor: Color(0xFF086494),
-                          borderRadius: 10,
-                          borderLength: 30,
-                          borderWidth: 10,
-                          cutOutSize: screenWidth * 0.7,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await qrController?.stopCamera();
-                        setState(() {
-                          isScanning = false;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(fontSize: 12, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+
               if (showQRCodeDetails && qrCodeDetails != null)
                 Column(
                   children: [
