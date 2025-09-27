@@ -1,16 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/ForgotPasswordService.dart';
+import 'package:skyticker/api/service/ForgotPasswordService.dart';
 
 void showOTPVerificationPopup(BuildContext context, String email) {
   TextEditingController OTPTextEditingController = TextEditingController();
 
   Future<void> handleVerifyOTP(
-      BuildContext context, String email, String otp) async {
+    BuildContext context,
+    String email,
+    String otp,
+  ) async {
     try {
       await ForgotPasswordService.verifyOTPForForgotPassword(
-          context, email, otp);
+        context,
+        email,
+        otp,
+      );
     } on Exception catch (e) {
       // TODO
     }
@@ -42,25 +48,25 @@ void showOTPVerificationPopup(BuildContext context, String email) {
                     const Text(
                       "The OTP is send to the email",
                       style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       email,
                       style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     TextField(
                       controller: OTPTextEditingController,
-                      decoration: const InputDecoration(
-                        hintText: "Enter OTP",
-                      ),
+                      decoration: const InputDecoration(hintText: "Enter OTP"),
                     ),
                   ],
                 ),
@@ -79,7 +85,10 @@ void showOTPVerificationPopup(BuildContext context, String email) {
                   ElevatedButton(
                     onPressed: () {
                       handleVerifyOTP(
-                          context, email, OTPTextEditingController.text);
+                        context,
+                        email,
+                        OTPTextEditingController.text,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

@@ -1,35 +1,35 @@
-name: qrbats_sp
-description: "SkyTicker App is the qr-code based attendance tracking system application for students."
+name: skyticker
+description: "A new Flutter project."
 
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
-
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.3.1 <4.0.0"
+  sdk: ^3.9.2
 
 dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.6
-  lottie: ^3.1.0
-  http: ^1.2.1
-  flutter_barcode_scanner: ^2.0.0
-  simple_barcode_scanner: ^0.1.1
-  intl: ^0.19.0
-  geolocator: ^7.7.0
-  shared_preferences: ^2.2.2
+  cupertino_icons: ^1.0.8
+  lottie: ^3.3.2
+  http: ^1.5.0
+  intl: ^0.20.2
+  geolocator: ^14.0.2
+  shared_preferences: ^2.5.3
   jwt_decoder: ^2.0.1
-  encrypt: ^5.0.0
-  logger: ^2.5.0
-  device_info_plus: 10.0.1
+  encrypt: ^5.0.3
+  logger: ^2.6.1
+  device_info_plus: ^12.1.0
+  qr_code_scanner_plus: ^2.0.10+1
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.3
-  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+
+  flutter_lints: ^5.0.0
 
 flutter_icons:
   android: true
@@ -40,7 +40,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - lib/assets/logo/logo1.png
     - lib/assets/logo/logo.png
     - lib/assets/loading/loading.json
     - lib/assets/loading/loading-carga.json

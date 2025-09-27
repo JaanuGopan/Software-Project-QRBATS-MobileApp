@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class EnrolledModuleAttendance extends StatelessWidget {
   final Module enrolledModule;
@@ -36,9 +36,10 @@ class EnrolledModuleAttendance extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text('$number',
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              '$number',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(width: 24),
             Expanded(
               child: Column(
@@ -47,7 +48,9 @@ class EnrolledModuleAttendance extends StatelessWidget {
                   Text(
                     enrolledModule.moduleCode,
                     style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
@@ -63,10 +66,7 @@ class EnrolledModuleAttendance extends StatelessWidget {
               height: 40,
               child: IconButton(
                 onPressed: () => onTap(enrolledModule),
-                icon: Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.green,
-                ),
+                icon: Icon(Icons.arrow_forward_ios, color: Colors.green),
               ),
             ),
           ],

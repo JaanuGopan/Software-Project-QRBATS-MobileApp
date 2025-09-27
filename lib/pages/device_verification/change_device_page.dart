@@ -4,10 +4,10 @@ import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/api_services/DeviceVerificationService.dart';
-import 'package:qrbats_sp/components/buttons/button_dark_large.dart';
-import 'package:qrbats_sp/components/buttons/round_button.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
+import 'package:skyticker/api/service/DeviceVerificationService.dart';
+import 'package:skyticker/components/buttons/button_dark_large.dart';
+import 'package:skyticker/components/buttons/round_button.dart';
+import 'package:skyticker/pages/login_signup_pages/login_page.dart';
 
 import '../../components/text_field/text_field.dart';
 import '../../components/texts/TextBlue.dart';
@@ -71,8 +71,9 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
         userNameHasError = true;
         userNameError = "Please Enter UserName.";
       });
-    } else if (!RegExp(r'^[a-zA-Z0-9]+$')
-        .hasMatch(_userNameTextController.text)) {
+    } else if (!RegExp(
+      r'^[a-zA-Z0-9]+$',
+    ).hasMatch(_userNameTextController.text)) {
       setState(() {
         userNameHasError = true;
         userNameError = "User name should not include special characters.";
@@ -143,9 +144,11 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
   void navigateToLoginPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return const Login();
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return const Login();
+        },
+      ),
     );
   }
 
@@ -154,11 +157,11 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
       var deviceInfo = DeviceInfoPlugin();
 
       if (kIsWeb) {
-        print("Running on Web - Device ID not available");
+        debugPrint("Running on Web - Device ID not available");
         return "Web_Device"; // Placeholder value for web
       } else if (Platform.isAndroid) {
         var androidInfo = await deviceInfo.androidInfo;
-        print("Android ID: " + androidInfo.id);
+        debugPrint("Android ID: " + androidInfo.id);
         return androidInfo.id; // Unique Android ID
       } else if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
@@ -182,7 +185,9 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(email)) {
       CustomSnackBar.showWarning(
-          context, "Please Enter a Valid Email Address.");
+        context,
+        "Please Enter a Valid Email Address.",
+      );
     }
 
     if (_userNameTextController.text == "") {
@@ -191,12 +196,16 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
     }
     if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(_userNameTextController.text)) {
       CustomSnackBar.showWarning(
-          context, "User name should not include special characters.");
+        context,
+        "User name should not include special characters.",
+      );
       return;
     }
     if (_userNameTextController.text.length < 6) {
       CustomSnackBar.showWarning(
-          context, "User name should be at least 6 characters long.");
+        context,
+        "User name should be at least 6 characters long.",
+      );
       return;
     }
     if (_password.text == "") {
@@ -209,8 +218,13 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
         _isOTPSend = false;
       });
       String? deviceId = await getDeviceId();
-      await DeviceVerificationService.sendOTPForDeviceVerification(context,
-          email, _userNameTextController.text, _password.text, deviceId);
+      await DeviceVerificationService.sendOTPForDeviceVerification(
+        context,
+        email,
+        _userNameTextController.text,
+        _password.text,
+        deviceId,
+      );
     } finally {
       setState(() {
         _isOTPSend = true;
@@ -233,8 +247,11 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                   children: [
                     const SizedBox(height: 20),
                     const Center(
-                        child: TextBlue(
-                            text: "Device Verification", fontSize: 30)),
+                      child: TextBlue(
+                        text: "Device Verification",
+                        fontSize: 30,
+                      ),
+                    ),
                     const SizedBox(height: 30),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -245,17 +262,22 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                             child: Center(
                               child: Text(
                                 "Please enter your account email address, username and password. You will receive an OTP to that email, and once verified, your device will be linked to your account.",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(
-                                  text: "Email Address", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(
+                              text: "Email Address",
+                              fontSize: 15,
+                            ),
+                          ),
                           const SizedBox(height: 10),
                           MyTextField(
                             controller: _emailController,
@@ -268,8 +290,9 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Username", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Username", fontSize: 15),
+                          ),
                           const SizedBox(height: 10),
                           MyTextField(
                             controller: _userNameTextController,
@@ -282,8 +305,9 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                           ),
                           const SizedBox(height: 10),
                           const Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextBlue(text: "Password", fontSize: 15)),
+                            alignment: Alignment.centerLeft,
+                            child: TextBlue(text: "Password", fontSize: 15),
+                          ),
                           const SizedBox(height: 10),
                           MyTextField(
                             controller: _password,
@@ -320,8 +344,10 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
           Positioned(
             top: 20,
             left: 20,
-            child:
-                RoundButton(onTap: navigateToLoginPage, icon: Icons.arrow_back),
+            child: RoundButton(
+              onTap: navigateToLoginPage,
+              icon: Icons.arrow_back,
+            ),
           ),
           if (_showWarningPopup)
             Stack(
@@ -330,9 +356,7 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                   color: Colors.black.withOpacity(0.5), // Dim background
                   dismissible: false, // Prevent dismiss by tapping outside
                 ),
-                Center(
-                  child: _showDeviceVerificationPopup(context),
-                ),
+                Center(child: _showDeviceVerificationPopup(context)),
               ],
             ),
         ],
@@ -366,7 +390,9 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
                   child: Text(
                     "Device Verification Warning",
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.red),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
                 ),
               ),

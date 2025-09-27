@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qrbats_sp/components/logout_popup/logout_popup.dart';
-import 'package:qrbats_sp/pages/getStart_page.dart';
-import 'package:qrbats_sp/pages/main_pages/main_page_contents/attendance_history_page.dart';
-import 'package:qrbats_sp/pages/main_pages/main_page_contents/module_page.dart';
-import 'package:qrbats_sp/pages/main_pages/main_page_contents/profile_setting_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skyticker/components/logout_popup/logout_popup.dart';
+import 'package:skyticker/pages/getStart_page.dart';
+import 'package:skyticker/pages/main_pages/main_page_contents/attendance_history_page.dart';
+import 'package:skyticker/pages/main_pages/main_page_contents/module_page.dart';
+import 'package:skyticker/pages/main_pages/main_page_contents/profile_setting_page.dart';
 
 import 'main_page_contents/home_page.dart';
 import 'main_page_contents/qr_scan_page.dart';
@@ -15,7 +15,7 @@ class MainPage extends StatefulWidget {
   final int pageIndex;
   final String token;
   const MainPage({Key? key, this.pageIndex = 2, this.token = ""})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -78,10 +78,7 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
           leading: IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer();
             },
@@ -91,17 +88,14 @@ class _MainPageState extends State<MainPage> {
               onPressed: () {
                 showLogoutPopup(context, () => _logout());
               },
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.logout, color: Colors.white),
             ),
           ],
         ),
         drawer: _drawerWidget(context),
         endDrawer: const Drawer(
-            // Add content for endDrawer
-            ),
+          // Add content for endDrawer
+        ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           selectedItemColor: const Color(0xFF086494),
@@ -112,10 +106,7 @@ class _MainPageState extends State<MainPage> {
             });
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.school_outlined),
               label: 'Module',
@@ -145,9 +136,7 @@ class _MainPageState extends State<MainPage> {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color(0xFF086494),
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF086494)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -165,10 +154,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Text(
                   userName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ],
             ),
@@ -242,13 +228,15 @@ class _MainPageState extends State<MainPage> {
                                       'Contact us: ',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          fontWeight: FontWeight.normal),
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
                                     Text(
                                       'skyticker.uor@gmail.com',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -282,8 +270,10 @@ class _MainPageState extends State<MainPage> {
               color: Color(0xFF086494),
               size: 35,
             ),
-            title: const Text('Logout',
-                style: TextStyle(color: Color(0xFF086494), fontSize: 20)),
+            title: const Text(
+              'Logout',
+              style: TextStyle(color: Color(0xFF086494), fontSize: 20),
+            ),
             onTap: () {
               showLogoutPopup(context, () => _logout());
             },

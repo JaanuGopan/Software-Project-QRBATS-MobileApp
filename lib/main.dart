@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qrbats_sp/pages/main_pages/main_page.dart';
-import 'package:qrbats_sp/pages/starting_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:skyticker/pages/main_pages/main_page.dart';
+import 'package:skyticker/pages/starting_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
-  runApp(MyApp(token: preferences.getString("token"),));
+  runApp(MyApp(token: preferences.getString("token")));
 }
 
 class MyApp extends StatelessWidget {
@@ -22,9 +21,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Sky Ticker',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: ThemeData(primarySwatch: Colors.blue),
         initialRoute: '/',
         routes: {
           '/': (context) {

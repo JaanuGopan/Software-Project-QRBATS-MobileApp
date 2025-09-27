@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
-import 'package:qrbats_sp/api_services/LectureService.dart';
-import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
-import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart';
+import 'package:skyticker/api/service/LectureAttendanceService.dart';
+import 'package:skyticker/api/service/LectureService.dart';
+import 'package:skyticker/components/mark_attendance/MarkAttendancePopup.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
+import 'package:skyticker/models/Lecture.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class ModuleEnrolledContent extends StatefulWidget {
   final Module module;
@@ -32,7 +32,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   int processingLectureId = -1;
 
   Future<void> _fetchLecturesByModuleCode(
-      BuildContext context, int moduleId) async {
+    BuildContext context,
+    int moduleId,
+  ) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
@@ -62,8 +64,10 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
         showLecturesList = !showLecturesList;
       });
     } else {
-      CustomSnackBar.showError(context,
-          "There Are No Any Lectures For This Module ${widget.module.moduleCode}");
+      CustomSnackBar.showError(
+        context,
+        "There Are No Any Lectures For This Module ${widget.module.moduleCode}",
+      );
     }
   }
 
@@ -88,14 +92,17 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
       }
       if (permission == LocationPermission.deniedForever) {
         CustomSnackBar.showError(
-            context, 'Location permission permanently denied.');
+          context,
+          'Location permission permanently denied.',
+        );
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: const Duration(
-            seconds: 10), // Add a timeout to avoid waiting indefinitely
+          seconds: 10,
+        ), // Add a timeout to avoid waiting indefinitely
       );
 
       setState(() {
@@ -130,11 +137,19 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
     }
   }
 
-  Future<void> markLectureAttendance(int lectureId, double latitude,
-      double longitude, BuildContext context) async {
+  Future<void> markLectureAttendance(
+    int lectureId,
+    double latitude,
+    double longitude,
+    BuildContext context,
+  ) async {
     bool isCloseDetails =
         await LectureAttendanceService.markLectureAttendanceByLectureId(
-            lectureId, latitude, longitude, context);
+          lectureId,
+          latitude,
+          longitude,
+          context,
+        );
     if (isCloseDetails) {
       setState(() {
         // Refresh the state if necessary
@@ -168,8 +183,10 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
             Row(
               children: [
                 const SizedBox(width: 10),
-                Text(widget.number.toString(),
-                    style: TextStyle(fontSize: _getFontSize(screenWidth))),
+                Text(
+                  widget.number.toString(),
+                  style: TextStyle(fontSize: _getFontSize(screenWidth)),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -178,16 +195,17 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                       Text(
                         widget.module.moduleCode,
                         style: TextStyle(
-                            fontSize: _getFontSize(screenWidth),
-                            fontWeight: FontWeight.bold),
+                          fontSize: _getFontSize(screenWidth),
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         widget.module.moduleName,
                         style: TextStyle(
-                            fontSize:
-                                _getFontSize(screenWidth, isSubtext: true),
-                            color: Colors.grey),
+                          fontSize: _getFontSize(screenWidth, isSubtext: true),
+                          color: Colors.grey,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -215,18 +233,16 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
   Widget _buildLectureList() {
     return isLecturesLoading
         ? const Center(
-            child: CircularProgressIndicator(
-              color: Color(0xFF086494),
-            ),
+            child: CircularProgressIndicator(color: Color(0xFF086494)),
           )
         : errorMessage.isNotEmpty
-            ? Center(child: Text(errorMessage))
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: lectures
-                    .map((lecture) => _buildLectureRow(context, lecture))
-                    .toList(),
-              );
+        ? Center(child: Text(errorMessage))
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: lectures
+                .map((lecture) => _buildLectureRow(context, lecture))
+                .toList(),
+          );
   }
 
   Widget _buildLectureRow(BuildContext context, Lecture lecture) {
@@ -257,14 +273,13 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                 Text(
                   "${lectures.indexOf(lecture) + 1}.",
                   style: TextStyle(
-                      fontSize: _getFontSize(screenWidth, isSubtext: true),
-                      color: Colors.black),
+                    fontSize: _getFontSize(screenWidth, isSubtext: true),
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(
-              width: 15,
-            ),
+            const SizedBox(width: 15),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,41 +287,46 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                   Text(
                     lecture.name,
                     style: TextStyle(
-                        fontSize: _getFontSize(screenWidth),
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
+                      fontSize: _getFontSize(screenWidth),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Date: ${DateFormat('yyyy-MM-dd').format(lecture.lectureDate)}",
                     style: TextStyle(
-                        fontSize: _getFontSize(screenWidth, isSubtext: true),
-                        color: Colors.black),
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.black,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Start Time: ${timeFormat.format(lecture.lectureStartTime)}",
                     style: TextStyle(
-                        fontSize: _getFontSize(screenWidth, isSubtext: true),
-                        color: Colors.black),
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.black,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "End Time: ${timeFormat.format(lecture.lectureEndTime)}",
                     style: TextStyle(
-                        fontSize: _getFontSize(screenWidth, isSubtext: true),
-                        color: Colors.black),
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.black,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Venue: ${lecture.locationName}",
                     style: TextStyle(
-                        fontSize: _getFontSize(screenWidth, isSubtext: true),
-                        color: Colors.black),
+                      fontSize: _getFontSize(screenWidth, isSubtext: true),
+                      color: Colors.black,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -322,8 +342,11 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         color: Color(0xFF086494),
                       ) // Show progress indicator when processing
                     : ElevatedButton(
-                        onPressed: () => markAttendancePopup(context,
-                            () => _handleMarkAttendance(lecture.id), lecture),
+                        onPressed: () => markAttendancePopup(
+                          context,
+                          () => _handleMarkAttendance(lecture.id),
+                          lecture,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
@@ -333,8 +356,9 @@ class _ModuleEnrolledContentState extends State<ModuleEnrolledContent> {
                         child: Text(
                           "Attend",
                           style: TextStyle(
-                              fontSize: _getFontSize(screenWidth),
-                              color: Colors.white),
+                            fontSize: _getFontSize(screenWidth),
+                            color: Colors.white,
+                          ),
                         ),
                       ),
               ],

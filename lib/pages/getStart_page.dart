@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/pages/login_signup_pages/login_page.dart';
+import 'package:skyticker/pages/login_signup_pages/login_page.dart';
 
 class OpeningPage extends StatefulWidget {
   const OpeningPage({super.key});
@@ -10,9 +10,14 @@ class OpeningPage extends StatefulWidget {
 
 class _OpeningPageState extends State<OpeningPage> {
   void getStart() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return const Login();
-    }));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const Login();
+        },
+      ),
+    );
   }
 
   @override
@@ -24,9 +29,7 @@ class _OpeningPageState extends State<OpeningPage> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: screenHeight,
-          ),
+          constraints: BoxConstraints(minHeight: screenHeight),
           child: IntrinsicHeight(
             child: Column(
               children: [
@@ -41,9 +44,7 @@ class _OpeningPageState extends State<OpeningPage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: screenHeight * 0.02,
-                ),
+                SizedBox(height: screenHeight * 0.02),
                 Image(
                   image: const AssetImage("lib/assets/logo/logo.png"),
                   height: screenHeight * 0.3,
@@ -77,30 +78,30 @@ class _OpeningPageState extends State<OpeningPage> {
                           ),
                         ),
                         OutlinedButton(
-                            onPressed: () {
-                              getStart();
-                            },
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
+                          onPressed: () {
+                            getStart();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: const Text(
-                              "Get Start",
-                              style: TextStyle(
-                                  color: Color(0xFF086494),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
-                            )),
+                          ),
+                          child: const Text(
+                            "Get Start",
+                            style: TextStyle(
+                              color: Color(0xFF086494),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
               ],
             ),
           ),

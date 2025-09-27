@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/components/modulecomponents/ModuleEnrolmentPopup.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
+import 'package:skyticker/components/modulecomponents/ModuleEnrolmentPopup.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
 
 class ModuleEnrollContent extends StatelessWidget {
   final Module module;
@@ -81,11 +81,11 @@ class ModuleEnrollContent extends StatelessWidget {
           ),
           IconButton(
             onPressed: () => showEnrollmentDialog(
-                context, (key) => onClick(module.id, key), module),
-            icon: Icon(
-              Icons.add_circle_outline_outlined,
-              color: Colors.green,
+              context,
+              (key) => onClick(module.id, key),
+              module,
             ),
+            icon: Icon(Icons.add_circle_outline_outlined, color: Colors.green),
           ),
         ],
       ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:qrbats_sp/models/QRCodeDetails.dart';
+import 'package:skyticker/models/QRCodeDetails.dart';
 
 void markEventAttendancePopup(
-    BuildContext context, Function markAttendance, EventQRCodeDetails event) {
+  BuildContext context,
+  Function markAttendance,
+  EventQRCodeDetails event,
+) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -15,10 +18,11 @@ void markEventAttendancePopup(
             children: [
               const ListTile(
                 title: Center(
-                    child: Text(
-                  "Mark Attendance",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                )),
+                  child: Text(
+                    "Mark Attendance",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -29,34 +33,43 @@ void markEventAttendancePopup(
                       Text(
                         event.eventName,
                         style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Date : ${event.eventDate}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Start Time : ${event.eventTime}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "End Time : ${event.eventEndTime}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Venue : ${event.eventVenue}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),

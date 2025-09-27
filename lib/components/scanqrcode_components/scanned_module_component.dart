@@ -1,21 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:qrbats_sp/api_services/LectureAttendanceService.dart';
-import 'package:qrbats_sp/api_services/LectureService.dart';
-import 'package:qrbats_sp/components/mark_attendance/MarkAttendancePopup.dart';
-import 'package:qrbats_sp/models/EnrolledModule.dart';
-import 'package:qrbats_sp/models/Lecture.dart';
-import 'package:qrbats_sp/utils/LocationUtils.dart';
-import 'package:qrbats_sp/widgets/snackbar/custom_snackbar.dart'; // Add this import for formatting time
+import 'package:skyticker/api/service/LectureAttendanceService.dart';
+import 'package:skyticker/api/service/LectureService.dart';
+import 'package:skyticker/components/mark_attendance/MarkAttendancePopup.dart';
+import 'package:skyticker/models/EnrolledModule.dart';
+import 'package:skyticker/models/Lecture.dart';
+import 'package:skyticker/utils/LocationUtils.dart';
+import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class ScannedModule extends StatefulWidget {
   final Module module;
 
-  const ScannedModule({
-    super.key,
-    required this.module,
-  });
+  const ScannedModule({super.key, required this.module});
 
   @override
   State<ScannedModule> createState() => _ScannedModuleState();
@@ -30,7 +27,9 @@ class _ScannedModuleState extends State<ScannedModule> {
   int processingLectureId = -1;
 
   Future<void> _fetchLecturesByModuleCode(
-      BuildContext context, int moduleId) async {
+    BuildContext context,
+    int moduleId,
+  ) async {
     setState(() {
       isLecturesLoading = true;
       errorMessage = "";
@@ -66,8 +65,10 @@ class _ScannedModuleState extends State<ScannedModule> {
         showLecturesList = !showLecturesList;
       });
     } else {
-      CustomSnackBar.showError(context,
-          "There Are No Any upcoming Lectures For This Module ${widget.module.moduleCode}");
+      CustomSnackBar.showError(
+        context,
+        "There Are No Any upcoming Lectures For This Module ${widget.module.moduleCode}",
+      );
     }
   }
 
@@ -79,16 +80,24 @@ class _ScannedModuleState extends State<ScannedModule> {
     try {
       bool isPermissionGranted = await LocationUtils.checkPermissions();
       if (isPermissionGranted) {
-        await LocationUtils.getLocation().then((position) async {
-          await markLectureAttendance(
-              lectureId, position.latitude, position.longitude, context);
-        }).catchError((error) {
-          debugPrint('Error getting location: $error');
-          CustomSnackBar.showError(context, 'Error in getting location.');
-        });
+        await LocationUtils.getLocation()
+            .then((position) async {
+              await markLectureAttendance(
+                lectureId,
+                position.latitude,
+                position.longitude,
+                context,
+              );
+            })
+            .catchError((error) {
+              debugPrint('Error getting location: $error');
+              CustomSnackBar.showError(context, 'Error in getting location.');
+            });
       } else {
         CustomSnackBar.showError(
-            context, 'Location permission is required to mark attendance.');
+          context,
+          'Location permission is required to mark attendance.',
+        );
       }
     } finally {
       setState(() {
@@ -98,11 +107,19 @@ class _ScannedModuleState extends State<ScannedModule> {
     }
   }
 
-  Future<void> markLectureAttendance(int lectureId, double latitude,
-      double longitude, BuildContext context) async {
+  Future<void> markLectureAttendance(
+    int lectureId,
+    double latitude,
+    double longitude,
+    BuildContext context,
+  ) async {
     bool isCloseDetails =
         await LectureAttendanceService.markLectureAttendanceByLectureId(
-            lectureId, latitude, longitude, context);
+          lectureId,
+          latitude,
+          longitude,
+          context,
+        );
     if (isCloseDetails) {
       setState(() {
         // Refresh the state if necessary
@@ -140,22 +157,28 @@ class _ScannedModuleState extends State<ScannedModule> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width *
+                      width:
+                          MediaQuery.of(context).size.width *
                           0.6, // Adjust the width as needed
                       child: Text(
                         widget.module.moduleCode,
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width *
+                      width:
+                          MediaQuery.of(context).size.width *
                           0.6, // Adjust the width as needed
                       child: Text(
                         widget.module.moduleName,
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -183,18 +206,16 @@ class _ScannedModuleState extends State<ScannedModule> {
   Widget _buildLectureList() {
     return isLecturesLoading
         ? const Center(
-            child: CircularProgressIndicator(
-              color: Color(0xFF086494),
-            ),
+            child: CircularProgressIndicator(color: Color(0xFF086494)),
           )
         : errorMessage.isNotEmpty
-            ? Center(child: Text(errorMessage))
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: lectures
-                    .map((lecture) => _buildLectureRow(context, lecture))
-                    .toList(),
-              );
+        ? Center(child: Text(errorMessage))
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: lectures
+                .map((lecture) => _buildLectureRow(context, lecture))
+                .toList(),
+          );
   }
 
   Widget _buildLectureRow(BuildContext context, Lecture lecture) {
@@ -231,9 +252,10 @@ class _ScannedModuleState extends State<ScannedModule> {
                   Text(
                     lecture.name,
                     style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
@@ -263,8 +285,11 @@ class _ScannedModuleState extends State<ScannedModule> {
                         color: Color(0xFF086494),
                       ) // Show CircularProgressIndicator if processing
                     : ElevatedButton(
-                        onPressed: () => markAttendancePopup(context,
-                            () => _handleMarkAttendance(lecture.id), lecture),
+                        onPressed: () => markAttendancePopup(
+                          context,
+                          () => _handleMarkAttendance(lecture.id),
+                          lecture,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
