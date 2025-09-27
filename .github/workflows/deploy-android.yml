@@ -1,0 +1,41 @@
+name: SkyTicker Android Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: 🤖 Android Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - run: flutter pub get
+
+      # Build APK
+      - run: flutter build apk --release
+
+      # Or build AppBundle (for Play Store)
+      - run: flutter build appbundle --release
+
+      - name: Upload APK to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/app/outputs/flutter-apk/app-release.apk
+          tag: v1.0
+          overwrite: true
+          body: "This is the first Android release"
+
+      - name: Upload AAB to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/app/outputs/bundle/release/app-release.aab
+          tag: v1.0
+          overwrite: true
+          body: "This is the first Android release (Play Store bundle)"
