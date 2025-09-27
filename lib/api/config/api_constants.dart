@@ -2,7 +2,7 @@ class ApiConstants {
   static const String facultyHostedNgrokIp =
       'https://redfish-real-directly.ngrok-free.app';
   static const String facultyLocalIp = 'http://10.50.227.44:8080';
-  static const String devIp1 = 'http://192.168.43.136:8080';
+  static const String devIp1 = 'http://192.168.1.11:8080';
   static const String devIp2 = 'http://localhost:8080';
   static const String facultyHostedIp = 'http://192.248.50.239:8080';
   static const String facultyHostedIp2 = 'http://192.248.50.239';

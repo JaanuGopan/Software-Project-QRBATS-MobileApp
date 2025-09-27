@@ -14,9 +14,17 @@ class DeviceVerificationService {
     String password,
     String? deviceId,
   ) async {
-    final String endpoint =
-        '/api/v1/auth/send-otp-for-device-verification?email=$email&username=$username&password=$password&deviceId=$deviceId';
+    final uri = Uri.parse('/api/v1/auth/send-otp-for-device-verification')
+        .replace(
+          queryParameters: {
+            'email': email,
+            'password': password,
+            'username': username,
+            'deviceId': deviceId,
+          },
+        );
 
+    String endpoint = uri.toString();
     try {
       final response = await ApiService.post(endpoint, {}, context);
 

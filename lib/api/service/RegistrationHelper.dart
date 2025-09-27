@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:skyticker/api/config/api_constants.dart';
 import 'package:skyticker/api/config/api_service.dart';
@@ -8,8 +6,6 @@ import 'package:skyticker/widgets/snackbar/custom_snackbar.dart';
 
 class RegistrationHelper {
   static const String studentRegisterEndpoint = ApiConstants.studentRegister;
-  static const String checkStudentUserNameEndpoint =
-      ApiConstants.checkStudentUserNameEndpoint;
 
   static Future<void> register(
     BuildContext context,
@@ -45,47 +41,24 @@ class RegistrationHelper {
     };
 
     try {
-      // Use ApiService for checking username
-      final checkUserNameResponse = await ApiService.post(
-        '$checkStudentUserNameEndpoint?userName=$username',
-        {},
+      final registerResponse = await ApiService.post(
+        studentRegisterEndpoint,
+        userData,
         context,
       );
 
-      if (checkUserNameResponse != null &&
-          checkUserNameResponse.statusCode == 200) {
-        final bool usernameExists = jsonDecode(checkUserNameResponse.body);
-        if (!usernameExists) {
-          // Use ApiService for registration
-          final registerResponse = await ApiService.post(
-            studentRegisterEndpoint,
-            userData,
-            context,
-          );
-
-          if (registerResponse != null && registerResponse.statusCode == 200) {
-            CustomSnackBar.showSuccess(
-              context,
-              "Account Successfully Created, Please Login Your Account.",
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Login()),
-            );
-          } else {
-            // Registration failed
-            CustomSnackBar.showError(context, 'Registration failed.');
-          }
-        } else {
-          // Username already exists, show snackbar
-          CustomSnackBar.showWarning(context, 'The User Name already exists.');
-        }
-      } else {
-        // Handle error if failed to check username
-        CustomSnackBar.showError(
+      if (registerResponse != null && registerResponse.statusCode == 200) {
+        CustomSnackBar.showSuccess(
           context,
-          'Failed to check username availability.',
+          "Account Successfully Created, Please Login Your Account.",
         );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Login()),
+        );
+      } else {
+        // Registration failed
+        CustomSnackBar.showError(context, 'Registration failed.');
       }
     } catch (error) {
       // Catch any errors that occur during the HTTP request

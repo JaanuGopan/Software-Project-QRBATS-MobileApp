@@ -157,11 +157,11 @@ class _ChangeDevicePageState extends State<ChangeDevicePage> {
       var deviceInfo = DeviceInfoPlugin();
 
       if (kIsWeb) {
-        print("Running on Web - Device ID not available");
+        debugPrint("Running on Web - Device ID not available");
         return "Web_Device"; // Placeholder value for web
       } else if (Platform.isAndroid) {
         var androidInfo = await deviceInfo.androidInfo;
-        print("Android ID: " + androidInfo.id);
+        debugPrint("Android ID: " + androidInfo.id);
         return androidInfo.id; // Unique Android ID
       } else if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
