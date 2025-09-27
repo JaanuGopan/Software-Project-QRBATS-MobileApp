@@ -1,0 +1,23 @@
+name: SkyTicker macOS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: 🖥️ macOS Build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - run: flutter pub get
+      - run: flutter build macos --release
+
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: build/macos/Build/Products/Release
